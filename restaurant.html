@@ -32,7 +32,7 @@
         div.style.padding = "10px";
 
         div.innerHTML = `
-          <strong>下单时间：</strong> ${order.created_at}<br>
+          <strong>下单时间：</strong> ${new Date(order.created_at).toLocaleString("zh-CN")}<br>
           <strong>内容：</strong><br>
           <ul>
             ${order.items.map(item => 
@@ -60,7 +60,7 @@
     }
 
     loadOrders();
-    setInterval(loadOrders, 30000); // 自动刷新每30秒
+    setInterval(loadOrders, 3); // 自动刷新每3秒
   </script>
 </body>
 </html>
