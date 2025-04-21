@@ -7,12 +7,48 @@
 <body>
   <h2>📋 当前新订单</h2>
   <div id="orders"></div>
-  <button onclick="loadOrders()">🔄 刷新订单</button>
+  <button onclick="loadOrders()">🔄 手动刷新订单</button>
 
   <script>
+    // ✅ 管理员密码验证（防止非工作人员访问）
+    const adminPassword = "88888888";  // 改成你自己的密码
+    const input = prompt("请输入管理员密码：");
+    if (input !== adminPassword) {
+      alert("密码错误！即将离开...");
+      window.location.href = "https://www.baidu.com";
+    }
+
     const SUPABASE_URL = "https://fdbcypvxuikhmxvyyvmb.supabase.co";
     const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkYmN5cHZ4dWlraG14dnl5dm1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjY5MzUsImV4cCI6MjA2MDg0MjkzNX0.Ju8wyqBS1irCWgtpBT_RanrqVErQt-gQkWdzb69XMr4";
 
+    // ✅ 记录上一次订单的 ID 集合
+    let lastOrderIds = new Set();
+
+    async function loadOrdersIfChanged() {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/orders?status=eq.新订单&select=id&order=created_at.desc`, {
+        headers: {
+          apikey: API_KEY,
+          Authorization: `Bearer ${API_KEY}`
+        }
+      });
+      const orders = await res.json();
+      const currentIds = new Set(orders.map(o => o.id));
+
+      let changed = false;
+      if (currentIds.size !== lastOrderIds.size || [...currentIds].some(id => !lastOrderIds.has(id))) {
+        changed = true;
+        lastOrderIds = currentIds;
+      }
+
+      if (changed) {
+        console.log("🆕 有新订单，刷新列表！");
+        loadOrders();
+      } else {
+        console.log("✅ 没有新订单，跳过刷新");
+      }
+    }
+
+    // ✅ 真正加载并渲染订单内容
     async function loadOrders() {
       const res = await fetch(`${SUPABASE_URL}/rest/v1/orders?status=eq.新订单&order=created_at.desc`, {
         headers: {
@@ -21,7 +57,6 @@
         }
       });
       const orders = await res.json();
-
       const container = document.getElementById("orders");
       container.innerHTML = "";
 
@@ -46,6 +81,7 @@
       });
     }
 
+    // ✅ 标记订单为已打印
     async function markPrinted(id) {
       await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${id}`, {
         method: "PATCH",
@@ -59,15 +95,16 @@
       loadOrders(); // 刷新列表
     }
 
+    // ✅ 控制自动轮询：页面可见时才请求
     let intervalId = null;
 
     function startPolling() {
       if (!intervalId) {
-        intervalId = setInterval(loadOrders, 30000);
+        intervalId = setInterval(loadOrdersIfChanged, 30000); // 每30秒查一次是否有新订单
         console.log("✅ 开始轮询");
       }
     }
-    
+
     function stopPolling() {
       if (intervalId) {
         clearInterval(intervalId);
@@ -75,7 +112,7 @@
         console.log("⏸️ 停止轮询");
       }
     }
-    
+
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") {
         loadOrders();
@@ -84,10 +121,9 @@
         stopPolling();
       }
     });
-    
+
     loadOrders();
     startPolling();
-
   </script>
 </body>
 </html>
