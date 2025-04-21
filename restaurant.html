@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>餐厅订单管理</title>
+</head>
+<body>
+  <h2>📋 当前新订单</h2>
+  <div id="orders"></div>
+  <button onclick="loadOrders()">🔄 刷新订单</button>
+
+  <script>
+    const SUPABASE_URL = "https://fdbcypvxuikhmxvyyvmb.supabase.co";
+    const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkYmN5cHZ4dWlraG14dnl5dm1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjY5MzUsImV4cCI6MjA2MDg0MjkzNX0.Ju8wyqBS1irCWgtpBT_RanrqVErQt-gQkWdzb69XMr4";
+
+    async function loadOrders() {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/orders?status=eq.新订单&order=created_at.desc`, {
+        headers: {
+          apikey: API_KEY,
+          Authorization: `Bearer ${API_KEY}`
+        }
+      });
+      const orders = await res.json();
+
+      const container = document.getElementById("orders");
+      container.innerHTML = "";
+
+      orders.forEach(order => {
+        const div = document.createElement("div");
+        div.style.border = "1px solid #ccc";
+        div.style.margin = "10px";
+        div.style.padding = "10px";
+
+        div.innerHTML = `
+          <strong>下单时间：</strong> ${order.created_at}<br>
+          <strong>内容：</strong><pre>${JSON.stringify(order.items, null, 2)}</pre>
+          <strong>备注：</strong> ${order.notes || "无"}<br>
+          <button onclick="markPrinted('${order.id}')">✅ 标记为已打印</button>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    async function markPrinted(id) {
+      await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${id}`, {
+        method: "PATCH",
+        headers: {
+          apikey: API_KEY,
+          Authorization: `Bearer ${API_KEY}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ status: "已打印" })
+      });
+      loadOrders(); // 刷新列表
+    }
+
+    loadOrders();
+    setInterval(loadOrders, 30000); // 自动刷新每30秒
+  </script>
+</body>
+</html>
