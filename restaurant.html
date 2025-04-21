@@ -33,7 +33,12 @@
 
         div.innerHTML = `
           <strong>下单时间：</strong> ${order.created_at}<br>
-          <strong>内容：</strong><pre>${JSON.stringify(order.items, null, 2)}</pre>
+          <strong>内容：</strong><br>
+          <ul>
+            ${order.items.map(item => 
+              `<li>📦 ${item.name} ×${item.qty} = ￥${item.qty * item.price}</li>`
+            ).join("")}
+          </ul>
           <strong>备注：</strong> ${order.notes || "无"}<br>
           <button onclick="markPrinted('${order.id}')">✅ 标记为已打印</button>
         `;
