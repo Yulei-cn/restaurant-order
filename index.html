@@ -2,34 +2,87 @@
 <html lang="zh">
 <head>
   <meta charset="UTF-8">
-  <title>点餐系统</title>
+  <title>小包子点餐</title>
+  <style>
+    body {
+      font-family: "Arial", sans-serif;
+      background: #f9f9f9;
+      padding: 20px;
+      max-width: 480px;
+      margin: auto;
+    }
+    h1 {
+      text-align: center;
+      font-size: 28px;
+    }
+    .menu-item {
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin-bottom: 12px;
+      border-radius: 8px;
+      background: white;
+    }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+    input[type=number] {
+      width: 100%;
+      padding: 6px;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    input[type=text] {
+      width: 100%;
+      padding: 6px;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 18px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    #result {
+      margin-top: 10px;
+      text-align: center;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-  <h2>点餐系统 - 餐厅下单页面</h2>
-
+  <h1>🥟 小包子点餐</h1>
   <form id="orderForm">
-    <label>包子1 数量：</label>
-    <input type="number" name="baozi1" value="0" min="0"><br><br>
+    <div class="menu-item">
+      <label>包子1（￥10）</label>
+      <input type="number" name="baozi1" value="0" min="0">
+    </div>
 
-    <label>包子2 数量：</label>
-    <input type="number" name="baozi2" value="0" min="0"><br><br>
+    <div class="menu-item">
+      <label>包子2（￥12）</label>
+      <input type="number" name="baozi2" value="0" min="0">
+    </div>
 
-    <label>备注：</label>
-    <input type="text" name="notes"><br><br>
+    <label>备注（可选）</label>
+    <input type="text" name="notes" placeholder="比如：不要辣、打包等">
 
-    <button type="submit">提交订单</button>
+    <button type="submit">✅ 提交订单</button>
   </form>
 
   <p id="result"></p>
 
-  <!-- 一定要放在页面结尾！ -->
   <script>
     const SUPABASE_URL = "https://fdbcypvxuikhmxvyyvmb.supabase.co";
     const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkYmN5cHZ4dWlraG14dnl5dm1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjY5MzUsImV4cCI6MjA2MDg0MjkzNX0.Ju8wyqBS1irCWgtpBT_RanrqVErQt-gQkWdzb69XMr4";
 
     document.getElementById("orderForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-
       const form = e.target;
       const qty1 = parseInt(form.baozi1.value);
       const qty2 = parseInt(form.baozi2.value);
@@ -39,9 +92,14 @@
       if (qty1 > 0) items.push({ name: "包子1", qty: qty1, price: 10 });
       if (qty2 > 0) items.push({ name: "包子2", qty: qty2, price: 12 });
 
+      if (items.length === 0) {
+        document.getElementById("result").textContent = "⚠️ 请至少选择一种包子";
+        return;
+      }
+
       const data = {
-        items,
-        notes,
+        items: items,
+        notes: notes,
         status: "新订单"
       };
 
@@ -57,7 +115,8 @@
       });
 
       if (res.ok) {
-        document.getElementById("result").textContent = "✅ 下单成功！";
+        document.getElementById("result").textContent = "✅ 下单成功，感谢光临！";
+        form.reset();
       } else {
         const err = await res.text();
         document.getElementById("result").textContent = "❌ 下单失败：" + err;
