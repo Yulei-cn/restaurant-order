@@ -25,6 +25,21 @@
     h1 {
       text-align: center;
       font-size: 28px;
+      margin-bottom: 5px;
+    }
+    .subtitle {
+      text-align: center;
+      font-size: 14px;
+      margin-bottom: 15px;
+      color: #555;
+    }
+    .info-block {
+      background: #fff8dc;
+      border: 1px dashed #999;
+      padding: 10px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      font-size: 14px;
     }
     .menu-item {
       border: 1px solid #ddd;
@@ -44,17 +59,12 @@
     .menu-info {
       flex: 1;
     }
-    input[type=number] {
-      width: 100%;
-      padding: 6px;
-      font-size: 16px;
-      margin-top: 6px;
-    }
+    input[type=number],
     input[type=text] {
       width: 100%;
       padding: 6px;
       font-size: 14px;
-      margin-top: 10px;
+      margin-top: 6px;
     }
     button[type=submit] {
       width: 100%;
@@ -81,6 +91,12 @@
   </div>
 
   <h1 id="title">🥟 Petit Baozi - Commande</h1>
+  <div class="subtitle">7 Rue Blanche, 75009 Paris</div>
+
+  <div class="info-block" id="infoBox">
+    ⏰ Heures d'ouverture : 11h30-14h30, 18h00-22h00<br>
+    📞 Contact : +33 1 23 45 67 89
+  </div>
 
   <form id="orderForm">
     <div class="menu-item">
@@ -99,6 +115,9 @@
       </div>
     </div>
 
+    <div class="label" data-fr="Adresse de livraison (optionnel)" data-zh="配送地址（可选）">Adresse de livraison (optionnel)</div>
+    <input type="text" name="address" placeholder="ex: 22 Rue Truc, 75010 Paris">
+
     <div class="label" data-fr="Remarque (optionnel)" data-zh="备注（可选）">Remarque (optionnel)</div>
     <input type="text" name="notes" placeholder="Pas épicé, à emporter...">
 
@@ -109,7 +128,7 @@
 
   <script>
     const SUPABASE_URL = "https://fdbcypvxuikhmxvyyvmb.supabase.co";
-    const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkYmN5cHZ4dWlraG14dnl5dm1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjY5MzUsImV4cCI6MjA2MDg0MjkzNX0.Ju8wyqBS1irCWgtpBT_RanrqVErQt-gQkWdzb69XMr4";
+    const API_KEY = "eyJ...";
 
     const langMap = {
       fr: {
@@ -117,28 +136,33 @@
         submit: "✅ Commander",
         resultSuccess: "✅ Commande réussie ! Merci.",
         resultFail: "❌ Échec de la commande",
-        placeholder: "Pas épicé, à emporter..."
+        placeholderNote: "Pas épicé, à emporter...",
+        placeholderAddr: "ex: 22 Rue Truc, 75010 Paris",
+        info: "⏰ Heures d'ouverture : 11h30-14h30, 18h00-22h00<br>📞 Contact : +33 1 23 45 67 89"
       },
       zh: {
         title: "🥟 小包子点餐",
         submit: "✅ 提交订单",
         resultSuccess: "✅ 下单成功，感谢光临！",
         resultFail: "❌ 下单失败",
-        placeholder: "比如：不要辣、打包等"
+        placeholderNote: "比如：不要辣、打包等",
+        placeholderAddr: "比如：22 Rue Truc, 75010 Paris",
+        info: "⏰ 营业时间：11:30-14:30，18:00-22:00<br>📞 电话：+33 1 23 45 67 89"
       }
     };
 
     function setLang(lang) {
       document.getElementById("title").textContent = langMap[lang].title;
       document.getElementById("submitBtn").textContent = langMap[lang].submit;
-      document.querySelector("input[name=notes]").placeholder = langMap[lang].placeholder;
-
+      document.querySelector("input[name=notes]").placeholder = langMap[lang].placeholderNote;
+      document.querySelector("input[name=address]").placeholder = langMap[lang].placeholderAddr;
+      document.getElementById("infoBox").innerHTML = langMap[lang].info;
       document.querySelectorAll(".label").forEach(el => {
         el.textContent = el.dataset[lang];
       });
     }
 
-    setLang("fr"); // 默认法语
+    setLang("fr");
 
     document.getElementById("orderForm").addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -146,6 +170,7 @@
       const qty1 = parseInt(form.baozi1.value);
       const qty2 = parseInt(form.baozi2.value);
       const notes = form.notes.value;
+      const address = form.address.value;
 
       const items = [];
       if (qty1 > 0) items.push({ name: "Baozi Viande", qty: qty1, price: 3.5 });
@@ -159,6 +184,7 @@
       const data = {
         items: items,
         notes: notes,
+        address: address,
         status: "新订单"
       };
 
@@ -173,10 +199,8 @@
         body: JSON.stringify(data)
       });
 
-      const resultText = res.ok
-        ? langMap[document.documentElement.lang].resultSuccess
-        : langMap[document.documentElement.lang].resultFail;
-
+      const lang = document.documentElement.lang || "fr";
+      const resultText = res.ok ? langMap[lang].resultSuccess : langMap[lang].resultFail;
       document.getElementById("result").textContent = resultText;
       if (res.ok) form.reset();
     });
