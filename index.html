@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>小包子点餐</title>
+  <title>Petit Baozi - Commande</title>
   <style>
     body {
       font-family: "Arial", sans-serif;
@@ -10,6 +10,17 @@
       padding: 20px;
       max-width: 480px;
       margin: auto;
+    }
+    .lang-switch {
+      text-align: right;
+      margin-bottom: 10px;
+    }
+    .lang-switch button {
+      background: none;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 14px;
     }
     h1 {
       text-align: center;
@@ -21,17 +32,23 @@
       margin-bottom: 12px;
       border-radius: 8px;
       background: white;
+      display: flex;
+      gap: 15px;
     }
-    label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: bold;
+    .menu-item img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .menu-info {
+      flex: 1;
     }
     input[type=number] {
       width: 100%;
       padding: 6px;
       font-size: 16px;
-      margin-bottom: 10px;
+      margin-top: 6px;
     }
     input[type=text] {
       width: 100%;
@@ -39,7 +56,7 @@
       font-size: 14px;
       margin-top: 10px;
     }
-    button {
+    button[type=submit] {
       width: 100%;
       padding: 12px;
       font-size: 18px;
@@ -48,6 +65,7 @@
       border: none;
       border-radius: 6px;
       cursor: pointer;
+      margin-top: 15px;
     }
     #result {
       margin-top: 10px;
@@ -57,22 +75,34 @@
   </style>
 </head>
 <body>
-  <h1>🥟 小包子点餐</h1>
+  <div class="lang-switch">
+    <button onclick="setLang('fr')">🇫🇷 Français</button> |
+    <button onclick="setLang('zh')">🇨🇳 中文</button>
+  </div>
+
+  <h1 id="title">🥟 Petit Baozi - Commande</h1>
+
   <form id="orderForm">
     <div class="menu-item">
-      <label>包子1（￥10）</label>
-      <input type="number" name="baozi1" value="0" min="0">
+      <img src="https://via.placeholder.com/80" alt="Baozi 1">
+      <div class="menu-info">
+        <div class="label" data-fr="Baozi Viande (3.50 €)" data-zh="肉包 (3.50 €)">Baozi Viande (3.50 €)</div>
+        <input type="number" name="baozi1" value="0" min="0">
+      </div>
     </div>
 
     <div class="menu-item">
-      <label>包子2（￥12）</label>
-      <input type="number" name="baozi2" value="0" min="0">
+      <img src="https://via.placeholder.com/80" alt="Baozi 2">
+      <div class="menu-info">
+        <div class="label" data-fr="Baozi Légumes (4.00 €)" data-zh="素包 (4.00 €)">Baozi Légumes (4.00 €)</div>
+        <input type="number" name="baozi2" value="0" min="0">
+      </div>
     </div>
 
-    <label>备注（可选）</label>
-    <input type="text" name="notes" placeholder="比如：不要辣、打包等">
+    <div class="label" data-fr="Remarque (optionnel)" data-zh="备注（可选）">Remarque (optionnel)</div>
+    <input type="text" name="notes" placeholder="Pas épicé, à emporter...">
 
-    <button type="submit">✅ 提交订单</button>
+    <button type="submit" id="submitBtn">✅ Commander</button>
   </form>
 
   <p id="result"></p>
@@ -80,6 +110,35 @@
   <script>
     const SUPABASE_URL = "https://fdbcypvxuikhmxvyyvmb.supabase.co";
     const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkYmN5cHZ4dWlraG14dnl5dm1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjY5MzUsImV4cCI6MjA2MDg0MjkzNX0.Ju8wyqBS1irCWgtpBT_RanrqVErQt-gQkWdzb69XMr4";
+
+    const langMap = {
+      fr: {
+        title: "🥟 Petit Baozi - Commande",
+        submit: "✅ Commander",
+        resultSuccess: "✅ Commande réussie ! Merci.",
+        resultFail: "❌ Échec de la commande",
+        placeholder: "Pas épicé, à emporter..."
+      },
+      zh: {
+        title: "🥟 小包子点餐",
+        submit: "✅ 提交订单",
+        resultSuccess: "✅ 下单成功，感谢光临！",
+        resultFail: "❌ 下单失败",
+        placeholder: "比如：不要辣、打包等"
+      }
+    };
+
+    function setLang(lang) {
+      document.getElementById("title").textContent = langMap[lang].title;
+      document.getElementById("submitBtn").textContent = langMap[lang].submit;
+      document.querySelector("input[name=notes]").placeholder = langMap[lang].placeholder;
+
+      document.querySelectorAll(".label").forEach(el => {
+        el.textContent = el.dataset[lang];
+      });
+    }
+
+    setLang("fr"); // 默认法语
 
     document.getElementById("orderForm").addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -89,11 +148,11 @@
       const notes = form.notes.value;
 
       const items = [];
-      if (qty1 > 0) items.push({ name: "包子1", qty: qty1, price: 10 });
-      if (qty2 > 0) items.push({ name: "包子2", qty: qty2, price: 12 });
+      if (qty1 > 0) items.push({ name: "Baozi Viande", qty: qty1, price: 3.5 });
+      if (qty2 > 0) items.push({ name: "Baozi Légumes", qty: qty2, price: 4.0 });
 
       if (items.length === 0) {
-        document.getElementById("result").textContent = "⚠️ 请至少选择一种包子";
+        document.getElementById("result").textContent = "⚠️ Choisissez au moins un article";
         return;
       }
 
@@ -114,13 +173,12 @@
         body: JSON.stringify(data)
       });
 
-      if (res.ok) {
-        document.getElementById("result").textContent = "✅ 下单成功，感谢光临！";
-        form.reset();
-      } else {
-        const err = await res.text();
-        document.getElementById("result").textContent = "❌ 下单失败：" + err;
-      }
+      const resultText = res.ok
+        ? langMap[document.documentElement.lang].resultSuccess
+        : langMap[document.documentElement.lang].resultFail;
+
+      document.getElementById("result").textContent = resultText;
+      if (res.ok) form.reset();
     });
   </script>
 </body>
