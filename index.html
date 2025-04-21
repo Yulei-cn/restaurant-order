@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>下单页面</title>
+</head>
+<body>
+  <h2>点餐系统 - 餐厅下单页面</h2>
+
+  <form id="orderForm">
+    <label>包子1 数量：</label>
+    <input type="number" name="baozi1" value="0" min="0"><br><br>
+
+    <label>包子2 数量：</label>
+    <input type="number" name="baozi2" value="0" min="0"><br><br>
+
+    <label>备注：</label>
+    <input type="text" name="notes"><br><br>
+
+    <button type="submit">提交订单</button>
+  </form>
+
+  <p id="result"></p>
+
+  <script>
+    const SUPABASE_URL = "https://你的项目ID.supabase.co";
+    const API_KEY = "你的匿名公开API密钥";
+
+    document.getElementById("orderForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const form = e.target;
+      const qty1 = parseInt(form.baozi1.value);
+      const qty2 = parseInt(form.baozi2.value);
+      const notes = form.notes.value;
+
+      const items = [];
+      if (qty1 > 0) items.push({ name: "包子1", qty: qty1, price: 10 });
+      if (qty2 > 0) items.push({ name: "包子2", qty: qty2, price: 12 });
+
+      const data = {
+        items: items,
+        notes: notes,
+        status: "新订单"
+      };
+
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/orders`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": API_KEY,
+          "Authorization": `Bearer ${API_KEY}`,
+          "Prefer": "return=minimal"
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (res.ok) {
+        document.getElementById("result").textContent = "✅ 下单成功！";
+      } else {
+        const err = await res.text();
+        document.getElementById("result").textContent = "❌ 下单失败：" + err;
+      }
+    });
+  </script>
+</body>
+</html>
