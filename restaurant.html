@@ -59,8 +59,35 @@
       loadOrders(); // 刷新列表
     }
 
+    let intervalId = null;
+
+    function startPolling() {
+      if (!intervalId) {
+        intervalId = setInterval(loadOrders, 30000);
+        console.log("✅ 开始轮询");
+      }
+    }
+    
+    function stopPolling() {
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+        console.log("⏸️ 停止轮询");
+      }
+    }
+    
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        loadOrders();
+        startPolling();
+      } else {
+        stopPolling();
+      }
+    });
+    
     loadOrders();
-    setInterval(loadOrders, 3); // 自动刷新每3秒
+    startPolling();
+
   </script>
 </body>
 </html>
