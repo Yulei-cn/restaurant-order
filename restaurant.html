@@ -71,7 +71,7 @@
           <strong>内容：</strong><br>
           <ul>
             ${order.items.map(item => 
-              `<li>📦 ${item.name} ×${item.qty} = ￥${item.qty * item.price}</li>`
+              `<li>📦 ${item.name} ×${item.qty} = €${item.qty * item.price}</li>`
             ).join("")}
           </ul>
           <strong>备注：</strong> ${order.notes || "无"}<br>
