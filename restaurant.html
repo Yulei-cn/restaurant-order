@@ -75,6 +75,7 @@
             ).join("")}
           </ul>
           <strong>备注：</strong> ${order.notes || "无"}<br>
+          <strong>地址：</strong> ${order.address || "未填写"}<br>
           <button onclick="markPrinted('${order.id}')">✅ 标记为已打印</button>
         `;
         container.appendChild(div);
