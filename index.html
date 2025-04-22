@@ -127,29 +127,32 @@
   </div>
 
   <form id="orderForm">
-    <div class="menu-item">
-      <img src="https://via.placeholder.com/80" alt="Baozi 1">
-      <div class="menu-info">
-        <label for="baozi1" class="label" data-fr="Baozi Viande (1.50 €)" data-zh="肉包 (1.50 €)">Baozi Viande (1.50 €)</label>
-        <div class="quantity">
-          <button type="button" onclick="changeQty('baozi1', -1)">−</button>
-          <input id="baozi1" name="baozi1" type="number" value="0" min="0" readonly>
-          <button type="button" onclick="changeQty('baozi1', 1)">＋</button>
-        </div>
+  <!-- 肉包 -->
+  <div class="menu-item">
+    <img src="roubao.png" alt="Baozi 1">
+    <div class="menu-info">
+      <label for="baozi1" class="label" data-fr="Baozi Viande (1.50 €)" data-zh="肉包 (1.50 €)">Baozi Viande (1.50 €)</label>
+      <div class="quantity">
+        <button type="button" onclick="changeQty('baozi1', -1)">−</button>
+        <input id="baozi1" name="baozi1" type="number" value="0" min="0" readonly>
+        <button type="button" onclick="changeQty('baozi1', 1)">＋</button>
       </div>
     </div>
+  </div>
+  
+  <!-- 素菜包 -->
+  <div class="menu-item">
+    <img src="subao.png" alt="Baozi 2">
+    <div class="menu-info">
+      <label for="baozi2" class="label" data-fr="Baozi Légumes (1.00 €)" data-zh="素包 (1.00 €)">Baozi Légumes (1.00 €)</label>
+      <div class="quantity">
+        <button type="button" onclick="changeQty('baozi2', -1)">−</button>
+        <input id="baozi2" name="baozi2" type="number" value="0" min="0" readonly>
+        <button type="button" onclick="changeQty('baozi2', 1)">＋</button>
+      </div>
+    </div>
+  </div>
 
-    <div class="menu-item">
-      <img src="https://via.placeholder.com/80" alt="Baozi 2">
-      <div class="menu-info">
-        <label for="baozi2" class="label" data-fr="Baozi Légumes (1.00 €)" data-zh="素包 (1.00 €)">Baozi Légumes (1.00 €)</label>
-        <div class="quantity">
-          <button type="button" onclick="changeQty('baozi2', -1)">−</button>
-          <input id="baozi2" name="baozi2" type="number" value="0" min="0" readonly>
-          <button type="button" onclick="changeQty('baozi2', 1)">＋</button>
-        </div>
-      </div>
-    </div>
 
     <label for="address" class="label" data-fr="Adresse de livraison (optionnel)" data-zh="配送地址（可选）">Adresse de livraison (optionnel)</label>
     <input type="text" name="address" id="address" placeholder="ex: 22 Rue Truc, 75010 Paris">
