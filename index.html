@@ -2,10 +2,12 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Petit Baozi - Commande</title>
   <style>
+    * { box-sizing: border-box; }
     body {
-      font-family: "Arial", sans-serif;
+      font-family: Arial, sans-serif;
       background: #f9f9f9;
       padding: 20px;
       max-width: 480px;
@@ -49,6 +51,7 @@
       background: white;
       display: flex;
       gap: 15px;
+      align-items: center;
     }
     .menu-item img {
       width: 80px;
@@ -59,12 +62,37 @@
     .menu-info {
       flex: 1;
     }
-    input[type=number],
+    .quantity {
+      display: flex;
+      align-items: center;
+      margin-top: 5px;
+    }
+    .quantity button {
+      width: 30px;
+      height: 30px;
+      font-size: 18px;
+      border: 1px solid #ccc;
+      background: #eee;
+      cursor: pointer;
+    }
+    .quantity input {
+      width: 50px;
+      text-align: center;
+      font-size: 16px;
+      margin: 0 5px;
+      border: 1px solid #ccc;
+      background: white;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      margin-bottom: 4px;
+      font-weight: bold;
+    }
     input[type=text] {
       width: 100%;
       padding: 6px;
       font-size: 14px;
-      margin-top: 6px;
     }
     button[type=submit] {
       width: 100%;
@@ -102,24 +130,32 @@
     <div class="menu-item">
       <img src="https://via.placeholder.com/80" alt="Baozi 1">
       <div class="menu-info">
-        <div class="label" data-fr="Baozi Viande (3.50 €)" data-zh="肉包 (3.50 €)">Baozi Viande (3.50 €)</div>
-        <input type="number" name="baozi1" value="0" min="0">
+        <label for="baozi1" class="label" data-fr="Baozi Viande (3.50 €)" data-zh="肉包 (3.50 €)">Baozi Viande (3.50 €)</label>
+        <div class="quantity">
+          <button type="button" onclick="changeQty('baozi1', -1)">−</button>
+          <input id="baozi1" name="baozi1" type="number" value="0" min="0" readonly>
+          <button type="button" onclick="changeQty('baozi1', 1)">＋</button>
+        </div>
       </div>
     </div>
 
     <div class="menu-item">
       <img src="https://via.placeholder.com/80" alt="Baozi 2">
       <div class="menu-info">
-        <div class="label" data-fr="Baozi Légumes (4.00 €)" data-zh="素包 (4.00 €)">Baozi Légumes (4.00 €)</div>
-        <input type="number" name="baozi2" value="0" min="0">
+        <label for="baozi2" class="label" data-fr="Baozi Légumes (4.00 €)" data-zh="素包 (4.00 €)">Baozi Légumes (4.00 €)</label>
+        <div class="quantity">
+          <button type="button" onclick="changeQty('baozi2', -1)">−</button>
+          <input id="baozi2" name="baozi2" type="number" value="0" min="0" readonly>
+          <button type="button" onclick="changeQty('baozi2', 1)">＋</button>
+        </div>
       </div>
     </div>
 
-    <div class="label" data-fr="Adresse de livraison (optionnel)" data-zh="配送地址（可选）">Adresse de livraison (optionnel)</div>
-    <input type="text" name="address" placeholder="ex: 22 Rue Truc, 75010 Paris">
+    <label for="address" class="label" data-fr="Adresse de livraison (optionnel)" data-zh="配送地址（可选）">Adresse de livraison (optionnel)</label>
+    <input type="text" name="address" id="address" placeholder="ex: 22 Rue Truc, 75010 Paris">
 
-    <div class="label" data-fr="Remarque (optionnel)" data-zh="备注（可选）">Remarque (optionnel)</div>
-    <input type="text" name="notes" placeholder="Pas épicé, à emporter...">
+    <label for="notes" class="label" data-fr="Remarque (optionnel)" data-zh="备注（可选）">Remarque (optionnel)</label>
+    <input type="text" name="notes" id="notes" placeholder="Pas épicé, à emporter...">
 
     <button type="submit" id="submitBtn">✅ Commander</button>
   </form>
@@ -129,6 +165,13 @@
   <script>
     const SUPABASE_URL = "https://fdbcypvxuikhmxvyyvmb.supabase.co";
     const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkYmN5cHZ4dWlraG14dnl5dm1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjY5MzUsImV4cCI6MjA2MDg0MjkzNX0.Ju8wyqBS1irCWgtpBT_RanrqVErQt-gQkWdzb69XMr4";
+
+    function changeQty(id, delta) {
+      const input = document.getElementById(id);
+      let val = parseInt(input.value) || 0;
+      val = Math.max(0, val + delta);
+      input.value = val;
+    }
 
     const langMap = {
       fr: {
@@ -154,8 +197,8 @@
     function setLang(lang) {
       document.getElementById("title").textContent = langMap[lang].title;
       document.getElementById("submitBtn").textContent = langMap[lang].submit;
-      document.querySelector("input[name=notes]").placeholder = langMap[lang].placeholderNote;
-      document.querySelector("input[name=address]").placeholder = langMap[lang].placeholderAddr;
+      document.getElementById("notes").placeholder = langMap[lang].placeholderNote;
+      document.getElementById("address").placeholder = langMap[lang].placeholderAddr;
       document.getElementById("infoBox").innerHTML = langMap[lang].info;
       document.querySelectorAll(".label").forEach(el => {
         el.textContent = el.dataset[lang];
