@@ -12,7 +12,7 @@
     <button onclick="setLang('zh')">🇨🇳 中文</button>
   </div>
 
-  <h1 id="title">🥟 Petit Baozi - Commande</h1>
+  <h1 id="title">🥡 Petit Baozi - Commande</h1>
   <div class="subtitle">7 Rue Blanche, 75009 Paris</div>
 
   <div class="info-block" id="infoBox">
@@ -21,29 +21,15 @@
   </div>
 
   <form id="orderForm">
-    <div class="menu-item">
-      <img src="roubao.png" alt="Baozi Viande">
-      <div class="menu-info">
-        <label for="baozi1" class="label" data-fr="Baozi Viande (1.50 €)" data-zh="肉包 (1.50 €)">Baozi Viande (1.50 €)</label>
-        <div class="quantity">
-          <button type="button" onclick="changeQty('baozi1', -1)">−</button>
-          <input id="baozi1" name="baozi1" type="number" value="0" min="0" readonly>
-          <button type="button" onclick="changeQty('baozi1', 1)">＋</button>
-        </div>
-      </div>
-    </div>
+    <h2>🍚 Choisissez un <strong>principal</strong> (3.00 €)</h2>
+    <label><input type="radio" name="main" value="Riz blanc"> Riz blanc</label>
+    <label><input type="radio" name="main" value="Nouilles sautées"> Nouilles sautées</label>
 
-    <div class="menu-item">
-      <img src="subao.png" alt="Baozi Légumes">
-      <div class="menu-info">
-        <label for="baozi2" class="label" data-fr="Baozi Légumes (1.00 €)" data-zh="素包 (1.00 €)">Baozi Légumes (1.00 €)</label>
-        <div class="quantity">
-          <button type="button" onclick="changeQty('baozi2', -1)">−</button>
-          <input id="baozi2" name="baozi2" type="number" value="0" min="0" readonly>
-          <button type="button" onclick="changeQty('baozi2', 1)">＋</button>
-        </div>
-      </div>
-    </div>
+    <h2>🥢 Choisissez vos <strong>accompagnements</strong> (2.00 € chacun)</h2>
+    <label><input type="checkbox" name="sides" value="Poulet caramel"> Poulet caramel</label><br>
+    <label><input type="checkbox" name="sides" value="Boeuf aux oignons"> Bœuf aux oignons</label><br>
+    <label><input type="checkbox" name="sides" value="Tofu piquant"> Tofu sauce piquante</label><br>
+    <label><input type="checkbox" name="sides" value="Légumes sautés"> Légumes sautés</label><br>
 
     <label for="address" class="label">Adresse de livraison (optionnel)</label>
     <input type="text" name="address" id="address" placeholder="ex: 22 Rue Truc, 75010 Paris">
@@ -52,7 +38,7 @@
     <input type="tel" name="phone" id="phone" placeholder="ex: 06 12 34 56 78" required>
 
     <label for="notes" class="label">Remarque (optionnel)</label>
-    <input type="text" name="notes" id="notes" placeholder="Pas épicé, à emporter...">
+    <input type="text" name="notes" id="notes" placeholder="Pas épicé, sans oignons...">
 
     <button type="submit" id="submitBtn">✅ Commander</button>
   </form>
@@ -63,30 +49,23 @@
     const SUPABASE_URL = "https://fdbcypvxuikhmxvyyvmb.supabase.co";
     const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkYmN5cHZ4dWlraG14dnl5dm1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjY5MzUsImV4cCI6MjA2MDg0MjkzNX0.Ju8wyqBS1irCWgtpBT_RanrqVErQt-gQkWdzb69XMr4";
 
-    function changeQty(id, delta) {
-      const input = document.getElementById(id);
-      let val = parseInt(input.value) || 0;
-      val = Math.max(0, val + delta);
-      input.value = val;
-    }
-
     function setLang(lang) {
       const langMap = {
         fr: {
-          title: "🥟 Petit Baozi - Commande",
+          title: "🥡 Petit Baozi - Commande",
           submit: "✅ Commander",
           resultSuccess: "✅ Commande réussie ! Merci.",
           resultFail: "❌ Échec de la commande",
-          placeholderNote: "Pas épicé, à emporter...",
+          placeholderNote: "Pas épicé, sans oignons...",
           placeholderAddr: "ex: 22 Rue Truc, 75010 Paris",
           info: "⏰ Heures d'ouverture : 11h30-14h30, 18h00-22h00<br>📞 Contact : +33 1 23 45 67 89"
         },
         zh: {
-          title: "🥟 小包子点餐",
+          title: "🥡 小包子盒饭点餐",
           submit: "✅ 提交订单",
           resultSuccess: "✅ 下单成功，感谢光临！",
           resultFail: "❌ 下单失败",
-          placeholderNote: "比如：不要辣、打包等",
+          placeholderNote: "比如：不要辣、不要洋葱等",
           placeholderAddr: "比如：22 Rue Truc, 75010 Paris",
           info: "⏰ 营业时间：11:30-14:30，18:00-22:00<br>📞 电话：+33 1 23 45 67 89"
         }
@@ -107,26 +86,28 @@
     document.getElementById("orderForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const form = e.target;
-      const qty1 = parseInt(form.baozi1.value);
-      const qty2 = parseInt(form.baozi2.value);
-      const notes = form.notes.value;
+      const main = form.main.value;
+      const sides = Array.from(form.querySelectorAll('input[name="sides"]:checked')).map(cb => cb.value);
       const address = form.address.value;
       const phone = form.phone.value;
+      const notes = form.notes.value;
+
+      if (!main) {
+        document.getElementById("result").textContent = "⚠️ Veuillez choisir un plat principal";
+        return;
+      }
 
       const items = [];
-      if (qty1 > 0) items.push({ name: "Baozi Viande", qty: qty1, price: 1.5 });
-      if (qty2 > 0) items.push({ name: "Baozi Légumes", qty: qty2, price: 1.0 });
-
-      if (items.length === 0) {
-        document.getElementById("result").textContent = "⚠️ Choisissez au moins un article";
-        return;
+      items.push({ name: main, qty: 1, price: 3.0 });
+      for (const side of sides) {
+        items.push({ name: side, qty: 1, price: 2.0 });
       }
 
       const data = {
         items,
-        notes,
         address,
         phone,
+        notes,
         status: "新订单"
       };
 
@@ -142,7 +123,7 @@
       });
 
       const lang = document.documentElement.lang || "fr";
-      const resultText = res.ok ? langMap[lang].resultSuccess : langMap[lang].resultFail;
+      const resultText = res.ok ? "✅ Commande réussie ! Merci." : "❌ Échec de la commande";
       document.getElementById("result").textContent = resultText;
       if (res.ok) form.reset();
     });
