@@ -59,10 +59,7 @@
       object-fit: cover;
       border-radius: 8px;
     }
-
-    .menu-info {
-      flex: 1;
-    }
+    .menu-info { flex: 1; }
     .quantity {
       display: flex;
       align-items: center;
@@ -90,7 +87,7 @@
       margin-bottom: 4px;
       font-weight: bold;
     }
-    input[type=text] {
+    input[type=text], input[type=tel] {
       width: 100%;
       padding: 6px;
       font-size: 14px;
@@ -128,37 +125,37 @@
   </div>
 
   <form id="orderForm">
-  <!-- 肉包 -->
-  <div class="menu-item">
-    <img src="roubao.png" alt="Baozi 1">
-    <div class="menu-info">
-      <label for="baozi1" class="label" data-fr="Baozi Viande (1.50 €)" data-zh="肉包 (1.50 €)">Baozi Viande (1.50 €)</label>
-      <div class="quantity">
-        <button type="button" onclick="changeQty('baozi1', -1)">−</button>
-        <input id="baozi1" name="baozi1" type="number" value="0" min="0" readonly>
-        <button type="button" onclick="changeQty('baozi1', 1)">＋</button>
+    <div class="menu-item">
+      <img src="roubao.png" alt="Baozi Viande">
+      <div class="menu-info">
+        <label for="baozi1" class="label" data-fr="Baozi Viande (1.50 €)" data-zh="肉包 (1.50 €)">Baozi Viande (1.50 €)</label>
+        <div class="quantity">
+          <button type="button" onclick="changeQty('baozi1', -1)">−</button>
+          <input id="baozi1" name="baozi1" type="number" value="0" min="0" readonly>
+          <button type="button" onclick="changeQty('baozi1', 1)">＋</button>
+        </div>
       </div>
     </div>
-  </div>
-  
-  <!-- 素菜包 -->
-  <div class="menu-item">
-    <img src="subao.png" alt="Baozi 2">
-    <div class="menu-info">
-      <label for="baozi2" class="label" data-fr="Baozi Légumes (1.00 €)" data-zh="素包 (1.00 €)">Baozi Légumes (1.00 €)</label>
-      <div class="quantity">
-        <button type="button" onclick="changeQty('baozi2', -1)">−</button>
-        <input id="baozi2" name="baozi2" type="number" value="0" min="0" readonly>
-        <button type="button" onclick="changeQty('baozi2', 1)">＋</button>
+
+    <div class="menu-item">
+      <img src="subao.png" alt="Baozi Légumes">
+      <div class="menu-info">
+        <label for="baozi2" class="label" data-fr="Baozi Légumes (1.00 €)" data-zh="素包 (1.00 €)">Baozi Légumes (1.00 €)</label>
+        <div class="quantity">
+          <button type="button" onclick="changeQty('baozi2', -1)">−</button>
+          <input id="baozi2" name="baozi2" type="number" value="0" min="0" readonly>
+          <button type="button" onclick="changeQty('baozi2', 1)">＋</button>
+        </div>
       </div>
     </div>
-  </div>
 
-
-    <label for="address" class="label" data-fr="Adresse de livraison (optionnel)" data-zh="配送地址（可选）">Adresse de livraison (optionnel)</label>
+    <label for="address" class="label">Adresse de livraison (optionnel)</label>
     <input type="text" name="address" id="address" placeholder="ex: 22 Rue Truc, 75010 Paris">
 
-    <label for="notes" class="label" data-fr="Remarque (optionnel)" data-zh="备注（可选）">Remarque (optionnel)</label>
+    <label for="phone" class="label">Numéro de téléphone</label>
+    <input type="tel" name="phone" id="phone" placeholder="ex: 06 12 34 56 78" required>
+
+    <label for="notes" class="label">Remarque (optionnel)</label>
     <input type="text" name="notes" id="notes" placeholder="Pas épicé, à emporter...">
 
     <button type="submit" id="submitBtn">✅ Commander</button>
@@ -177,35 +174,35 @@
       input.value = val;
     }
 
-    const langMap = {
-      fr: {
-        title: "🥟 Petit Baozi - Commande",
-        submit: "✅ Commander",
-        resultSuccess: "✅ Commande réussie ! Merci.",
-        resultFail: "❌ Échec de la commande",
-        placeholderNote: "Pas épicé, à emporter...",
-        placeholderAddr: "ex: 22 Rue Truc, 75010 Paris",
-        info: "⏰ Heures d'ouverture : 11h30-14h30, 18h00-22h00<br>📞 Contact : +33 1 23 45 67 89"
-      },
-      zh: {
-        title: "🥟 小包子点餐",
-        submit: "✅ 提交订单",
-        resultSuccess: "✅ 下单成功，感谢光临！",
-        resultFail: "❌ 下单失败",
-        placeholderNote: "比如：不要辣、打包等",
-        placeholderAddr: "比如：22 Rue Truc, 75010 Paris",
-        info: "⏰ 营业时间：11:30-14:30，18:00-22:00<br>📞 电话：+33 1 23 45 67 89"
-      }
-    };
-
     function setLang(lang) {
+      const langMap = {
+        fr: {
+          title: "🥟 Petit Baozi - Commande",
+          submit: "✅ Commander",
+          resultSuccess: "✅ Commande réussie ! Merci.",
+          resultFail: "❌ Échec de la commande",
+          placeholderNote: "Pas épicé, à emporter...",
+          placeholderAddr: "ex: 22 Rue Truc, 75010 Paris",
+          info: "⏰ Heures d'ouverture : 11h30-14h30, 18h00-22h00<br>📞 Contact : +33 1 23 45 67 89"
+        },
+        zh: {
+          title: "🥟 小包子点餐",
+          submit: "✅ 提交订单",
+          resultSuccess: "✅ 下单成功，感谢光临！",
+          resultFail: "❌ 下单失败",
+          placeholderNote: "比如：不要辣、打包等",
+          placeholderAddr: "比如：22 Rue Truc, 75010 Paris",
+          info: "⏰ 营业时间：11:30-14:30，18:00-22:00<br>📞 电话：+33 1 23 45 67 89"
+        }
+      };
+
       document.getElementById("title").textContent = langMap[lang].title;
       document.getElementById("submitBtn").textContent = langMap[lang].submit;
       document.getElementById("notes").placeholder = langMap[lang].placeholderNote;
       document.getElementById("address").placeholder = langMap[lang].placeholderAddr;
       document.getElementById("infoBox").innerHTML = langMap[lang].info;
       document.querySelectorAll(".label").forEach(el => {
-        el.textContent = el.dataset[lang];
+        if (el.dataset[lang]) el.textContent = el.dataset[lang];
       });
     }
 
@@ -218,6 +215,7 @@
       const qty2 = parseInt(form.baozi2.value);
       const notes = form.notes.value;
       const address = form.address.value;
+      const phone = form.phone.value;
 
       const items = [];
       if (qty1 > 0) items.push({ name: "Baozi Viande", qty: qty1, price: 1.5 });
@@ -229,9 +227,10 @@
       }
 
       const data = {
-        items: items,
-        notes: notes,
-        address: address,
+        items,
+        notes,
+        address,
+        phone,
         status: "新订单"
       };
 
@@ -239,9 +238,9 @@
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "apikey": API_KEY,
-          "Authorization": `Bearer ${API_KEY}`,
-          "Prefer": "return=minimal"
+          apikey: API_KEY,
+          Authorization: `Bearer ${API_KEY}`,
+          Prefer: "return=minimal"
         },
         body: JSON.stringify(data)
       });
@@ -252,7 +251,8 @@
       if (res.ok) form.reset();
     });
   </script>
-    <footer style="margin-top: 40px;">
+
+  <footer style="margin-top: 40px;">
     <h2 style="text-align:center; font-size: 18px;">📍 Nous trouver</h2>
     <div style="margin-top: 10px;">
       <iframe
@@ -266,6 +266,5 @@
       </iframe>
     </div>
   </footer>
-
 </body>
 </html>
