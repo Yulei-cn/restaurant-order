@@ -130,7 +130,7 @@
     <div class="menu-item">
       <img src="https://via.placeholder.com/80" alt="Baozi 1">
       <div class="menu-info">
-        <label for="baozi1" class="label" data-fr="Baozi Viande (3.50 €)" data-zh="肉包 (3.50 €)">Baozi Viande (3.50 €)</label>
+        <label for="baozi1" class="label" data-fr="Baozi Viande (1.50 €)" data-zh="肉包 (1.50 €)">Baozi Viande (1.50 €)</label>
         <div class="quantity">
           <button type="button" onclick="changeQty('baozi1', -1)">−</button>
           <input id="baozi1" name="baozi1" type="number" value="0" min="0" readonly>
@@ -142,7 +142,7 @@
     <div class="menu-item">
       <img src="https://via.placeholder.com/80" alt="Baozi 2">
       <div class="menu-info">
-        <label for="baozi2" class="label" data-fr="Baozi Légumes (4.00 €)" data-zh="素包 (4.00 €)">Baozi Légumes (4.00 €)</label>
+        <label for="baozi2" class="label" data-fr="Baozi Légumes (1.00 €)" data-zh="素包 (1.00 €)">Baozi Légumes (1.00 €)</label>
         <div class="quantity">
           <button type="button" onclick="changeQty('baozi2', -1)">−</button>
           <input id="baozi2" name="baozi2" type="number" value="0" min="0" readonly>
@@ -216,8 +216,8 @@
       const address = form.address.value;
 
       const items = [];
-      if (qty1 > 0) items.push({ name: "Baozi Viande", qty: qty1, price: 3.5 });
-      if (qty2 > 0) items.push({ name: "Baozi Légumes", qty: qty2, price: 4.0 });
+      if (qty1 > 0) items.push({ name: "Baozi Viande", qty: qty1, price: 1.5 });
+      if (qty2 > 0) items.push({ name: "Baozi Légumes", qty: qty2, price: 1.0 });
 
       if (items.length === 0) {
         document.getElementById("result").textContent = "⚠️ Choisissez au moins un article";
