@@ -54,17 +54,18 @@
         const sideItems = order.items.filter(item => item.price === 2.0);
 
         div.innerHTML = `
-          <strong>下单时间：</strong> ${new Date(order.created_at).toLocaleString("zh-CN")}<br>
-          <strong>主食：</strong> ${mainItem ? mainItem.name : "无"}（€${mainItem?.price}）<br>
-          <strong>配菜：</strong>
+          <strong>🕒 下单时间：</strong> ${new Date(order.created_at).toLocaleString("zh-CN")}<br>
+          <strong>🍚 主食：</strong> ${mainItem ? mainItem.name : "无"}（€${mainItem?.price}）<br>
+          <strong>🥗 配菜：</strong>
           <ul>
             ${sideItems.map(item => `<li>${item.name} ×${item.qty}（€${item.price}）</li>`).join("")}
           </ul>
-          <strong>总价：</strong> €${total.toFixed(2)}<br>
-          <strong>备注：</strong> ${order.notes || "无"}<br>
-          <strong>地址：</strong> ${order.address || "未填写"}<br>
-          <strong>电话：</strong> ${order.phone || "无"}<br>
+          <strong>💶 总价：</strong> €${total.toFixed(2)}<br>
+          <strong>📝 备注：</strong> ${order.notes || "无"}<br>
+          <strong>📍 地址：</strong> ${order.address || "未填写"}<br>
+          <strong>📞 电话：</strong> ${order.phone || "无"}<br>
           <button onclick="markPrinted('${order.id}')">✅ 标记为已打印</button>
+          <button onclick="generateBat('${order.id}')">🖨️ 下载打印命令</button>
         `;
         container.appendChild(div);
       });
@@ -81,6 +82,15 @@
         body: JSON.stringify({ status: "已打印" })
       });
       loadOrders();
+    }
+
+    function generateBat(orderId) {
+      const content = `@echo off\npython auto_printer.py ${orderId}\npause\n`;
+      const blob = new Blob([content], { type: "text/plain" });
+      const link = document.createElement("a");
+      link.download = `print_order_${orderId}.bat`;
+      link.href = URL.createObjectURL(blob);
+      link.click();
     }
 
     let intervalId = null;
