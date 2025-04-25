@@ -3,30 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>餐厅订单管理</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      background-color: #f9f9f9;
-      padding: 20px;
-    }
-    h2 {
-      font-size: 22px;
-    }
-    .order {
-      border: 1px solid #ccc;
-      background: #fff;
-      padding: 12px 16px;
-      margin: 16px 0;
-      border-radius: 6px;
-    }
-    .order ul {
-      margin-top: 5px;
-      margin-bottom: 10px;
-    }
-    .order button {
-      margin-right: 10px;
-    }
-  </style>
 </head>
 <body>
   <h2>📋 当前新订单</h2>
@@ -69,26 +45,27 @@
 
       orders.forEach(order => {
         const div = document.createElement("div");
-        div.className = "order";
+        div.style.border = "1px solid #ccc";
+        div.style.margin = "10px";
+        div.style.padding = "10px";
 
         const total = order.items.reduce((sum, item) => sum + item.qty * item.price, 0);
         const mainItem = order.items.find(item => item.price === 3.0);
         const sideItems = order.items.filter(item => item.price === 2.0);
 
         div.innerHTML = `
-          🕒 <strong>下单时间：</strong> ${new Date(order.created_at).toLocaleString("zh-CN")}<br>
-          🍰 <strong>主食：</strong> ${mainItem ? mainItem.name : "无"}（€${mainItem?.price}）<br>
-          🥗 <strong>配菜：</strong>
+          <strong>🕒 下单时间：</strong> ${new Date(order.created_at).toLocaleString("zh-CN")}<br>
+          <strong>🍚 主食：</strong> ${mainItem ? mainItem.name : "无"}（€${mainItem?.price}）<br>
+          <strong>🥗 配菜：</strong>
           <ul>
-            ${sideItems.map(item => `<li>• ${item.name} ×${item.qty}（€${item.price}）</li>`).join("")}
+            ${sideItems.map(item => `<li>${item.name} ×${item.qty}（€${item.price}）</li>`).join("")}
           </ul>
-          💳 <strong>总价：</strong> €${total.toFixed(2)}<br>
-          📝 <strong>备注：</strong> ${order.notes || "无"}<br>
-          📍 <strong>地址：</strong> ${order.address || "未填写"}<br>
-          📞 <strong>电话：</strong> ${order.phone || "无"}<br>
-          <small style="color:gray;">🆔 订单ID：${order.id}</small><br>
+          <strong>💶 总价：</strong> €${total.toFixed(2)}<br>
+          <strong>📝 备注：</strong> ${order.notes || "无"}<br>
+          <strong>📍 地址：</strong> ${order.address || "未填写"}<br>
+          <strong>📞 电话：</strong> ${order.phone || "无"}<br>
           <button onclick="markPrinted('${order.id}')">✅ 标记为已打印</button>
-          <button onclick="downloadCommand('${order.id}')">🖨️ 下载打印命令</button>
+          <button onclick="generateBat('${order.id}')">🖨️ 下载打印命令</button>
         `;
         container.appendChild(div);
       });
@@ -107,17 +84,13 @@
       loadOrders();
     }
 
-    function downloadCommand(id) {
-      const content = `@echo off\npython auto_printer.py ${id}`;
-      const blob = new Blob([content], { type: "application/octet-stream" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `print_order_${id}.bat`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
+    function generateBat(orderId) {
+      const content = `@echo off\npython auto_printer.py ${orderId}\npause\n`;
+      const blob = new Blob([content], { type: "text/plain" });
+      const link = document.createElement("a");
+      link.download = `print_order_${orderId}.bat`;
+      link.href = URL.createObjectURL(blob);
+      link.click();
     }
 
     let intervalId = null;
