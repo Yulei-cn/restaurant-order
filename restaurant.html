@@ -25,6 +25,7 @@
     }
     .order button {
       margin-right: 10px;
+      margin-top: 6px;
     }
   </style>
 </head>
@@ -88,7 +89,7 @@
           📞 <strong>电话：</strong> ${order.phone || "无"}<br>
           <small style="color:gray;">🆔 订单ID：${order.id}</small><br>
           <button onclick="markPrinted('${order.id}')">✅ 标记为已打印</button>
-          <button onclick="downloadCommand('${order.id}')">🖨️ 下载打印命令</button>
+          <button onclick="autoPrint('${order.id}')">🖨️ 自动打印</button>
         `;
         container.appendChild(div);
       });
@@ -107,17 +108,25 @@
       loadOrders();
     }
 
-    function downloadCommand(id) {
-      const content = `@echo off\npython auto_printer.py ${id}`;
-      const blob = new Blob([content], { type: "application/octet-stream" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `print_order_${id}.bat`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
+    function autoPrint(orderId) {
+      fetch("http://localhost:5005/print", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ id: orderId })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === "success") {
+          alert("🖨️ 已自动打印！");
+        } else {
+          alert("❌ 打印失败：" + data.detail);
+        }
+      })
+      .catch(err => {
+        alert("❌ 打印请求失败，可能是打印服务未启动。");
+      });
     }
 
     let intervalId = null;
