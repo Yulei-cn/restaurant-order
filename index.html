@@ -45,10 +45,13 @@
 
   <p id="result"></p>
 
+   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.5/dist/umd/supabase.min.js"></script>
   <script>
     const SUPABASE_URL = "https://fdbcypvxuikhmxvyyvmb.supabase.co";
     const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkYmN5cHZ4dWlraG14dnl5dm1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjY5MzUsImV4cCI6MjA2MDg0MjkzNX0.Ju8wyqBS1irCWgtpBT_RanrqVErQt-gQkWdzb69XMr4";
-
+  
+    const client = window.supabase.createClient(SUPABASE_URL, API_KEY);
+  
     function setLang(lang) {
       const langMap = {
         fr: {
@@ -70,7 +73,7 @@
           info: "⏰ 营业时间：11:30-14:30，18:00-22:00<br>📞 电话：+33 1 23 45 67 89"
         }
       };
-
+  
       document.getElementById("title").textContent = langMap[lang].title;
       document.getElementById("submitBtn").textContent = langMap[lang].submit;
       document.getElementById("notes").placeholder = langMap[lang].placeholderNote;
@@ -80,9 +83,9 @@
         if (el.dataset[lang]) el.textContent = el.dataset[lang];
       });
     }
-
+  
     setLang("fr");
-
+  
     document.getElementById("orderForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const form = e.target;
@@ -91,26 +94,38 @@
       const address = form.address.value;
       const phone = form.phone.value;
       const notes = form.notes.value;
-
+  
       if (!main) {
         document.getElementById("result").textContent = "⚠️ Veuillez choisir un plat principal";
         return;
       }
-
+  
+      const {
+        data: { user },
+        error
+      } = await client.auth.getUser();
+  
+      if (!user || error) {
+        alert("Veuillez vous connecter d'abord.");
+        window.location.href = "mes-commandes.html";
+        return;
+      }
+  
       const items = [];
       items.push({ name: main, qty: 1, price: 3.0 });
       for (const side of sides) {
         items.push({ name: side, qty: 1, price: 2.0 });
       }
-
+  
       const data = {
         items,
         address,
         phone,
         notes,
+        user_id: user.id,
         status: "新订单"
       };
-
+  
       const res = await fetch(`${SUPABASE_URL}/rest/v1/orders`, {
         method: "POST",
         headers: {
@@ -121,13 +136,17 @@
         },
         body: JSON.stringify(data)
       });
-
+  
       const lang = document.documentElement.lang || "fr";
-      const resultText = res.ok ? "✅ Commande réussie ! Merci." : "❌ Échec de la commande";
+      const resultText = res.ok
+        ? (lang === "zh" ? "✅ 下单成功，感谢光临！" : "✅ Commande réussie ! Merci.")
+        : (lang === "zh" ? "❌ 下单失败" : "❌ Échec de la commande");
+  
       document.getElementById("result").textContent = resultText;
       if (res.ok) form.reset();
     });
   </script>
+
 
   <footer style="margin-top: 40px;">
     <h2 style="text-align:center; font-size: 18px;">📍 Nous trouver</h2>
