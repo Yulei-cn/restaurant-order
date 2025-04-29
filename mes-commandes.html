@@ -2,27 +2,68 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mes commandes / 我的订单</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    h2 {
+      margin-top: 30px;
+    }
+
+    input, button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    button.lang-btn {
+      display: inline-block;
+      width: auto;
+      margin-right: 10px;
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+
+    @media (max-width: 600px) {
+      h2 {
+        font-size: 20px;
+      }
+
+      input, button {
+        font-size: 14px;
+      }
+    }
+  </style>
 </head>
 <body>
   <!-- 语言切换按钮 -->
   <div>
-    <button onclick="setLang('fr')">🇫🇷 Français</button>
-    <button onclick="setLang('zh')">🇨🇳 中文</button>
+    <button class="lang-btn" onclick="setLang('fr')">🇫🇷 Français</button>
+    <button class="lang-btn" onclick="setLang('zh')">🇨🇳 中文</button>
   </div>
 
   <!-- 注册 / 登录 -->
   <h2 data-i18n="auth_title">Connexion / Inscription</h2>
-  <input type="email" id="email" placeholder="Email"><br>
-  <input type="password" id="password" placeholder="Mot de passe"><br>
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Mot de passe">
   <button onclick="signup()" data-i18n="signup_btn">S'inscrire</button>
   <button onclick="login()" data-i18n="login_btn">Se connecter</button>
   <button onclick="logout()" data-i18n="logout_btn">Se déconnecter</button>
 
   <!-- 下单 -->
   <h2 data-i18n="order_title">Passer une commande</h2>
-  <input type="text" id="address" placeholder="Adresse de livraison"><br>
-  <input type="text" id="phone" placeholder="Numéro de téléphone"><br>
+  <input type="text" id="address" placeholder="Adresse de livraison">
+  <input type="text" id="phone" placeholder="Numéro de téléphone">
   <button onclick="submitOrder()" data-i18n="submit_order_btn">Commander</button>
 
   <!-- 订单历史 -->
@@ -30,7 +71,6 @@
   <button onclick="fetchOrders()" data-i18n="refresh_btn">Actualiser</button>
   <ul id="orderList"></ul>
 
-  <!-- Supabase JS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script>
     const SUPABASE_URL = "https://fdbcypvxuikhmxvyyvmb.supabase.co";
@@ -89,7 +129,6 @@
       });
     }
 
-    // 多语言字典
     const i18n = {
       fr: {
         auth_title: "Connexion / Inscription",
@@ -133,7 +172,6 @@
       }
     };
 
-    // 当前语言
     let currentLang = "fr";
 
     function setLang(lang) {
@@ -150,8 +188,8 @@
       return i18n[currentLang][key] || key;
     }
 
-    // 默认语言设置
-    setLang("fr");
+    // 初始化默认语言
+    window.onload = () => setLang("fr");
   </script>
 </body>
 </html>
