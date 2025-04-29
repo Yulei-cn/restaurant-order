@@ -1,22 +1,18 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Connexion / 登录</title>
   <style>
     body {
       font-family: Arial, sans-serif;
+      max-width: 400px;
+      margin: auto;
+      padding: 40px 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 40px 20px;
-      max-width: 400px;
-      margin: auto;
-    }
-
-    h2 {
-      text-align: center;
     }
 
     input, button {
@@ -40,50 +36,49 @@
   </style>
 </head>
 <body>
-  <!-- 语言切换按钮 -->
   <div class="lang-buttons">
-    <button onclick="setLang('fr')">🇫🇷 Français</button>
-    <button onclick="setLang('zh')">🇨🇳 中文</button>
+    <button onclick="window.setLang('fr')">🇫🇷 Français</button>
+    <button onclick="window.setLang('zh')">🇨🇳 中文</button>
   </div>
 
   <h2 data-i18n="auth_title">Connexion / Inscription</h2>
-  <input type="email" id="email" placeholder="Email">
-  <input type="password" id="password" placeholder="Mot de passe">
-  <button onclick="signup()" data-i18n="signup_btn">S'inscrire</button>
-  <button onclick="login()" data-i18n="login_btn">Se connecter</button>
+  <input type="email" id="email" placeholder="Email" />
+  <input type="password" id="password" placeholder="Mot de passe" />
+  <button onclick="window.signup()" data-i18n="signup_btn">S'inscrire</button>
+  <button onclick="window.login()" data-i18n="login_btn">Se connecter</button>
 
+  <!-- 正确版本的 UMD CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.5/dist/umd/supabase.min.js"></script>
   <script>
     const SUPABASE_URL = "https://fdbcypvxuikhmxvyyvmb.supabase.co";
     const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkYmN5cHZ4dWlraG14dnl5dm1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjY5MzUsImV4cCI6MjA2MDg0MjkzNX0.Ju8wyqBS1irCWgtpBT_RanrqVErQt-gQkWdzb69XMr4";
-    const supabase = supabase.createClient(SUPABASE_URL, API_KEY);
-    const supabase = window.supabase.createClient(SUPABASE_URL, API_KEY);
 
-    async function signup() {
+    const client = window.supabase.createClient(SUPABASE_URL, API_KEY);
+
+    window.signup = async function () {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
-      const { error } = await supabase.auth.signUp({ email, password });
+      const { error } = await client.auth.signUp({ email, password });
       if (error) {
-        alert(getText("signup_fail") + error.message);
+        alert(window.getText("signup_fail") + error.message);
       } else {
-        alert(getText("signup_success"));
+        alert(window.getText("signup_success"));
         window.location.href = "index.html";
       }
-    }
+    };
 
-    async function login() {
+    window.login = async function () {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await client.auth.signInWithPassword({ email, password });
       if (error) {
-        alert(getText("login_fail") + error.message);
+        alert(window.getText("login_fail") + error.message);
       } else {
-        alert(getText("login_success"));
+        alert(window.getText("login_success"));
         window.location.href = "index.html";
       }
-    }
+    };
 
-    // 多语言字典
     const i18n = {
       fr: {
         auth_title: "Connexion / Inscription",
@@ -107,7 +102,7 @@
 
     let currentLang = "fr";
 
-    function setLang(lang) {
+    window.setLang = function (lang) {
       currentLang = lang;
       document.querySelectorAll("[data-i18n]").forEach(el => {
         const key = el.getAttribute("data-i18n");
@@ -115,16 +110,15 @@
           el.textContent = i18n[lang][key];
         }
       });
-      // 更新 placeholder
       document.getElementById("password").placeholder =
         lang === "fr" ? "Mot de passe" : "密码";
-    }
+    };
 
-    function getText(key) {
+    window.getText = function (key) {
       return i18n[currentLang][key] || key;
-    }
+    };
 
-    window.onload = () => setLang("fr");
+    window.onload = () => window.setLang("fr");
   </script>
 </body>
 </html>
