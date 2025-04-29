@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Mes commandes / 我的订单</title>
+</head>
+<body>
+  <!-- 语言切换按钮 -->
+  <div>
+    <button onclick="setLang('fr')">🇫🇷 Français</button>
+    <button onclick="setLang('zh')">🇨🇳 中文</button>
+  </div>
+
+  <!-- 注册 / 登录 -->
+  <h2 data-i18n="auth_title">Connexion / Inscription</h2>
+  <input type="email" id="email" placeholder="Email"><br>
+  <input type="password" id="password" placeholder="Mot de passe"><br>
+  <button onclick="signup()" data-i18n="signup_btn">S'inscrire</button>
+  <button onclick="login()" data-i18n="login_btn">Se connecter</button>
+  <button onclick="logout()" data-i18n="logout_btn">Se déconnecter</button>
+
+  <!-- 下单 -->
+  <h2 data-i18n="order_title">Passer une commande</h2>
+  <input type="text" id="address" placeholder="Adresse de livraison"><br>
+  <input type="text" id="phone" placeholder="Numéro de téléphone"><br>
+  <button onclick="submitOrder()" data-i18n="submit_order_btn">Commander</button>
+
+  <!-- 订单历史 -->
+  <h2 data-i18n="history_title">Mes commandes</h2>
+  <button onclick="fetchOrders()" data-i18n="refresh_btn">Actualiser</button>
+  <ul id="orderList"></ul>
+
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script>
+    const SUPABASE_URL = "https://fdbcypvxuikhmxvyyvmb.supabase.co";
+    const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...";
+    const supabase = supabase.createClient(SUPABASE_URL, API_KEY);
+
+    async function signup() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const { error } = await supabase.auth.signUp({ email, password });
+      alert(error ? getText("signup_fail") + error.message : getText("signup_success"));
+    }
+
+    async function login() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      alert(error ? getText("login_fail") + error.message : getText("login_success"));
+    }
+
+    async function logout() {
+      await supabase.auth.signOut();
+      alert(getText("logout_success"));
+    }
+
+    async function submitOrder() {
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) return alert(getText("must_login"));
+
+      const address = document.getElementById("address").value;
+      const phone = document.getElementById("phone").value;
+      const { error } = await supabase.from("orders").insert({
+        address, phone, user_id: user.id, created_at: new Date().toISOString()
+      });
+      alert(error ? getText("order_fail") + error.message : getText("order_success"));
+    }
+
+    async function fetchOrders() {
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) return alert(getText("must_login"));
+
+      const { data: orders, error } = await supabase
+        .from("orders")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (error) return alert(getText("fetch_fail") + error.message);
+
+      const list = document.getElementById("orderList");
+      list.innerHTML = "";
+      orders.forEach(o => {
+        const li = document.createElement("li");
+        li.textContent = `${getText("order_line")}${o.address}, ${o.phone}, ${new Date(o.created_at).toLocaleString()}`;
+        list.appendChild(li);
+      });
+    }
+
+    // 多语言字典
+    const i18n = {
+      fr: {
+        auth_title: "Connexion / Inscription",
+        signup_btn: "S'inscrire",
+        login_btn: "Se connecter",
+        logout_btn: "Se déconnecter",
+        order_title: "Passer une commande",
+        submit_order_btn: "Commander",
+        history_title: "Mes commandes",
+        refresh_btn: "Actualiser",
+        signup_fail: "Échec de l'inscription : ",
+        signup_success: "Inscription réussie. Vérifiez votre email.",
+        login_fail: "Échec de la connexion : ",
+        login_success: "Connexion réussie.",
+        logout_success: "Déconnexion réussie.",
+        must_login: "Veuillez d'abord vous connecter.",
+        order_fail: "Échec de la commande : ",
+        order_success: "Commande réussie !",
+        fetch_fail: "Erreur de chargement : ",
+        order_line: "Commande : "
+      },
+      zh: {
+        auth_title: "注册 / 登录",
+        signup_btn: "注册",
+        login_btn: "登录",
+        logout_btn: "退出登录",
+        order_title: "提交订单",
+        submit_order_btn: "提交",
+        history_title: "我的订单",
+        refresh_btn: "刷新",
+        signup_fail: "注册失败：",
+        signup_success: "注册成功，请检查邮箱验证。",
+        login_fail: "登录失败：",
+        login_success: "登录成功。",
+        logout_success: "已退出登录。",
+        must_login: "请先登录。",
+        order_fail: "提交失败：",
+        order_success: "订单提交成功！",
+        fetch_fail: "获取失败：",
+        order_line: "订单："
+      }
+    };
+
+    // 当前语言
+    let currentLang = "fr";
+
+    function setLang(lang) {
+      currentLang = lang;
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        if (i18n[lang][key]) {
+          el.textContent = i18n[lang][key];
+        }
+      });
+    }
+
+    function getText(key) {
+      return i18n[currentLang][key] || key;
+    }
+
+    // 默认语言设置
+    setLang("fr");
+  </script>
+</body>
+</html>
