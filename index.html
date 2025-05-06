@@ -128,10 +128,14 @@
       }
   
       const items = [];
-      items.push({ name: main, qty: 1, price: 3.0 });
-      for (const side of sides) {
-        items.push({ name: side, qty: 1, price: 2.0 });
+      if (priceMap[main]) {
+        items.push({ name: main, qty: 1, price: priceMap[main] });
       }
+      for (const side of sides) {
+        const price = priceMap[side] || 0;
+        items.push({ name: side, qty: 1, price });
+      }
+
   
       const data = {
         items,
