@@ -21,27 +21,42 @@
   </div>
 
   <form id="orderForm">
-    <h2>🍚 Choisissez un <strong>principal</strong> (3.00 €)</h2>
-    <label><input type="radio" name="main" value="Riz blanc"> Riz blanc</label>
-    <label><input type="radio" name="main" value="Nouilles sautées"> Nouilles sautées</label>
-
-    <h2>🥢 Choisissez vos <strong>accompagnements</strong> (2.00 € chacun)</h2>
-    <label><input type="checkbox" name="sides" value="Poulet caramel"> Poulet caramel</label><br>
-    <label><input type="checkbox" name="sides" value="Boeuf aux oignons"> Bœuf aux oignons</label><br>
-    <label><input type="checkbox" name="sides" value="Tofu piquant"> Tofu sauce piquante</label><br>
-    <label><input type="checkbox" name="sides" value="Légumes sautés"> Légumes sautés</label><br>
-
+    <h2>🍚 Choisissez un <strong>accompagnement de base</strong></h2>
+    <label><input type="radio" name="main" value="Riz blanc"> Riz blanc</label><br>
+    <label><input type="radio" name="main" value="Riz sauté (+1€)"> Riz sauté (+1€)</label><br>
+    <label><input type="radio" name="main" value="Nouilles sautées (+1€)"> Nouilles sautées (+1€)</label><br>
+  
+    <h2>🍛 Choisissez vos <strong>plats chauds</strong> (2,00 € chacun)</h2>
+    <label><input type="checkbox" name="sides" value="Bœuf braisé"> Bœuf braisé</label><br>
+    <label><input type="checkbox" name="sides" value="Porc caramélisé"> Porc caramélisé</label><br>
+    <label><input type="checkbox" name="sides" value="Poulet aigre-doux"> Poulet aigre-doux</label><br>
+    <label><input type="checkbox" name="sides" value="Porc sauté doux"> Porc sauté doux</label><br>
+    <label><input type="checkbox" name="sides" value="Poulet frit"> Poulet frit</label><br>
+    <label><input type="checkbox" name="sides" value="Porc croustillant"> Porc croustillant</label><br>
+    <label><input type="checkbox" name="sides" value="Poulet Kung Pao"> Poulet Kung Pao</label><br>
+    <label><input type="checkbox" name="sides" value="Aubergines braisées"> Aubergines braisées</label><br>
+    <label><input type="checkbox" name="sides" value="Haricots verts épicés"> Haricots verts épicés</label><br>
+    <label><input type="checkbox" name="sides" value="Œufs aux tomates"> Œufs aux tomates</label><br>
+  
+    <h2>🥗 Choisissez une <strong>entrée</strong> (optionnelle)</h2>
+    <label><input type="checkbox" name="sides" value="Concombre à l’ail"> Concombre à l’ail</label><br>
+    <label><input type="checkbox" name="sides" value="Radis aigre-doux"> Radis aigre-doux</label><br>
+    <label><input type="checkbox" name="sides" value="Pommes de terre épicées"> Pommes de terre épicées</label><br>
+    <label><input type="checkbox" name="sides" value="Algues marinées"> Algues marinées</label><br>
+  
+    <h2>📍 Informations</h2>
     <label for="address" class="label">Adresse de livraison (optionnel)</label>
     <input type="text" name="address" id="address" placeholder="ex: 22 Rue Truc, 75010 Paris">
-
+  
     <label for="phone" class="label">Numéro de téléphone</label>
     <input type="tel" name="phone" id="phone" placeholder="ex: 06 12 34 56 78" required>
-
+  
     <label for="notes" class="label">Remarque (optionnel)</label>
     <input type="text" name="notes" id="notes" placeholder="Pas épicé, sans oignons...">
-
+  
     <button type="submit" id="submitBtn">✅ Commander</button>
   </form>
+
 
   <p id="result"></p>
 
