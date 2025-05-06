@@ -42,15 +42,10 @@
   <script>
     const SUPABASE_URL = "https://fdbcypvxuikhmxvyyvmb.supabase.co";
     const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkYmN5cHZ4dWlraG14dnl5dm1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjY5MzUsImV4cCI6MjA2MDg0MjkzNX0.Ju8wyqBS1irCWgtpBT_RanrqVErQt-gQkWdzb69XMr4";
-
     const client = window.supabase.createClient(SUPABASE_URL, API_KEY);
 
     async function loadOrders() {
-      const {
-        data: { user },
-        error
-      } = await client.auth.getUser();
-
+      const { data: { user }, error } = await client.auth.getUser();
       if (!user || error) {
         alert("Veuillez vous connecter d'abord.");
         window.location.href = "index.html";
@@ -63,37 +58,36 @@
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
-      if (ordersError || !orders) {
-        document.getElementById("ordersContainer").innerText = "Erreur de chargement.";
-        return;
-      }
-
-      if (orders.length === 0) {
-        document.getElementById("ordersContainer").innerText = "Aucune commande trouvée.";
-        return;
-      }
-
       const container = document.getElementById("ordersContainer");
       container.innerHTML = "";
 
+      if (ordersError || !orders || orders.length === 0) {
+        container.innerText = "Aucune commande trouvée.";
+        return;
+      }
+
       orders.forEach(order => {
-        const total = order.items.reduce((sum, item) => sum + (item.price || 0) * (item.qty || 1), 0);
-
-        const itemListHtml = order.items
-          .map(i => `<li>${i.name} ×${i.qty || 1}（€${(i.price || 0).toFixed(2)}）</li>`)
-          .join("");
-
         const div = document.createElement("div");
         div.className = "order";
+
+        const total = order.items?.reduce((sum, item) => sum + item.qty * item.price, 0) || 0;
+
+        const mainItem = order.items?.[0];
+        const sideItems = order.items?.slice(1) || [];
+
         div.innerHTML = `
-          <h3>🕒 Commande du ${new Date(order.created_at).toLocaleString()}</h3>
-          <p><strong>🍽️ Détails :</strong></p>
-          <ul>${itemListHtml}</ul>
-          <p><strong>💳 Total :</strong> €${total.toFixed(2)}</p>
-          <p><strong>📍 Adresse :</strong> ${order.address || "—"}</p>
-          <p><strong>📞 Téléphone :</strong> ${order.phone || "—"}</p>
-          <p><strong>📝 Remarque :</strong> ${order.notes || "—"}</p>
-          <p class="status">🧾 Statut : ${order.status}</p>
+          <p>🕒 下单时间： ${new Date(order.created_at).toLocaleString()}</p>
+          <p>🍰 主食： ${mainItem ? `${mainItem.name}（€${mainItem.price.toFixed(2)}）` : "无（€undefined）"}</p>
+          <p>🥗 配菜：</p>
+          <ul>
+            ${sideItems.map(i => `<li>• ${i.name} ×${i.qty}（€${i.price.toFixed(2)}）</li>`).join("") || "<li>无</li>"}
+          </ul>
+          <p>💳 总价： €${total.toFixed(2)}</p>
+          <p>📝 备注： ${order.notes || "—"}</p>
+          <p>📍 地址： ${order.address || "—"}</p>
+          <p>📞 电话： ${order.phone}</p>
+          <p>🆔 订单ID：${order.id}</p>
+          <p class="status">✅ 标记为已打印 🖨️ 自动打印</p>
         `;
         container.appendChild(div);
       });
