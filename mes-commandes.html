@@ -81,12 +81,17 @@
       orders.forEach(order => {
         const items = order.items || [];
 
+        // ✅ 主食识别使用双向 normalize
         const main = items.find(item =>
-          mainNames.some(name => normalize(name) === normalize(item.name))
+          mainNames.some(name =>
+            normalize(name) === normalize(item.name)
+          )
         ) || null;
 
         const sides = items.filter(item =>
-          !mainNames.some(name => normalize(name) === normalize(item.name))
+          !mainNames.some(name =>
+            normalize(name) === normalize(item.name)
+          )
         );
 
         const mainText = main
