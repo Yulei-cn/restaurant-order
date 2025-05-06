@@ -101,6 +101,29 @@
     }
   
     setLang("fr");
+
+    const priceMap = {
+  "Riz blanc": 2.5,
+  "Riz sauté": 5.8,
+  "Nouilles sautées": 6.8,
+
+  "Bœuf braisé": 8.8,
+  "Porc caramélisé": 8.8,
+  "Poulet aigre-doux": 8.8,
+  "Porc sauté doux": 8.8,
+  "Poulet frit": 8.8,
+  "Porc croustillant": 8.8,
+  "Poulet Kung Pao": 8.8,
+  "Aubergines braisées": 6.8,
+  "Haricots verts épicés": 6.8,
+  "Œufs aux tomates": 6.8,
+
+  "Concombre à l’ail": 5.8,
+  "Radis aigre-doux": 5.8,
+  "Pommes de terre épicées": 5.8,
+  "Algues marinées": 5.8
+};
+
   
     document.getElementById("orderForm").addEventListener("submit", async (e) => {
       e.preventDefault();
