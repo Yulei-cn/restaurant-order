@@ -141,10 +141,16 @@
         return;
       }
 
-      const items = [];
-      if (priceMap[main] !== undefined) {
-        items.push({ name: main, qty: 1, price: priceMap[main] });
-      }
+        const items = [];
+        
+        const cleanMainKey = Object.keys(priceMap).find(k => k.trim() === main.trim());
+        
+        if (cleanMainKey) {
+          items.push({ name: cleanMainKey, qty: 1, price: priceMap[cleanMainKey] });
+        } else {
+          console.warn("主食未匹配到 priceMap 中的价格！main =", main);
+        }
+
       for (const side of sides) {
         if (priceMap[side] !== undefined) {
           items.push({ name: side, qty: 1, price: priceMap[side] });
