@@ -42,7 +42,6 @@
   <script>
     const SUPABASE_URL = "https://fdbcypvxuikhmxvyyvmb.supabase.co";
     const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkYmN5cHZ4dWlraG14dnl5dm1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjY5MzUsImV4cCI6MjA2MDg0MjkzNX0.Ju8wyqBS1irCWgtpBT_RanrqVErQt-gQkWdzb69XMr4";
-
     const client = window.supabase.createClient(SUPABASE_URL, API_KEY);
 
     async function loadOrders() {
@@ -78,8 +77,10 @@
 
       orders.forEach(order => {
         const items = order.items || [];
-        const main = items[0] || null;
-        const sides = items.slice(1);
+
+        const mainNames = ["Riz blanc", "Riz sauté", "Nouilles sautées"];
+        const main = items.find(item => mainNames.includes(item.name)) || null;
+        const sides = items.filter(item => !mainNames.includes(item.name));
 
         const mainText = main
           ? `${main.name}（€${main.price.toFixed(2)}）`
