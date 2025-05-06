@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="zh">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mes Commandes</title>
+  <title>我的订单</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -35,19 +35,24 @@
   </style>
 </head>
 <body>
-  <h1>📦 Mes Commandes</h1>
-  <div id="ordersContainer">Chargement...</div>
+  <h1>📋 当前新订单</h1>
+  <div id="ordersContainer">加载中...</div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.5/dist/umd/supabase.min.js"></script>
   <script>
     const SUPABASE_URL = "https://fdbcypvxuikhmxvyyvmb.supabase.co";
     const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkYmN5cHZ4dWlraG14dnl5dm1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjY5MzUsImV4cCI6MjA2MDg0MjkzNX0.Ju8wyqBS1irCWgtpBT_RanrqVErQt-gQkWdzb69XMr4";
+
     const client = window.supabase.createClient(SUPABASE_URL, API_KEY);
 
     async function loadOrders() {
-      const { data: { user }, error } = await client.auth.getUser();
+      const {
+        data: { user },
+        error
+      } = await client.auth.getUser();
+
       if (!user || error) {
-        alert("Veuillez vous connecter d'abord.");
+        alert("请先登录！");
         window.location.href = "index.html";
         return;
       }
@@ -58,30 +63,41 @@
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
-      const container = document.getElementById("ordersContainer");
-      container.innerHTML = "";
-
-      if (ordersError || !orders || orders.length === 0) {
-        container.innerText = "Aucune commande trouvée.";
+      if (ordersError) {
+        document.getElementById("ordersContainer").innerText = "订单加载失败。";
         return;
       }
 
+      if (!orders || orders.length === 0) {
+        document.getElementById("ordersContainer").innerText = "暂无订单。";
+        return;
+      }
+
+      const container = document.getElementById("ordersContainer");
+      container.innerHTML = "";
+
       orders.forEach(order => {
+        const items = order.items || [];
+        const main = items[0] || null;
+        const sides = items.slice(1);
+
+        const mainText = main
+          ? `${main.name}（€${main.price.toFixed(2)}）`
+          : "无（€0.00）";
+
+        const sidesHTML = sides.length
+          ? sides.map(i => `<li>• ${i.name} ×${i.qty}（€${(i.price * i.qty).toFixed(2)}）</li>`).join("")
+          : "<li>无</li>";
+
+        const total = items.reduce((sum, i) => sum + i.qty * i.price, 0);
+
         const div = document.createElement("div");
         div.className = "order";
-
-        const total = order.items?.reduce((sum, item) => sum + item.qty * item.price, 0) || 0;
-
-        const mainItem = order.items?.[0];
-        const sideItems = order.items?.slice(1) || [];
-
         div.innerHTML = `
           <p>🕒 下单时间： ${new Date(order.created_at).toLocaleString()}</p>
-          <p>🍰 主食： ${mainItem ? `${mainItem.name}（€${mainItem.price.toFixed(2)}）` : "无（€undefined）"}</p>
+          <p>🍰 主食： ${mainText}</p>
           <p>🥗 配菜：</p>
-          <ul>
-            ${sideItems.map(i => `<li>• ${i.name} ×${i.qty}（€${i.price.toFixed(2)}）</li>`).join("") || "<li>无</li>"}
-          </ul>
+          <ul>${sidesHTML}</ul>
           <p>💳 总价： €${total.toFixed(2)}</p>
           <p>📝 备注： ${order.notes || "—"}</p>
           <p>📍 地址： ${order.address || "—"}</p>
