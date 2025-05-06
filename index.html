@@ -141,21 +141,26 @@
         return;
       }
 
-        const items = [];
-        
-        const cleanMainKey = Object.keys(priceMap).find(k => k.trim() === main.trim());
-        
-        if (cleanMainKey) {
-          items.push({ name: cleanMainKey, qty: 1, price: priceMap[cleanMainKey] });
-        } else {
-          console.warn("主食未匹配到 priceMap 中的价格！main =", main);
-        }
-
+      const items = [];
+      
+      // 处理主食
+      const cleanMainKey = Object.keys(priceMap).find(k => k.trim() === main.trim());
+      if (cleanMainKey) {
+        items.push({ name: cleanMainKey, qty: 1, price: priceMap[cleanMainKey] });
+      } else {
+        console.warn("主食未匹配到 priceMap 中的价格！main =", main);
+      }
+      
+      // 处理配菜
       for (const side of sides) {
-        if (priceMap[side] !== undefined) {
-          items.push({ name: side, qty: 1, price: priceMap[side] });
+        const cleanSideKey = Object.keys(priceMap).find(k => k.trim() === side.trim());
+        if (cleanSideKey) {
+          items.push({ name: cleanSideKey, qty: 1, price: priceMap[cleanSideKey] });
+        } else {
+          console.warn("配菜未匹配到 priceMap 中的价格！side =", side);
         }
       }
+
 
       const data = {
         items,
