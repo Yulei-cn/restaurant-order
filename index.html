@@ -142,17 +142,18 @@
         status: "新订单"
       };
   
-      const res = await fetch(${SUPABASE_URL}/rest/v1/orders, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          apikey: API_KEY,
-          Authorization: Bearer ${API_KEY},
-          Prefer: "return=minimal"
-        },
-        body: JSON.stringify(data)
-      });
-  
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/orders`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        apikey: API_KEY,
+        Authorization: `Bearer ${API_KEY}`,
+        Prefer: "return=minimal"
+      },
+      body: JSON.stringify(data)
+    });
+    
+      
       const lang = document.documentElement.lang || "fr";
       const resultText = res.ok
         ? (lang === "zh" ? "✅ 下单成功，感谢光临！" : "✅ Commande réussie ! Merci.")
