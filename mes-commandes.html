@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>我的订单</title>
+  <title>Mes Commandes</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -22,6 +22,9 @@
       margin-bottom: 20px;
       background-color: #f9f9f9;
     }
+    .order h3 {
+      margin-top: 0;
+    }
     ul {
       padding-left: 20px;
     }
@@ -32,22 +35,15 @@
   </style>
 </head>
 <body>
-  <h1>📋 当前新订单</h1>
-  <div id="ordersContainer">加载中...</div>
+  <h1>📦 Mes Commandes</h1>
+  <div id="ordersContainer">Chargement...</div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.5/dist/umd/supabase.min.js"></script>
   <script>
     const SUPABASE_URL = "https://fdbcypvxuikhmxvyyvmb.supabase.co";
     const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkYmN5cHZ4dWlraG14dnl5dm1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjY5MzUsImV4cCI6MjA2MDg0MjkzNX0.Ju8wyqBS1irCWgtpBT_RanrqVErQt-gQkWdzb69XMr4";
-    const client = window.supabase.createClient(SUPABASE_URL, API_KEY);
 
-    function normalizeDeep(str) {
-      return str
-        .normalize("NFKC") // 强力 Unicode 标准化
-        .replace(/\s+/g, " ") // 合并多空格
-        .replace(/[^\x20-\x7E\u00A0-\u024F]/g, "") // 去除不可见字符
-        .trim();
-    }
+    const client = window.supabase.createClient(SUPABASE_URL, API_KEY);
 
     async function loadOrders() {
       const {
@@ -56,7 +52,7 @@
       } = await client.auth.getUser();
 
       if (!user || error) {
-        alert("请先登录！");
+        alert("Veuillez vous connecter d'abord.");
         window.location.href = "index.html";
         return;
       }
@@ -68,60 +64,32 @@
         .order("created_at", { ascending: false });
 
       if (ordersError) {
-        document.getElementById("ordersContainer").innerText = "订单加载失败。";
+        document.getElementById("ordersContainer").innerText = "Erreur de chargement.";
         return;
       }
 
       if (!orders || orders.length === 0) {
-        document.getElementById("ordersContainer").innerText = "暂无订单。";
+        document.getElementById("ordersContainer").innerText = "Aucune commande trouvée.";
         return;
       }
 
       const container = document.getElementById("ordersContainer");
       container.innerHTML = "";
 
-      const mainNames = ["Riz blanc", "Riz sauté", "Nouilles sautées"];
-
       orders.forEach(order => {
-        const items = order.items || [];
-
-        console.log("🧪 订单项目名：", items.map(i => `"${i.name}"`));
-
-        const main = items.find(item =>
-          mainNames.some(name =>
-            normalizeDeep(name) === normalizeDeep(item.name)
-          )
-        ) || null;
-
-        const sides = items.filter(item =>
-          !mainNames.some(name =>
-            normalizeDeep(name) === normalizeDeep(item.name)
-          )
-        );
-
-        const mainText = main
-          ? `${main.name}（€${main.price.toFixed(2)}）`
-          : "无（€0.00）";
-
-        const sidesHTML = sides.length
-          ? sides.map(i => `<li>• ${i.name} ×${i.qty}（€${(i.price * i.qty).toFixed(2)}）</li>`).join("")
-          : "<li>无</li>";
-
-        const total = items.reduce((sum, i) => sum + i.qty * i.price, 0);
-
         const div = document.createElement("div");
         div.className = "order";
+        const total = order.items.reduce((sum, item) => sum + item.qty * item.price, 0);
         div.innerHTML = `
-          <p>🕒 下单时间： ${new Date(order.created_at).toLocaleString()}</p>
-          <p>🍰 主食： ${mainText}</p>
-          <p>🥗 配菜：</p>
-          <ul>${sidesHTML}</ul>
-          <p>💳 总价： €${total.toFixed(2)}</p>
-          <p>📝 备注： ${order.notes || "—"}</p>
-          <p>📍 地址： ${order.address || "—"}</p>
-          <p>📞 电话： ${order.phone}</p>
-          <p>🆔 订单ID：${order.id}</p>
-          <p class="status">✅ 标记为已打印 🖨️ 自动打印</p>
+          <h3>Commande du ${new Date(order.created_at).toLocaleString()}</h3>
+          <ul>
+            ${order.items.map(i => `<li>${i.name} x${i.qty} — ${(i.price * i.qty).toFixed(2)} €</li>`).join("")}
+          </ul>
+          <p><strong>Total :</strong> ${total.toFixed(2)} €</p>
+          <p><strong>Adresse :</strong> ${order.address || "(non renseignée)"}</p>
+          <p><strong>Téléphone :</strong> ${order.phone}</p>
+          <p><strong>Remarque :</strong> ${order.notes || "—"}</p>
+          <p class="status">🧾 Statut : ${order.status}</p>
         `;
         container.appendChild(div);
       });
