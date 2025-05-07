@@ -22,6 +22,9 @@
       margin-bottom: 20px;
       background-color: #f9f9f9;
     }
+    .order h3 {
+      margin-top: 0;
+    }
     ul {
       padding-left: 20px;
     }
@@ -39,11 +42,8 @@
   <script>
     const SUPABASE_URL = "https://fdbcypvxuikhmxvyyvmb.supabase.co";
     const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkYmN5cHZ4dWlraG14dnl5dm1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjY5MzUsImV4cCI6MjA2MDg0MjkzNX0.Ju8wyqBS1irCWgtpBT_RanrqVErQt-gQkWdzb69XMr4";
-    const client = window.supabase.createClient(SUPABASE_URL, API_KEY);
 
-    function normalize(str) {
-      return str.trim().normalize("NFC");
-    }
+    const client = window.supabase.createClient(SUPABASE_URL, API_KEY);
 
     async function loadOrders() {
       const {
@@ -76,23 +76,10 @@
       const container = document.getElementById("ordersContainer");
       container.innerHTML = "";
 
-      const mainNames = ["Riz blanc", "Riz sauté", "Nouilles sautées"];
-
       orders.forEach(order => {
         const items = order.items || [];
-
-        // ✅ 主食识别使用双向 normalize
-        const main = items.find(item =>
-          mainNames.some(name =>
-            normalize(name) === normalize(item.name)
-          )
-        ) || null;
-
-        const sides = items.filter(item =>
-          !mainNames.some(name =>
-            normalize(name) === normalize(item.name)
-          )
-        );
+        const main = items[0] || null;
+        const sides = items.slice(1);
 
         const mainText = main
           ? `${main.name}（€${main.price.toFixed(2)}）`
