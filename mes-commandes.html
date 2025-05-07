@@ -1,42 +1,39 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="zh">
 <head>
-  <meta charset="UTF-8">
-  <title>👨‍🍳 CUBE - Commandes à préparer</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>我的订单</title>
   <style>
-    body { font-family: sans-serif; padding: 20px; background: #fffdf8; }
-    h1 { text-align: center; }
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #2e7d32;
+    }
     .order {
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      padding: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 16px;
       margin-bottom: 20px;
-      background: #fff;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      background-color: #f9f9f9;
     }
-    .order h2 {
-      margin-top: 0;
-      color: #d35400;
+    ul {
+      padding-left: 20px;
     }
-    .order-items li {
-      margin: 4px 0;
-      font-size: 16px;
-    }
-    .label {
+    .status {
       font-weight: bold;
-      margin-top: 10px;
-    }
-    .note, .address, .phone {
-      font-size: 15px;
-      color: #333;
+      color: #1b5e20;
     }
   </style>
 </head>
 <body>
-
-  <h1>📋 Commandes en cours - Cuisine</h1>
-  <div id="ordersContainer">Chargement des commandes...</div>
+  <h1>📋 当前新订单</h1>
+  <div id="ordersContainer">加载中...</div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.5/dist/umd/supabase.min.js"></script>
   <script>
@@ -44,45 +41,88 @@
     const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkYmN5cHZ4dWlraG14dnl5dm1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjY5MzUsImV4cCI6MjA2MDg0MjkzNX0.Ju8wyqBS1irCWgtpBT_RanrqVErQt-gQkWdzb69XMr4";
     const client = window.supabase.createClient(SUPABASE_URL, API_KEY);
 
+    function normalize(str) {
+      return str.trim().normalize("NFC");
+    }
+
     async function loadOrders() {
-      const { data, error } = await client
-        .from('orders')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(20); // 最新20个订单
+      const {
+        data: { user },
+        error
+      } = await client.auth.getUser();
 
-      const container = document.getElementById('ordersContainer');
-      if (error || !data) {
-        container.textContent = "Erreur lors du chargement des commandes.";
+      if (!user || error) {
+        alert("请先登录！");
+        window.location.href = "index.html";
         return;
       }
 
-      if (data.length === 0) {
-        container.textContent = "Aucune commande à préparer pour l’instant.";
+      const { data: orders, error: ordersError } = await client
+        .from("orders")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (ordersError) {
+        document.getElementById("ordersContainer").innerText = "订单加载失败。";
         return;
       }
 
-      container.innerHTML = '';
-      for (const order of data) {
-        const div = document.createElement('div');
-        div.className = 'order';
+      if (!orders || orders.length === 0) {
+        document.getElementById("ordersContainer").innerText = "暂无订单。";
+        return;
+      }
 
-        const time = new Date(order.created_at).toLocaleTimeString();
+      const container = document.getElementById("ordersContainer");
+      container.innerHTML = "";
+
+      const mainNames = ["Riz blanc", "Riz sauté", "Nouilles sautées"];
+
+      orders.forEach(order => {
+        const items = order.items || [];
+
+        // ✅ 主食识别使用双向 normalize
+        const main = items.find(item =>
+          mainNames.some(name =>
+            normalize(name) === normalize(item.name)
+          )
+        ) || null;
+
+        const sides = items.filter(item =>
+          !mainNames.some(name =>
+            normalize(name) === normalize(item.name)
+          )
+        );
+
+        const mainText = main
+          ? `${main.name}（€${main.price.toFixed(2)}）`
+          : "无（€0.00）";
+
+        const sidesHTML = sides.length
+          ? sides.map(i => `<li>• ${i.name} ×${i.qty}（€${(i.price * i.qty).toFixed(2)}）</li>`).join("")
+          : "<li>无</li>";
+
+        const total = items.reduce((sum, i) => sum + i.qty * i.price, 0);
+
+        const div = document.createElement("div");
+        div.className = "order";
         div.innerHTML = `
-          <h2>🕒 ${time} — ${order.status || 'En attente'}</h2>
-          <ul class="order-items">
-            ${order.items.map(item => `<li>🍽️ ${item.name} × ${item.qty}</li>`).join('')}
-          </ul>
-          ${order.notes ? `<div class="label">📝 Remarque :</div><div class="note">${order.notes}</div>` : ''}
-          ${order.address ? `<div class="label">📍 Adresse :</div><div class="address">${order.address}</div>` : ''}
-          ${order.phone ? `<div class="label">📞 Téléphone :</div><div class="phone">${order.phone}</div>` : ''}
+          <p>🕒 下单时间： ${new Date(order.created_at).toLocaleString()}</p>
+          <p>🍰 主食： ${mainText}</p>
+          <p>🥗 配菜：</p>
+          <ul>${sidesHTML}</ul>
+          <p>💳 总价： €${total.toFixed(2)}</p>
+          <p>📝 备注： ${order.notes || "—"}</p>
+          <p>📍 地址： ${order.address || "—"}</p>
+          <p>📞 电话： ${order.phone}</p>
+          <p>🆔 订单ID：${order.id}</p>
+          <p class="status">✅ 标记为已打印 🖨️ 自动打印</p>
         `;
         container.appendChild(div);
-      }
+      });
     }
 
     loadOrders();
-    setInterval(loadOrders, 10000); // 刷新间隔：10秒钟
   </script>
 </body>
 </html>
