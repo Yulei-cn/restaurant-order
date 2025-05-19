@@ -32,10 +32,14 @@
       border-bottom: 1px solid #ccc;
       padding-bottom: 5px;
     }
+    .table-container {
+      overflow-x: auto;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 10px;
+      min-width: 600px;
     }
     table th, table td {
       border: 1px solid #ccc;
@@ -50,6 +54,13 @@
       font-size: 0.9em;
       color: #666;
     }
+    .info-box {
+      background: #f9fbe7;
+      border-left: 4px solid #cddc39;
+      padding: 15px;
+      margin-top: 20px;
+      font-size: 1em;
+    }
   </style>
 </head>
 <body>
@@ -60,7 +71,7 @@
   <div class="section">
     <h2>🇨🇳 🇯🇵 Un Voyage de Saveurs à Chaque Repas</h2>
     <p>
-      Chez Petit Baozi, nos boîtes repas sont un hommage aux saveurs authentiques de la Chine et du Japon.
+      Chez <strong>CUBE</strong>, nos boîtes repas sont un hommage aux saveurs authentiques de la Chine et du Japon.
       Du riz parfumé aux nouilles sautées, chaque plat est préparé à la commande, avec soin et générosité.
       Offrez-vous une pause déjeuner qui vous transporte en Asie sans quitter Paris.
     </p>
@@ -83,56 +94,72 @@
     </p>
   </div>
 
+  <div class="info-box">
+    <p>
+      📢 <strong>Bonne nouvelle !</strong> Nous serons bientôt disponibles sur <strong>Uber Eats</strong> et <strong>PandaGo</strong> (熊猫外卖) !
+      Des <strong>promotions exclusives</strong> seront proposées lors du lancement.<br>
+      Vous pouvez également <strong>précommander</strong> et <strong>venir chercher vos commandes sur place</strong> dès maintenant !
+    </p>
+  </div>
+
   <h2>📍 Infos Pratiques</h2>
   <p><strong>Adresse :</strong> 7 Rue Blanche, 75009 Paris</p>
   <p><strong>Horaires :</strong> Tous les jours, de 11h00 à 20h30</p>
 
   <h2>🥗 Entrées</h2>
-  <table>
-    <tr><th>Nom</th><th>Prix</th></tr>
-    <tr><td>Concombre écrasé à l’ail</td><td>5,80 €</td></tr>
-    <tr><td>Radis mariné aigre-doux</td><td>5,80 €</td></tr>
-    <tr><td>Salade de pommes de terre épicée</td><td>5,80 €</td></tr>
-    <tr><td>Salade d’algues</td><td>5,80 €</td></tr>
-  </table>
+  <div class="table-container">
+    <table>
+      <tr><th>Nom</th><th>Prix</th></tr>
+      <tr><td>Concombre écrasé à l’ail</td><td>5,80 €</td></tr>
+      <tr><td>Radis mariné aigre-doux</td><td>5,80 €</td></tr>
+      <tr><td>Salade de pommes de terre épicée</td><td>5,80 €</td></tr>
+      <tr><td>Salade d’algues</td><td>5,80 €</td></tr>
+    </table>
+  </div>
 
   <h2>🍛 Plats chauds</h2>
-  <table>
-    <tr><th>Nom</th><th>Prix</th></tr>
-    <tr><td>Bœuf braisé à la sauce maison</td><td>8,80 €</td></tr>
-    <tr><td>Porc caramélisé (Hong Shao Rou)</td><td>8,80 €</td></tr>
-    <tr><td>Poulet aigre-doux</td><td>8,80 €</td></tr>
-    <tr><td>Porc sauté en sauce douce</td><td>8,80 €</td></tr>
-    <tr><td>Poulet frit croustillant</td><td>8,80 €</td></tr>
-    <tr><td>Porc frit croustillant (Xiao Su Rou)</td><td>8,80 €</td></tr>
-    <tr><td>Poulet Kung Pao (épicé, cacahuètes)</td><td>8,80 €</td></tr>
-    <tr><td>Aubergines braisées</td><td>6,80 €</td></tr>
-    <tr><td>Haricots verts sautés au piment</td><td>6,80 €</td></tr>
-    <tr><td>Œufs brouillés aux tomates</td><td>6,80 €</td></tr>
-  </table>
+  <div class="table-container">
+    <table>
+      <tr><th>Nom</th><th>Prix</th></tr>
+      <tr><td>Bœuf braisé à la sauce maison</td><td>8,80 €</td></tr>
+      <tr><td>Porc caramélisé (Hong Shao Rou)</td><td>8,80 €</td></tr>
+      <tr><td>Poulet aigre-doux</td><td>8,80 €</td></tr>
+      <tr><td>Porc sauté en sauce douce</td><td>8,80 €</td></tr>
+      <tr><td>Poulet frit croustillant</td><td>8,80 €</td></tr>
+      <tr><td>Porc frit croustillant (Xiao Su Rou)</td><td>8,80 €</td></tr>
+      <tr><td>Poulet Kung Pao (épicé, cacahuètes)</td><td>8,80 €</td></tr>
+      <tr><td>Aubergines braisées</td><td>6,80 €</td></tr>
+      <tr><td>Haricots verts sautés au piment</td><td>6,80 €</td></tr>
+      <tr><td>Œufs brouillés aux tomates</td><td>6,80 €</td></tr>
+    </table>
+  </div>
 
   <h2>🍚 Accompagnements</h2>
-  <table>
-    <tr><th>Nom</th><th>Prix</th></tr>
-    <tr><td>Riz blanc vapeur</td><td>2,50 €</td></tr>
-    <tr><td>Riz sauté (œuf, légumes)</td><td>5,80 €</td></tr>
-    <tr><td>Nouilles sautées</td><td>6,80 €</td></tr>
-  </table>
+  <div class="table-container">
+    <table>
+      <tr><th>Nom</th><th>Prix</th></tr>
+      <tr><td>Riz blanc vapeur</td><td>2,50 €</td></tr>
+      <tr><td>Riz sauté (œuf, légumes)</td><td>5,80 €</td></tr>
+      <tr><td>Nouilles sautées</td><td>6,80 €</td></tr>
+    </table>
+  </div>
 
   <h2>🥯 Snacks</h2>
-  <table>
-    <tr><th>Nom</th><th>Prix</th></tr>
-    <tr>
-      <td>Burger chinois (porc mijoté, coriandre, piment doux)<br>
-      <span class="note">Pain chinois croustillant garni façon traditionnelle</span></td>
-      <td>5,80 €</td>
-    </tr>
-    <tr>
-      <td>Burger chinois (bœuf mijoté, coriandre, piment doux)<br>
-      <span class="note">Pain chinois croustillant garni façon traditionnelle</span></td>
-      <td>6,80 €</td>
-    </tr>
-  </table>
+  <div class="table-container">
+    <table>
+      <tr><th>Nom</th><th>Prix</th></tr>
+      <tr>
+        <td>Burger chinois (porc mijoté, coriandre, piment doux)<br>
+        <span class="note">Pain chinois croustillant garni façon traditionnelle</span></td>
+        <td>5,80 €</td>
+      </tr>
+      <tr>
+        <td>Burger chinois (bœuf mijoté, coriandre, piment doux)<br>
+        <span class="note">Pain chinois croustillant garni façon traditionnelle</span></td>
+        <td>6,80 €</td>
+      </tr>
+    </table>
+  </div>
 
   <h2>🥤 Boissons</h2>
   <p>Toutes les boissons : <strong>2,00 €</strong></p>
