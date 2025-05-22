@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Restaurant CUBE - Boîtes Repas & Menu</title>
+  <title>Restaurant CUBE - Menu</title>
   <style>
     body {
       background: white;
@@ -49,17 +49,13 @@
     table th {
       background-color: #f1f8e9;
     }
-    .note {
-      font-style: italic;
-      font-size: 0.9em;
-      color: #666;
+    ul {
+      padding-left: 20px;
     }
-    .info-box {
-      background: #f9fbe7;
-      border-left: 4px solid #cddc39;
-      padding: 15px;
-      margin-top: 20px;
-      font-size: 1em;
+    a.download-link {
+      color: #1b5e20;
+      text-decoration: underline;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -68,123 +64,89 @@
   <img src="logo.png" alt="Logo CUBE" class="logo">
   <h1>🍱 Livraison de Boîtes Repas Chinoises et Japonaises</h1>
 
-  <div class="section">
-    <h2>🇨🇳 🇯🇵 Un Voyage de Saveurs à Chaque Repas</h2>
-    <p>
-      Chez <strong>CUBE</strong>, nos boîtes repas sont un hommage aux saveurs authentiques de la Chine et du Japon.
-      Du riz parfumé aux nouilles sautées, chaque plat est préparé à la commande, avec soin et générosité.
-      Offrez-vous une pause déjeuner qui vous transporte en Asie sans quitter Paris.
-    </p>
-  </div>
+  <p>
+    📄 <a href="meun.pdf" download class="download-link">Télécharger le menu en PDF</a>
+  </p>
 
-  <div class="section">
-    <h2>⏱️ Commande Simple, Livraison Express</h2>
-    <p>
-      Commandez en ligne en quelques clics. Nous cuisinons à la minute et livrons chaud à votre porte.
-      Livraison en 30 minutes dans Paris. Pas de surprise, juste de la rapidité, de la fraîcheur et du goût.
-    </p>
-  </div>
-
-  <div class="section">
-    <h2>🌿 Sain, Léger et Savoureux</h2>
-    <p>
-      Nos recettes sont conçues pour vous offrir un repas complet, équilibré et léger.
-      Moins de gras, plus de légumes, des ingrédients de saison, sans compromis sur la gourmandise.
-      C’est bon pour le corps, et pour le moral.
-    </p>
-  </div>
-
-  <div class="info-box">
-    <p>
-      📢 <strong>Bonne nouvelle !</strong> Nous serons bientôt disponibles sur <strong>Uber Eats</strong> et <strong>PandaGo</strong> (熊猫外卖) !
-      Des <strong>promotions exclusives</strong> seront proposées lors du lancement.<br>
-      Vous pouvez également <strong>précommander</strong> et <strong>venir chercher vos commandes sur place</strong> dès maintenant !
-    </p>
-  </div>
-
-  <h2>📍 Infos Pratiques</h2>
-  <p><strong>Adresse :</strong> 7 Rue Blanche, 75009 Paris</p>
-  <p><strong>Horaires :</strong> Tous les jours, de 11h00 à 20h30</p>
-
-  <h2>🥗 Entrées</h2>
-  <div class="table-container">
-    <table>
-      <tr><th>Nom</th><th>Prix</th></tr>
-      <tr><td>Concombre écrasé à l’ail</td><td>5,80 €</td></tr>
-      <tr><td>Radis mariné aigre-doux</td><td>5,80 €</td></tr>
-      <tr><td>Salade de pommes de terre épicée</td><td>5,80 €</td></tr>
-      <tr><td>Salade d’algues</td><td>5,80 €</td></tr>
-    </table>
-  </div>
-
-  <h2>🍛 Plats chauds</h2>
-  <div class="table-container">
-    <table>
-      <tr><th>Nom</th><th>Prix</th></tr>
-      <tr><td>Bœuf braisé à la sauce maison</td><td>8,80 €</td></tr>
-      <tr><td>Porc caramélisé (Hong Shao Rou)</td><td>8,80 €</td></tr>
-      <tr><td>Poulet aigre-doux</td><td>8,80 €</td></tr>
-      <tr><td>Porc sauté en sauce douce</td><td>8,80 €</td></tr>
-      <tr><td>Poulet frit croustillant</td><td>8,80 €</td></tr>
-      <tr><td>Porc frit croustillant (Xiao Su Rou)</td><td>8,80 €</td></tr>
-      <tr><td>Poulet Kung Pao (épicé, cacahuètes)</td><td>8,80 €</td></tr>
-      <tr><td>Aubergines braisées</td><td>6,80 €</td></tr>
-      <tr><td>Haricots verts sautés au piment</td><td>6,80 €</td></tr>
-      <tr><td>Œufs brouillés aux tomates</td><td>6,80 €</td></tr>
-    </table>
-  </div>
-
-  <h2>🍚 Accompagnements</h2>
-  <div class="table-container">
-    <table>
-      <tr><th>Nom</th><th>Prix</th></tr>
-      <tr><td>Riz blanc vapeur</td><td>2,50 €</td></tr>
-      <tr><td>Riz sauté (œuf, légumes)</td><td>5,80 €</td></tr>
-      <tr><td>Nouilles sautées</td><td>6,80 €</td></tr>
-    </table>
-  </div>
-
-  <h2>🥯 Snacks</h2>
-  <div class="table-container">
-    <table>
-      <tr><th>Nom</th><th>Prix</th></tr>
-      <tr>
-        <td>Burger chinois (porc mijoté, coriandre, piment doux)<br>
-        <span class="note">Pain chinois croustillant garni façon traditionnelle</span></td>
-        <td>5,80 €</td>
-      </tr>
-      <tr>
-        <td>Burger chinois (bœuf mijoté, coriandre, piment doux)<br>
-        <span class="note">Pain chinois croustillant garni façon traditionnelle</span></td>
-        <td>6,80 €</td>
-      </tr>
-    </table>
-  </div>
-
-  <h2>🥤 Boissons</h2>
-  <p>Toutes les boissons : <strong>2,00 €</strong></p>
-  <ul>
-    <li>Coca-Cola</li>
-    <li>Sprite</li>
-    <li>Fanta</li>
-    <li>Thé à la pêche</li>
-    <li>Jus d’orange</li>
-    <li>Eau minérale</li>
-  </ul>
-
-  <h2>🍱 Formules</h2>
+  <h2>🍱 Formules (套餐)</h2>
   <ul>
     <li>
       <strong>Formule 1 — 11,80 €</strong><br>
-      Riz (inclus) ou nouilles sautées <strong>(+1,00 €)</strong> + 1 entrée + 2 plats chauds au choix<br>
-      <em>Boisson en supplément : +1,00 €</em>
+      Riz ou nouilles sautées (+1,00 €) + 1 entrée + 2 plats chauds<br>
+      米饭 或 炒面（加1欧）+ 一个前菜 + 两个热菜<br>
+      <em>Boisson en supplément : +1,00 € / 饮料另加1欧</em>
     </li>
     <li>
       <strong>Formule 2 — 13,80 €</strong><br>
-      3 plats chauds au choix + 1 entrée + Riz (inclus) ou nouilles sautées <strong>(+1,00 €)</strong><br>
-      <em>Boisson en supplément : +1,00 €</em>
+      Riz ou nouilles sautées (+1,00 €) + 1 entrée + 3 plats chauds<br>
+      米饭 或 炒面（加1欧）+ 一个前菜 + 三个热菜<br>
+      <em>Boisson en supplément : +1,00 € / 饮料另加1欧</em>
     </li>
   </ul>
+
+  <h2>🥯 Roujiamo 肉夹馍</h2>
+  <div class="table-container">
+    <table>
+      <tr><th>Nom / 名称</th><th>Prix</th></tr>
+      <tr><td>Roujiamo au porc (猪肉)</td><td>5,80 €</td></tr>
+      <tr><td>Roujiamo au bœuf (牛肉)</td><td>6,80 €</td></tr>
+    </table>
+  </div>
+
+  <h2>🥗 Entrées (前菜)</h2>
+  <div class="table-container">
+    <table>
+      <tr><th>Nom / 名称</th><th>Prix</th></tr>
+      <tr><td>Concombre mariné à l’ail / 拍黄瓜</td><td>5,80 €</td></tr>
+      <tr><td>Radis aigre-doux / 酸甜萝卜</td><td>5,80 €</td></tr>
+      <tr><td>Pommes de terre râpées épicées / 凉拌土豆丝</td><td>5,80 €</td></tr>
+      <tr><td>Algues marinées / 海带丝</td><td>5,80 €</td></tr>
+    </table>
+  </div>
+
+  <h2>🍛 Plats chauds (热菜)</h2>
+  <div class="table-container">
+    <table>
+      <tr><th>Nom / 名称</th><th>Prix</th></tr>
+      <tr><td>Bœuf mijoté / 烧牛肉</td><td>8,80 €</td></tr>
+      <tr><td>Porc braisé / 红烧肉</td><td>8,80 €</td></tr>
+      <tr><td>Poulet aigre-doux / 糖醋鸡</td><td>8,80 €</td></tr>
+      <tr><td>Porc sauté croustillant / 溜肉段</td><td>8,80 €</td></tr>
+      <tr><td>Poulet frit / 炸鸡块</td><td>8,80 €</td></tr>
+      <tr><td>Porc frit croustillant / 小酥肉</td><td>8,80 €</td></tr>
+      <tr><td>Poulet Kung Pao / 宫保鸡丁</td><td>8,80 €</td></tr>
+      <tr><td>Aubergines braisées / 烧茄子</td><td>6,80 €</td></tr>
+      <tr><td>Haricots verts sautés / 干煸豆角</td><td>6,80 €</td></tr>
+      <tr><td>Œufs à la tomate / 番茄炒鸡蛋</td><td>6,80 €</td></tr>
+    </table>
+  </div>
+
+  <h2>🍚 Accompagnements (主食)</h2>
+  <div class="table-container">
+    <table>
+      <tr><th>Nom / 名称</th><th>Prix</th></tr>
+      <tr><td>Riz blanc vapeur / 米饭</td><td>2,50 €</td></tr>
+      <tr><td>Riz sauté (œuf, légumes) / 炒饭</td><td>5,80 €</td></tr>
+      <tr><td>Nouilles sautées / 炒面</td><td>6,80 €</td></tr>
+    </table>
+  </div>
+
+  <h2>🥤 Boissons (饮品)</h2>
+  <p>Toutes les boissons : <strong>2,00 €</strong></p>
+  <ul>
+    <li>Coca-Cola / 可乐</li>
+    <li>Sprite / 雪碧</li>
+    <li>Fanta / 芬达</li>
+    <li>Thé à la pêche / 桃茶</li>
+    <li>Jus d’orange / 橙汁</li>
+    <li>Eau minérale / 矿泉水</li>
+  </ul>
+
+  <h2>📍 Infos Pratiques (实用信息)</h2>
+  <p><strong>Adresse :</strong> 7 Rue Blanche, 75009 Paris</p>
+  <p><strong>Horaires :</strong> Lundi à samedi : 11h00 – 20h30</p>
+  <p><strong>Téléphone :</strong> 01 88 61 44 96</p>
+  <p><strong>Fermé le dimanche / 周日休息</strong></p>
 
 </body>
 </html>
