@@ -74,11 +74,45 @@
       border-radius: 8px;
       display: inline-block;
     }
+    .lang-switch {
+      text-align: center;
+      margin: 20px 0;
+    }
+    .lang-switch button {
+      font-size: 22px;
+      padding: 10px 20px;
+      background-color: #81c784;
+      border: none;
+      border-radius: 8px;
+      margin: 0 10px;
+      cursor: pointer;
+    }
+    .notice {
+      text-align: center;
+      background-color: #fffde7;
+      border: 2px dashed #fbc02d;
+      padding: 15px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #f57f17;
+      margin-bottom: 20px;
+    }
   </style>
 </head>
 <body>
 
   <img src="logo.png" alt="Logo CUBE" class="logo">
+
+  <div class="lang-switch">
+    <button>🇫🇷 Français</button>
+    <button>🇨🇳 中文</button>
+  </div>
+
+  <div class="notice">
+    ⚠️ En phase de test : nous acceptons uniquement les commandes anticipées.<br>
+    Merci de venir retirer votre boîte repas au comptoir extérieur. 自提窗口取餐。
+  </div>
+
   <h1>🍱 Livraison de Boîtes Repas Chinoises et Japonaises</h1>
 
   <div class="section">
@@ -108,14 +142,15 @@
   </div>
 
   <div class="info-box">
-    📢 <strong>Bonne nouvelle !</strong> Nous serons bientôt disponibles sur <strong>Uber Eats</strong> et <strong>PandaGo</strong> (熊猫外卖) !
+    📢 <strong>Bonne nouvelle !</strong> Nous serons bientôt disponibles sur <strong>Uber Eats</strong> et <strong>PandaGo</strong> (熊猫外卖) !<br>
     Des <strong>promotions exclusives</strong> seront proposées lors du lancement.<br>
     Vous pouvez également <strong>précommander</strong> et <strong>venir chercher vos commandes sur place</strong> dès maintenant !
   </div>
 
   <h2>📍 Infos Pratiques</h2>
   <p><strong>Adresse :</strong> 7 Rue Blanche, 75009 Paris</p>
-  <p><strong>Horaires :</strong> Tous les jours, de 11h00 à 20h30</p>
+  <p><strong>Téléphone :</strong> 01 88 61 44 96</p>
+  <p><strong>Horaires :</strong> Lundi à samedi, de 11h00 à 20h30 (fermé le dimanche)</p>
 
   <div class="download-section">
     <a href="meun.pdf" download>📄 Télécharger le menu PDF / 下载菜单 PDF</a>
@@ -125,10 +160,10 @@
   <div class="table-container">
     <table>
       <tr><th>Nom</th><th>Prix</th></tr>
-      <tr><td>Concombre écrasé à l’ail / 拍黄瓜</td><td>5,80 €</td></tr>
-      <tr><td>Radis mariné aigre-doux / 酸甜萝卜</td><td>5,80 €</td></tr>
-      <tr><td>Salade de pommes de terre épicée / 凉拌土豆丝</td><td>5,80 €</td></tr>
-      <tr><td>Salade d’algues / 海带丝</td><td>5,80 €</td></tr>
+      <tr><td>Concombre mariné / 拍黄瓜</td><td>5,80 €</td></tr>
+      <tr><td>Radis aigre-doux / 酸甜萝卜</td><td>5,80 €</td></tr>
+      <tr><td>Pommes de terre râpées / 凉拌土豆丝</td><td>5,80 €</td></tr>
+      <tr><td>Algues marinées / 海带丝</td><td>5,80 €</td></tr>
     </table>
   </div>
 
@@ -136,16 +171,16 @@
   <div class="table-container">
     <table>
       <tr><th>Nom</th><th>Prix</th></tr>
-      <tr><td>Bœuf braisé à la sauce maison / 烧牛肉</td><td>8,80 €</td></tr>
-      <tr><td>Porc caramélisé (Hong Shao Rou) / 红烧肉</td><td>8,80 €</td></tr>
+      <tr><td>Bœuf mijoté / 烧牛肉</td><td>8,80 €</td></tr>
+      <tr><td>Porc braisé / 红烧肉</td><td>8,80 €</td></tr>
       <tr><td>Poulet aigre-doux / 糖醋鸡</td><td>8,80 €</td></tr>
-      <tr><td>Porc sauté en sauce douce / 溜肉段</td><td>8,80 €</td></tr>
-      <tr><td>Poulet frit croustillant / 炸鸡块</td><td>8,80 €</td></tr>
-      <tr><td>Porc frit croustillant (Xiao Su Rou) / 小酥肉</td><td>8,80 €</td></tr>
-      <tr><td>Poulet Kung Pao (épicé, cacahuètes) / 宫保鸡丁</td><td>8,80 €</td></tr>
+      <tr><td>Porc sauté croustillant / 溜肉段</td><td>8,80 €</td></tr>
+      <tr><td>Poulet frit / 炸鸡块</td><td>8,80 €</td></tr>
+      <tr><td>Porc frit croustillant / 小酥肉</td><td>8,80 €</td></tr>
+      <tr><td>Poulet Kung Pao / 宫保鸡丁</td><td>8,80 €</td></tr>
       <tr><td>Aubergines braisées / 烧茄子</td><td>6,80 €</td></tr>
-      <tr><td>Haricots verts sautés au piment / 干煸豆角</td><td>6,80 €</td></tr>
-      <tr><td>Œufs brouillés aux tomates / 番茄炒鸡蛋</td><td>6,80 €</td></tr>
+      <tr><td>Haricots verts sautés / 干煸豆角</td><td>6,80 €</td></tr>
+      <tr><td>Œufs à la tomate / 番茄炒鸡蛋</td><td>6,80 €</td></tr>
     </table>
   </div>
 
@@ -153,8 +188,8 @@
   <div class="table-container">
     <table>
       <tr><th>Nom</th><th>Prix</th></tr>
-      <tr><td>Riz blanc vapeur / 米饭</td><td>2,50 €</td></tr>
-      <tr><td>Riz sauté (œuf, légumes) / 炒饭</td><td>5,80 €</td></tr>
+      <tr><td>Riz nature / 米饭</td><td>2,50 €</td></tr>
+      <tr><td>Riz sauté / 炒饭</td><td>5,80 €</td></tr>
       <tr><td>Nouilles sautées / 炒面</td><td>6,80 €</td></tr>
     </table>
   </div>
@@ -164,12 +199,12 @@
     <table>
       <tr><th>Nom</th><th>Prix</th></tr>
       <tr>
-        <td>Burger chinois (porc mijoté, coriandre, piment doux) / 猪肉肉夹馍<br>
+        <td>Roujiamo porc (pain chinois farci) / 猪肉肉夹馍<br>
         <span class="note">Pain chinois croustillant garni façon traditionnelle</span></td>
         <td>5,80 €</td>
       </tr>
       <tr>
-        <td>Burger chinois (bœuf mijoté, coriandre, piment doux) / 牛肉肉夹馍<br>
+        <td>Roujiamo bœuf (pain chinois farci) / 牛肉肉夹馍<br>
         <span class="note">Pain chinois croustillant garni façon traditionnelle</span></td>
         <td>6,80 €</td>
       </tr>
