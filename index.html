@@ -142,25 +142,38 @@ function updateTotal() {
 }
 window.onload = renderMenu;
 
+<script>
 document.getElementById("orderForm").addEventListener("submit", async (e) => {
   e.preventDefault();
+
   const items = [];
   for (const [name, qty] of Object.entries(cart)) {
     if (qty > 0) {
-      const price = menuData.find(i => i.name === name).price;
-      items.push({ name, qty, price });
+      const item = menuData.find(i => i.name === name);
+      items.push({ name, qty, price: item.price });
     }
   }
-  if (items.length === 0) return alert("Veuillez choisir au moins un produit");
 
-  const { value: phone } = document.getElementById("phone");
-  const { value: address } = document.getElementById("address");
-  const { value: notes } = document.getElementById("notes");
+  if (items.length === 0) {
+    document.getElementById("result").textContent = "⚠️ Veuillez choisir au moins un produit / 请至少选择一个菜品";
+    return;
+  }
 
-  const { data: { user }, error } = await client.auth.getUser();
-  if (!user || error) return alert("Non connecté");
+  const address = document.getElementById("address").value || "";
+  const phone = document.getElementById("phone").value || "";
+  const notes = document.getElementById("notes").value || "";
 
-  await fetch(`${SUPABASE_URL}/rest/v1/orders`, {
+  const {
+    data: { user },
+    error
+  } = await client.auth.getUser();
+
+  if (!user || error) {
+    alert("Veuillez vous connecter d'abord / 请先登录");
+    return;
+  }
+
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/orders`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -169,13 +182,26 @@ document.getElementById("orderForm").addEventListener("submit", async (e) => {
       Prefer: "return=minimal"
     },
     body: JSON.stringify({
-      user_id: user.id, status: "新订单",
-      items, phone, address, notes
+      user_id: user.id,
+      status: "新订单",
+      items,
+      address,
+      phone,
+      notes
     })
   });
-  cart = {}; renderMenu();
-  alert("✅ Commande envoyée !");
+
+  if (res.ok) {
+    cart = {};
+    renderMenu();
+    document.getElementById("orderForm").reset();
+    updateTotal();
+    document.getElementById("result").textContent = "✅ Commande envoyée avec succès ! / 订单提交成功";
+  } else {
+    document.getElementById("result").textContent = "❌ Échec de la commande / 下单失败";
+  }
 });
+</script>
 
 function setLang(lang) {
   document.documentElement.lang = lang;
