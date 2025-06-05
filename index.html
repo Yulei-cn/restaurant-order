@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CUBE - Commande</title>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 900px; margin: auto; padding: 20px; line-height: 1.6; }
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: auto; padding: 20px; }
     h1 { text-align: center; }
     .lang-switch { text-align: center; margin-bottom: 20px; }
     .lang-switch button {
@@ -48,9 +48,7 @@
 
 <form id="orderForm">
   <h2>🍱 <span data-fr="Composez votre repas" data-zh="选择你的餐品">Composez votre repas</span></h2>
-
   <div id="menuItems"></div>
-
   <div class="total-price">💰 Total : <span id="total">0.00</span> €</div>
 
   <h2 data-fr="Informations de livraison" data-zh="送餐信息">Informations de livraison</h2>
@@ -58,25 +56,29 @@
   <label data-fr="Adresse (optionnel)" data-zh="地址（可选）">
     <input type="text" name="address" id="address" placeholder="22 Rue Truc, 75010 Paris">
   </label>
-
   <label data-fr="Téléphone" data-zh="电话">
     <input type="tel" name="phone" id="phone" required placeholder="06 12 34 56 78">
   </label>
-
   <label data-fr="Remarques (optionnel)" data-zh="备注（可选）">
     <input type="text" name="notes" id="notes" placeholder="Pas épicé, sans oignons...">
   </label>
-
   <button type="submit" id="submitBtn">✅ Commander</button>
 </form>
 
 <p id="result"></p>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.5/dist/umd/supabase.min.js"></script>
 <script>
+const SUPABASE_URL = "https://fdbcypvxuikhmxvyyvmb.supabase.co";
+const API_KEY = "你的API_KEY";
+const client = window.supabase.createClient(SUPABASE_URL, API_KEY);
+
 const menuData = [
+  // 主食
   { name: "Riz nature", price: 2.5 },
   { name: "Riz sauté", price: 5.8 },
   { name: "Nouilles sautées", price: 6.8 },
+  // 热菜
   { name: "Bœuf mijoté", price: 8.8 },
   { name: "Porc braisé", price: 8.8 },
   { name: "Poulet aigre-doux", price: 8.8 },
@@ -87,10 +89,24 @@ const menuData = [
   { name: "Aubergines braisées", price: 6.8 },
   { name: "Haricots verts sautés", price: 6.8 },
   { name: "Œufs aux tomates", price: 6.8 },
+  // 前菜
   { name: "Concombre mariné", price: 5.8 },
   { name: "Radis aigre-doux", price: 5.8 },
   { name: "Pommes de terre râpées", price: 5.8 },
-  { name: "Algues marinées", price: 5.8 }
+  { name: "Algues marinées", price: 5.8 },
+  // 小吃
+  { name: "Roujiamo porc", price: 5.8 },
+  { name: "Roujiamo bœuf", price: 6.8 },
+  // 饮品
+  { name: "Coca-Cola", price: 2.0 },
+  { name: "Sprite", price: 2.0 },
+  { name: "Fanta", price: 2.0 },
+  { name: "Thé à la pêche", price: 2.0 },
+  { name: "Jus d’orange", price: 2.0 },
+  { name: "Eau minérale", price: 2.0 },
+  // 套餐
+  { name: "Formule 1", price: 11.8 },
+  { name: "Formule 2", price: 13.8 }
 ];
 
 let cart = {};
@@ -99,27 +115,23 @@ function renderMenu() {
   container.innerHTML = "";
   menuData.forEach(item => {
     const qty = cart[item.name] || 0;
-    const row = document.createElement("div");
-    row.className = "item-row";
-    row.innerHTML = `
-      <div class="item-name">${item.name} - ${item.price.toFixed(2)}€</div>
-      <div class="item-controls">
-        <button type="button" onclick="changeQty('${item.name}', -1)">➖</button>
-        <span id="qty-${item.name}">${qty}</span>
-        <button type="button" onclick="changeQty('${item.name}', 1)">➕</button>
-      </div>
-    `;
-    container.appendChild(row);
+    container.innerHTML += `
+      <div class="item-row">
+        <div class="item-name">${item.name} - ${item.price.toFixed(2)}€</div>
+        <div class="item-controls">
+          <button type="button" onclick="changeQty('${item.name}', -1)">➖</button>
+          <span id="qty-${item.name}">${qty}</span>
+          <button type="button" onclick="changeQty('${item.name}', 1)">➕</button>
+        </div>
+      </div>`;
   });
   updateTotal();
 }
-
 function changeQty(name, delta) {
   cart[name] = Math.max(0, (cart[name] || 0) + delta);
   document.getElementById(`qty-${name}`).textContent = cart[name];
   updateTotal();
 }
-
 function updateTotal() {
   let total = 0;
   for (const [name, qty] of Object.entries(cart)) {
@@ -128,15 +140,7 @@ function updateTotal() {
   }
   document.getElementById("total").textContent = total.toFixed(2);
 }
-
 window.onload = renderMenu;
-// Supabase + 提交逻辑
-</script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.5/dist/umd/supabase.min.js"></script>
-<script>
-const SUPABASE_URL = "https://fdbcypvxuikhmxvyyvmb.supabase.co";
-const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."; // 你的完整 key
-const client = window.supabase.createClient(SUPABASE_URL, API_KEY);
 
 document.getElementById("orderForm").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -147,26 +151,16 @@ document.getElementById("orderForm").addEventListener("submit", async (e) => {
       items.push({ name, qty, price });
     }
   }
+  if (items.length === 0) return alert("Veuillez choisir au moins un produit");
 
-  if (items.length === 0) {
-    document.getElementById("result").textContent = "⚠️ Veuillez sélectionner au moins un plat.";
-    return;
-  }
+  const { value: phone } = document.getElementById("phone");
+  const { value: address } = document.getElementById("address");
+  const { value: notes } = document.getElementById("notes");
 
-  const address = document.getElementById("address").value;
-  const phone = document.getElementById("phone").value;
-  const notes = document.getElementById("notes").value;
+  const { data: { user }, error } = await client.auth.getUser();
+  if (!user || error) return alert("Non connecté");
 
-  const {
-    data: { user }, error
-  } = await client.auth.getUser();
-
-  if (!user || error) {
-    alert("Veuillez vous connecter d'abord.");
-    return;
-  }
-
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/orders`, {
+  await fetch(`${SUPABASE_URL}/rest/v1/orders`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -175,24 +169,14 @@ document.getElementById("orderForm").addEventListener("submit", async (e) => {
       Prefer: "return=minimal"
     },
     body: JSON.stringify({
-      items, address, phone, notes,
-      user_id: user.id,
-      status: "新订单"
+      user_id: user.id, status: "新订单",
+      items, phone, address, notes
     })
   });
-
-  document.getElementById("result").textContent = res.ok
-    ? "✅ Commande réussie !" : "❌ Erreur lors de la commande";
-
-  if (res.ok) {
-    cart = {};
-    renderMenu();
-    document.getElementById("orderForm").reset();
-    updateTotal();
-  }
+  cart = {}; renderMenu();
+  alert("✅ Commande envoyée !");
 });
 
-// 多语言切换
 function setLang(lang) {
   document.documentElement.lang = lang;
   document.getElementById("title").textContent =
@@ -201,15 +185,14 @@ function setLang(lang) {
     lang === "zh" ? "✅ 提交订单" : "✅ Commander";
   document.getElementById("infoBox").textContent =
     lang === "zh" ? "📍 巴黎9区 Rue Blanche 7号 — ⏰ 营业时间 11:30–20:30"
-                 : "📍 7 Rue Blanche, 75009 Paris — ⏰ 11:30–20:30";
-
+                  : "📍 7 Rue Blanche, 75009 Paris — ⏰ 11:30–20:30";
   document.querySelectorAll("[data-fr]").forEach(el => {
     el.textContent = lang === "zh" ? el.dataset.zh : el.dataset.fr;
   });
 }
 </script>
 
-<!-- 📍 Google Maps -->
+<!-- 📍 地图 -->
 <footer style="margin-top: 40px;">
   <h2 style="text-align:center; font-size: 18px;">📍 Nous trouver</h2>
   <div style="margin-top: 10px;">
