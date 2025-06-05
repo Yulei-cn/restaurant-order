@@ -2,206 +2,285 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CUBE - Commande</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Restaurant CUBE - Boîtes Repas & Menu</title>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 900px; margin: auto; padding: 20px; }
-    h1 { text-align: center; }
-    .lang-switch { text-align: center; margin-bottom: 20px; }
+    body {
+      background: white;
+      color: #2e7d32;
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      max-width: 900px;
+      margin: auto;
+      line-height: 1.6;
+    }
+    img.logo {
+      display: block;
+      margin: auto;
+      width: 120px;
+      margin-bottom: 20px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+    h2 {
+      font-size: 24px;
+      color: #1b5e20;
+      margin-top: 30px;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 5px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      min-width: 600px;
+    }
+    .table-container {
+      overflow-x: auto;
+    }
+    table th, table td {
+      border: 1px solid #ccc;
+      padding: 8px 10px;
+      text-align: left;
+    }
+    table th {
+      background-color: #f1f8e9;
+    }
+    .note {
+      font-style: italic;
+      font-size: 0.9em;
+      color: #666;
+    }
+    .info-box {
+      background: #f9fbe7;
+      border-left: 4px solid #cddc39;
+      padding: 15px;
+      margin-top: 20px;
+      font-size: 1em;
+    }
+    .download-section {
+      text-align: center;
+      margin: 40px 0;
+    }
+    .download-section a {
+      background-color: #aed581;
+      color: #1b5e20;
+      padding: 15px 25px;
+      text-decoration: none;
+      font-size: 20px;
+      border-radius: 8px;
+      display: inline-block;
+    }
+    .lang-switch {
+      text-align: center;
+      margin: 20px 0;
+    }
     .lang-switch button {
-      font-size: 20px; padding: 8px 16px; margin: 0 5px;
-      background-color: #aed581; border: none; border-radius: 6px; cursor: pointer;
+      font-size: 22px;
+      padding: 10px 20px;
+      background-color: #81c784;
+      border: none;
+      border-radius: 8px;
+      margin: 0 10px;
+      cursor: pointer;
     }
-    .item-row {
-      display: flex; justify-content: space-between; align-items: center;
-      border-bottom: 1px solid #ddd; padding: 10px 0;
+    .notice {
+      text-align: center;
+      background-color: #fffde7;
+      border: 2px dashed #fbc02d;
+      padding: 15px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #f57f17;
+      margin-bottom: 20px;
     }
-    .item-name { flex: 1; }
-    .item-controls {
-      display: flex; align-items: center; gap: 10px;
-    }
-    .item-controls button {
-      padding: 4px 10px; font-size: 16px; cursor: pointer;
-    }
-    .total-price {
-      text-align: right; font-size: 1.4em; margin-top: 20px; font-weight: bold;
-    }
-    label { display: block; margin-top: 15px; }
-    input[type="text"], input[type="tel"] {
-      width: 100%; padding: 8px; margin-top: 5px;
-    }
-    #submitBtn {
-      margin-top: 20px; font-size: 18px; padding: 10px 20px;
-      background: #81c784; border: none; border-radius: 6px; cursor: pointer;
-    }
+    .zh-only { display: none; }
   </style>
+  <script>
+    function switchLanguage(lang) {
+      const frElems = document.querySelectorAll('.fr-only');
+      const zhElems = document.querySelectorAll('.zh-only');
+      if (lang === 'fr') {
+        frElems.forEach(el => el.style.display = 'block');
+        zhElems.forEach(el => el.style.display = 'none');
+      } else {
+        frElems.forEach(el => el.style.display = 'none');
+        zhElems.forEach(el => el.style.display = 'block');
+      }
+    }
+  </script>
 </head>
 <body>
 
-<div class="lang-switch">
-  <button onclick="setLang('fr')">🇫🇷 Français</button>
-  <button onclick="setLang('zh')">🇨🇳 中文</button>
-</div>
+  <img src="logo.png" alt="Logo CUBE" class="logo">
 
-<h1 id="title">🥡 CUBE - Commande</h1>
-<div id="infoBox">📍 7 Rue Blanche, 75009 Paris — ⏰ 11:30–20:30</div>
-
-<form id="orderForm">
-  <h2>🍱 <span data-fr="Composez votre repas" data-zh="选择你的餐品">Composez votre repas</span></h2>
-  <div id="menuItems"></div>
-  <div class="total-price">💰 Total : <span id="total">0.00</span> €</div>
-
-  <h2 data-fr="Informations de livraison" data-zh="送餐信息">Informations de livraison</h2>
-
-  <label data-fr="Adresse (optionnel)" data-zh="地址（可选）">
-    <input type="text" name="address" id="address" placeholder="22 Rue Truc, 75010 Paris">
-  </label>
-  <label data-fr="Téléphone" data-zh="电话">
-    <input type="tel" name="phone" id="phone" required placeholder="06 12 34 56 78">
-  </label>
-  <label data-fr="Remarques (optionnel)" data-zh="备注（可选）">
-    <input type="text" name="notes" id="notes" placeholder="Pas épicé, sans oignons...">
-  </label>
-  <button type="submit" id="submitBtn">✅ Commander</button>
-</form>
-
-<p id="result"></p>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.5/dist/umd/supabase.min.js"></script>
-<script>
-const SUPABASE_URL = "https://fdbcypvxuikhmxvyyvmb.supabase.co";
-const API_KEY = "你的API_KEY";
-const client = window.supabase.createClient(SUPABASE_URL, API_KEY);
-
-const menuData = [
-  // 主食
-  { name: "Riz nature", price: 2.5 },
-  { name: "Riz sauté", price: 5.8 },
-  { name: "Nouilles sautées", price: 6.8 },
-  // 热菜
-  { name: "Bœuf mijoté", price: 8.8 },
-  { name: "Porc braisé", price: 8.8 },
-  { name: "Poulet aigre-doux", price: 8.8 },
-  { name: "Porc sauté croustillant", price: 8.8 },
-  { name: "Poulet frit", price: 8.8 },
-  { name: "Porc frit croustillant", price: 8.8 },
-  { name: "Poulet Kung Pao", price: 8.8 },
-  { name: "Aubergines braisées", price: 6.8 },
-  { name: "Haricots verts sautés", price: 6.8 },
-  { name: "Œufs aux tomates", price: 6.8 },
-  // 前菜
-  { name: "Concombre mariné", price: 5.8 },
-  { name: "Radis aigre-doux", price: 5.8 },
-  { name: "Pommes de terre râpées", price: 5.8 },
-  { name: "Algues marinées", price: 5.8 },
-  // 小吃
-  { name: "Roujiamo porc", price: 5.8 },
-  { name: "Roujiamo bœuf", price: 6.8 },
-  // 饮品
-  { name: "Coca-Cola", price: 2.0 },
-  { name: "Sprite", price: 2.0 },
-  { name: "Fanta", price: 2.0 },
-  { name: "Thé à la pêche", price: 2.0 },
-  { name: "Jus d’orange", price: 2.0 },
-  { name: "Eau minérale", price: 2.0 },
-  // 套餐
-  { name: "Formule 1", price: 11.8 },
-  { name: "Formule 2", price: 13.8 }
-];
-
-let cart = {};
-function renderMenu() {
-  const container = document.getElementById("menuItems");
-  container.innerHTML = "";
-  menuData.forEach(item => {
-    const qty = cart[item.name] || 0;
-    container.innerHTML += `
-      <div class="item-row">
-        <div class="item-name">${item.name} - ${item.price.toFixed(2)}€</div>
-        <div class="item-controls">
-          <button type="button" onclick="changeQty('${item.name}', -1)">➖</button>
-          <span id="qty-${item.name}">${qty}</span>
-          <button type="button" onclick="changeQty('${item.name}', 1)">➕</button>
-        </div>
-      </div>`;
-  });
-  updateTotal();
-}
-function changeQty(name, delta) {
-  cart[name] = Math.max(0, (cart[name] || 0) + delta);
-  document.getElementById(`qty-${name}`).textContent = cart[name];
-  updateTotal();
-}
-function updateTotal() {
-  let total = 0;
-  for (const [name, qty] of Object.entries(cart)) {
-    const item = menuData.find(i => i.name === name);
-    if (item) total += item.price * qty;
-  }
-  document.getElementById("total").textContent = total.toFixed(2);
-}
-window.onload = renderMenu;
-
-document.getElementById("orderForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const items = [];
-  for (const [name, qty] of Object.entries(cart)) {
-    if (qty > 0) {
-      const price = menuData.find(i => i.name === name).price;
-      items.push({ name, qty, price });
-    }
-  }
-  if (items.length === 0) return alert("Veuillez choisir au moins un produit");
-
-  const { value: phone } = document.getElementById("phone");
-  const { value: address } = document.getElementById("address");
-  const { value: notes } = document.getElementById("notes");
-
-  const { data: { user }, error } = await client.auth.getUser();
-  if (!user || error) return alert("Non connecté");
-
-  await fetch(`${SUPABASE_URL}/rest/v1/orders`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      apikey: API_KEY,
-      Authorization: `Bearer ${API_KEY}`,
-      Prefer: "return=minimal"
-    },
-    body: JSON.stringify({
-      user_id: user.id, status: "新订单",
-      items, phone, address, notes
-    })
-  });
-  cart = {}; renderMenu();
-  alert("✅ Commande envoyée !");
-});
-
-function setLang(lang) {
-  document.documentElement.lang = lang;
-  document.getElementById("title").textContent =
-    lang === "zh" ? "🥡 CUBE盒饭点餐" : "🥡 CUBE - Commande";
-  document.getElementById("submitBtn").textContent =
-    lang === "zh" ? "✅ 提交订单" : "✅ Commander";
-  document.getElementById("infoBox").textContent =
-    lang === "zh" ? "📍 巴黎9区 Rue Blanche 7号 — ⏰ 营业时间 11:30–20:30"
-                  : "📍 7 Rue Blanche, 75009 Paris — ⏰ 11:30–20:30";
-  document.querySelectorAll("[data-fr]").forEach(el => {
-    el.textContent = lang === "zh" ? el.dataset.zh : el.dataset.fr;
-  });
-}
-</script>
-
-<!-- 📍 地图 -->
-<footer style="margin-top: 40px;">
-  <h2 style="text-align:center; font-size: 18px;">📍 Nous trouver</h2>
-  <div style="margin-top: 10px;">
-    <iframe
-      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d8825.590530254658!2d2.3290846801073477!3d48.87987362995386!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e66e49cbdef35d%3A0xb63d7e4ddc4223c7!2sHano%C3%AF%20Corner!5e0!3m2!1szh-CN!2sfr!4v1745323929492!5m2!1szh-CN!2sfr"
-      width="100%" height="300" style="border:0; border-radius: 8px;" allowfullscreen="" loading="lazy">
-    </iframe>
+  <!-- VIP 积分提示（双语） -->
+  <div class="fr-only notice" style="background-color:#fff3e0; color:#d84315; border-color:#ff9800;">
+    🎁 Chaque commande = 1 tampon ! Cumulez-en 9 et la 10<sup>e</sup> boîte est offerte !
+    <div style="margin-top:15px;">
+      <img src="vip.jpg" alt="Carte VIP" style="max-width:100%; height:auto; border:2px solid #ffcc80; border-radius:10px;">
+    </div>
   </div>
-</footer>
+
+  <div class="zh-only notice" style="background-color:#fff3e0; color:#d84315; border-color:#ff9800;">
+    🎁 每次点菜记得领取会员卡片，每次可累计一次，累计9次，第十次免费盒饭！
+    <div style="margin-top:15px;">
+      <img src="vip.jpg" alt="VIP卡" style="max-width:100%; height:auto; border:2px solid #ffcc80; border-radius:10px;">
+    </div>
+  </div>
+
+  <div class="lang-switch">
+    <button onclick="switchLanguage('fr')">🇫🇷 Français</button>
+    <button onclick="switchLanguage('zh')">🇨🇳 中文</button>
+  </div>
+
+  <div class="notice">
+    ⚠️ En phase de test : nous acceptons uniquement les commandes anticipées.<br>
+    Merci de venir retirer votre boîte repas au comptoir extérieur. 自提窗口取餐。
+  </div>
+
+  <div class="fr-only">
+    <h1>🍱 Livraison de Boîtes Repas Chinoises et Japonaises</h1>
+
+    <h2>🇨🇳 🇯🇵 Un Voyage de Saveurs à Chaque Repas</h2>
+    <p>
+      Chez CUBE, nos boîtes repas sont un hommage aux saveurs authentiques de la Chine et du Japon.
+      Du riz parfumé aux nouilles sautées, chaque plat est préparé à la commande, avec soin et générosité.
+    </p>
+
+    <h2>⏱️ Commande Simple, Livraison Express</h2>
+    <p>
+      Commandez en ligne en quelques clics. Nous cuisinons à la minute et livrons chaud à votre porte.
+      Livraison en 30 minutes dans Paris.
+    </p>
+
+    <h2>🌿 Sain, Léger et Savoureux</h2>
+    <p>
+      Nos recettes sont conçues pour vous offrir un repas complet, équilibré et léger.
+    </p>
+
+    <div class="info-box">
+      📢 <strong>Bonne nouvelle !</strong> Bientôt sur <strong>Uber Eats</strong> et <strong>PandaGo</strong> (熊猫外卖) !<br>
+      Précommande & retrait sur place disponibles dès maintenant.
+    </div>
+
+    <h2>📍 Infos Pratiques</h2>
+    <p><strong>Adresse :</strong> 7 Rue Blanche, 75009 Paris</p>
+    <p><strong>Téléphone :</strong> 01 88 61 44 96</p>
+    <p><strong>Horaires :</strong> Lundi à samedi, de 11h00 à 20h30 (fermé le dimanche)</p>
+  </div>
+
+  <div class="zh-only">
+    <h1>🍱 中日风味便当配送服务</h1>
+
+    <h2>🇨🇳 🇯🇵 每一口都是亚洲风情</h2>
+    <p>在 CUBE，我们的便当融合了正宗中日风味。米饭、炒面、热菜，现做现送。</p>
+
+    <h2>⏱️ 预定简便，配送快捷</h2>
+    <p>在线下单，厨房现做。巴黎 30 分钟送达。</p>
+
+    <h2>🌿 健康、清爽、美味</h2>
+    <p>低脂肪，多蔬菜，健康不失美味。</p>
+
+    <div class="info-box">
+      📢 <strong>好消息！</strong> 即将上线 <strong>Uber Eats</strong> 和 <strong>PandaGo 熊猫外卖</strong><br>
+      现在可预定并前往门口自提窗口领取。
+    </div>
+
+    <h2>📍 实用信息</h2>
+    <p><strong>地址：</strong>巴黎 9区 Rue Blanche 7号</p>
+    <p><strong>电话：</strong>01 88 61 44 96</p>
+    <p><strong>营业时间：</strong>周一至周六 11:00 – 20:30（周日休息）</p>
+  </div>
+
+  <div class="download-section">
+    <a href="meun.pdf" download>📄 Télécharger le menu PDF / 下载菜单 PDF</a>
+  </div>
+
+  <h2>🥗 Entrées / 前菜</h2>
+  <div class="table-container">
+    <table>
+      <tr><th>Nom</th><th>Prix</th></tr>
+      <tr><td>Concombre mariné / 拍黄瓜</td><td>5,80 €</td></tr>
+      <tr><td>Radis aigre-doux / 酸甜萝卜</td><td>5,80 €</td></tr>
+      <tr><td>Pommes de terre râpées / 凉拌土豆丝</td><td>5,80 €</td></tr>
+      <tr><td>Algues marinées / 海带丝</td><td>5,80 €</td></tr>
+    </table>
+  </div>
+
+  <h2>🍛 Plats chauds / 热菜</h2>
+  <div class="table-container">
+    <table>
+      <tr><th>Nom</th><th>Prix</th></tr>
+      <tr><td>Bœuf mijoté / 烧牛肉</td><td>8,80 €</td></tr>
+      <tr><td>Porc braisé / 红烧肉</td><td>8,80 €</td></tr>
+      <tr><td>Poulet aigre-doux / 糖醋鸡</td><td>8,80 €</td></tr>
+      <tr><td>Porc sauté croustillant / 溜肉段</td><td>8,80 €</td></tr>
+      <tr><td>Poulet frit / 炸鸡块</td><td>8,80 €</td></tr>
+      <tr><td>Porc frit croustillant / 小酥肉</td><td>8,80 €</td></tr>
+      <tr><td>Poulet Kung Pao / 宫保鸡丁</td><td>8,80 €</td></tr>
+      <tr><td>Aubergines braisées / 烧茄子</td><td>6,80 €</td></tr>
+      <tr><td>Haricots verts sautés / 干煸豆角</td><td>6,80 €</td></tr>
+      <tr><td>Œufs à la tomate / 番茄炒鸡蛋</td><td>6,80 €</td></tr>
+    </table>
+  </div>
+
+  <h2>🍚 Accompagnements / 主食</h2>
+  <div class="table-container">
+    <table>
+      <tr><th>Nom</th><th>Prix</th></tr>
+      <tr><td>Riz nature / 米饭</td><td>2,50 €</td></tr>
+      <tr><td>Riz sauté / 炒饭</td><td>5,80 €</td></tr>
+      <tr><td>Nouilles sautées / 炒面</td><td>6,80 €</td></tr>
+    </table>
+  </div>
+
+  <h2>🥯 Snacks / 小吃</h2>
+  <div class="table-container">
+    <table>
+      <tr><th>Nom</th><th>Prix</th></tr>
+      <tr>
+        <td>Roujiamo porc / 猪肉肉夹馍<br>
+        <span class="note">Pain chinois croustillant garni</span></td>
+        <td>5,80 €</td>
+      </tr>
+      <tr>
+        <td>Roujiamo bœuf / 牛肉肉夹馍<br>
+        <span class="note">Pain chinois croustillant garni</span></td>
+        <td>6,80 €</td>
+      </tr>
+    </table>
+  </div>
+
+  <h2>🥤 Boissons / 饮品</h2>
+  <p>Toutes les boissons : <strong>2,00 €</strong></p>
+  <ul>
+    <li>Coca-Cola / 可乐</li>
+    <li>Sprite / 雪碧</li>
+    <li>Fanta / 芬达</li>
+    <li>Thé à la pêche / 桃茶</li>
+    <li>Jus d’orange / 橙汁</li>
+    <li>Eau minérale / 矿泉水</li>
+  </ul>
+
+  <h2>🍱 Formules / 套餐</h2>
+  <ul>
+    <li>
+      <strong>Formule 1 — 11,80 €</strong><br>
+      Riz ou nouilles sautées (+1,00 €) + 1 entrée + 2 plats chauds<br>
+      米饭 或 炒面（加1欧）+ 一个前菜 + 两个热菜<br>
+      <em>Boisson en supplément : +1,00 € / 饮料另加1欧</em>
+    </li>
+    <li>
+      <strong>Formule 2 — 13,80 €</strong><br>
+      Riz ou nouilles sautées (+1,00 €) + 1 entrée + 3 plats chauds<br>
+      米饭 或 炒面（加1欧）+ 一个前菜 + 三个热菜<br>
+      <em>Boisson en supplément : +1,00 € / 饮料另加1欧</em>
+    </li>
+  </ul>
 
 </body>
 </html>
