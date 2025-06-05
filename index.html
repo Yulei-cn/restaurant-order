@@ -5,10 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CUBE - Commande</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    .lang-switch {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .lang-switch button {
+      font-size: 20px;
+      padding: 10px 20px;
+      background-color: #aed581;
+      border: none;
+      border-radius: 8px;
+      margin: 0 10px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
   <div class="lang-switch">
-    <button onclick="setLang('fr')">🇫🇷 Français</button> |
+    <button onclick="setLang('fr')">🇫🇷 Français</button>
     <button onclick="setLang('zh')">🇨🇳 中文</button>
   </div>
 
@@ -21,100 +36,78 @@
   </div>
 
   <form id="orderForm">
-    <h2>🍚 Choisissez un <strong>accompagnement de base</strong></h2>
-    <label data-fr="Riz blanc" data-zh="米饭"><input type="radio" name="main" value="Riz blanc"> Riz blanc</label>
+    <h2>🍚 <span data-fr="Choisissez un accompagnement de base" data-zh="请选择主食">Choisissez un accompagnement de base</span></h2>
+    <label data-fr="Riz nature" data-zh="米饭"><input type="radio" name="main" value="Riz nature"> Riz nature</label>
     <label data-fr="Riz sauté" data-zh="炒饭"><input type="radio" name="main" value="Riz sauté"> Riz sauté (+3.3€)</label>
     <label data-fr="Nouilles sautées" data-zh="炒面"><input type="radio" name="main" value="Nouilles sautées"> Nouilles sautées (+4.3€)</label>
 
-    <h2>🍛 Choisissez vos <strong>plats chauds</strong></h2>
-    <label data-fr="Bœuf braisé" data-zh="烧牛肉"><input type="checkbox" name="sides" value="Bœuf braisé"> Bœuf braisé (8.8€)</label>
-    <label data-fr="Porc caramélisé" data-zh="红烧肉"><input type="checkbox" name="sides" value="Porc caramélisé"> Porc caramélisé (8.8€)</label>
+    <h2>🍛 <span data-fr="Choisissez vos plats chauds" data-zh="请选择热菜">Choisissez vos plats chauds</span></h2>
+    <label data-fr="Bœuf mijoté" data-zh="烧牛肉"><input type="checkbox" name="sides" value="Bœuf mijoté"> Bœuf mijoté (8.8€)</label>
+    <label data-fr="Porc braisé" data-zh="红烧肉"><input type="checkbox" name="sides" value="Porc braisé"> Porc braisé (8.8€)</label>
     <label data-fr="Poulet aigre-doux" data-zh="糖醋鸡"><input type="checkbox" name="sides" value="Poulet aigre-doux"> Poulet aigre-doux (8.8€)</label>
-    <label data-fr="Porc sauté doux" data-zh="溜肉段"><input type="checkbox" name="sides" value="Porc sauté doux"> Porc sauté doux (8.8€)</label>
+    <label data-fr="Porc sauté croustillant" data-zh="溜肉段"><input type="checkbox" name="sides" value="Porc sauté croustillant"> Porc sauté croustillant (8.8€)</label>
     <label data-fr="Poulet frit" data-zh="炸鸡块"><input type="checkbox" name="sides" value="Poulet frit"> Poulet frit (8.8€)</label>
-    <label data-fr="Porc croustillant" data-zh="小酥肉"><input type="checkbox" name="sides" value="Porc croustillant"> Porc croustillant (8.8€)</label>
+    <label data-fr="Porc frit croustillant" data-zh="小酥肉"><input type="checkbox" name="sides" value="Porc frit croustillant"> Porc frit croustillant (8.8€)</label>
     <label data-fr="Poulet Kung Pao" data-zh="宫保鸡丁"><input type="checkbox" name="sides" value="Poulet Kung Pao"> Poulet Kung Pao (8.8€)</label>
     <label data-fr="Aubergines braisées" data-zh="烧茄子"><input type="checkbox" name="sides" value="Aubergines braisées"> Aubergines braisées (6.8€)</label>
-    <label data-fr="Haricots verts épicés" data-zh="干煸豆角"><input type="checkbox" name="sides" value="Haricots verts épicés"> Haricots verts épicés (6.8€)</label>
-    <label data-fr="Œufs aux tomates" data-zh="西红柿炒鸡蛋"><input type="checkbox" name="sides" value="Œufs aux tomates"> Œufs aux tomates (6.8€)</label>
+    <label data-fr="Haricots verts sautés" data-zh="干煸豆角"><input type="checkbox" name="sides" value="Haricots verts sautés"> Haricots verts sautés (6.8€)</label>
+    <label data-fr="Œufs aux tomates" data-zh="番茄炒鸡蛋"><input type="checkbox" name="sides" value="Œufs aux tomates"> Œufs aux tomates (6.8€)</label>
 
-    <h2>🥗 Choisissez une <strong>entrée</strong> (optionnelle)</h2>
-    <label data-fr="Concombre à l’ail" data-zh="拍黄瓜"><input type="checkbox" name="sides" value="Concombre à l’ail"> Concombre à l’ail (5.8€)</label>
+    <h2>🥗 <span data-fr="Choisissez une entrée (optionnelle)" data-zh="请选择前菜（可选）">Choisissez une entrée (optionnelle)</span></h2>
+    <label data-fr="Concombre mariné" data-zh="拍黄瓜"><input type="checkbox" name="sides" value="Concombre mariné"> Concombre mariné (5.8€)</label>
     <label data-fr="Radis aigre-doux" data-zh="酸甜萝卜"><input type="checkbox" name="sides" value="Radis aigre-doux"> Radis aigre-doux (5.8€)</label>
-    <label data-fr="Pommes de terre épicées" data-zh="凉拌土豆丝"><input type="checkbox" name="sides" value="Pommes de terre épicées"> Pommes de terre épicées (5.8€)</label>
+    <label data-fr="Pommes de terre râpées" data-zh="凉拌土豆丝"><input type="checkbox" name="sides" value="Pommes de terre râpées"> Pommes de terre râpées (5.8€)</label>
     <label data-fr="Algues marinées" data-zh="海带丝"><input type="checkbox" name="sides" value="Algues marinées"> Algues marinées (5.8€)</label>
 
-    <h2>📍 Informations</h2>
-    <label for="address" class="label">Adresse de livraison (optionnel)</label>
+    <h2>📍 <span data-fr="Informations" data-zh="联系信息">Informations</span></h2>
+    <label class="label" data-fr="Adresse de livraison (optionnel)" data-zh="送餐地址（可选）" for="address">Adresse de livraison (optionnel)</label>
     <input type="text" name="address" id="address" placeholder="ex: 22 Rue Truc, 75010 Paris">
-    <label for="phone" class="label">Numéro de téléphone</label>
+    
+    <label class="label" data-fr="Numéro de téléphone" data-zh="联系电话" for="phone">Numéro de téléphone</label>
     <input type="tel" name="phone" id="phone" placeholder="ex: 06 12 34 56 78" required>
-    <label for="notes" class="label">Remarque (optionnel)</label>
+    
+    <label class="label" data-fr="Remarque (optionnel)" data-zh="备注（可选）" for="notes">Remarque (optionnel)</label>
     <input type="text" name="notes" id="notes" placeholder="Pas épicé, sans oignons...">
+    
     <button type="submit" id="submitBtn">✅ Commander</button>
   </form>
 
   <p id="result"></p>
 
+  <!-- Supabase & Script -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.5/dist/umd/supabase.min.js"></script>
   <script>
     const SUPABASE_URL = "https://fdbcypvxuikhmxvyyvmb.supabase.co";
-    const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkYmN5cHZ4dWlraG14dnl5dm1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjY5MzUsImV4cCI6MjA2MDg0MjkzNX0.Ju8wyqBS1irCWgtpBT_RanrqVErQt-gQkWdzb69XMr4";
+    const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...";
     const client = window.supabase.createClient(SUPABASE_URL, API_KEY);
 
     const priceMap = {
-      "Riz blanc": 2.5,
-      "Riz sauté": 5.8,
-      "Nouilles sautées": 6.8,
-      "Bœuf braisé": 8.8,
-      "Porc caramélisé": 8.8,
-      "Poulet aigre-doux": 8.8,
-      "Porc sauté doux": 8.8,
-      "Poulet frit": 8.8,
-      "Porc croustillant": 8.8,
-      "Poulet Kung Pao": 8.8,
-      "Aubergines braisées": 6.8,
-      "Haricots verts épicés": 6.8,
-      "Œufs aux tomates": 6.8,
-      "Concombre à l’ail": 5.8,
-      "Radis aigre-doux": 5.8,
-      "Pommes de terre épicées": 5.8,
-      "Algues marinées": 5.8
+      "Riz nature": 2.5, "Riz sauté": 5.8, "Nouilles sautées": 6.8,
+      "Bœuf mijoté": 8.8, "Porc braisé": 8.8, "Poulet aigre-doux": 8.8,
+      "Porc sauté croustillant": 8.8, "Poulet frit": 8.8, "Porc frit croustillant": 8.8,
+      "Poulet Kung Pao": 8.8, "Aubergines braisées": 6.8,
+      "Haricots verts sautés": 6.8, "Œufs aux tomates": 6.8,
+      "Concombre mariné": 5.8, "Radis aigre-doux": 5.8,
+      "Pommes de terre râpées": 5.8, "Algues marinées": 5.8
     };
 
     function setLang(lang) {
-      const langMap = {
-        fr: {
-          title: "🥡 CUBE - Commande",
-          submit: "✅ Commander",
-          resultSuccess: "✅ Commande réussie ! Merci.",
-          resultFail: "❌ Échec de la commande",
-          placeholderNote: "Pas épicé, sans oignons...",
-          placeholderAddr: "ex: 22 Rue Truc, 75010 Paris",
-          info: "⏰ Heures d'ouverture : 11:30-20:30<br>📞 Contact : +33 1 88 61 44 96"
-        },
-        zh: {
-          title: "🥡 CUBE盒饭点餐",
-          submit: "✅ 提交订单",
-          resultSuccess: "✅ 下单成功，感谢光临！",
-          resultFail: "❌ 下单失败",
-          placeholderNote: "比如：不要辣、不要洋葱等",
-          placeholderAddr: "比如：22 Rue Truc, 75010 Paris",
-          info: "⏰ 营业时间：11:30-20:30<br>📞 电话：+33 1 88 61 44 96"
-        }
-      };
+      const fr = lang === 'fr';
+      document.documentElement.lang = lang;
+      document.getElementById("title").textContent = fr ? "🥡 CUBE - Commande" : "🥡 CUBE盒饭点餐";
+      document.getElementById("submitBtn").textContent = fr ? "✅ Commander" : "✅ 提交订单";
+      document.getElementById("notes").placeholder = fr ? "Pas épicé, sans oignons..." : "比如：不要辣、不要洋葱等";
+      document.getElementById("address").placeholder = fr ? "ex: 22 Rue Truc, 75010 Paris" : "比如：22 Rue Truc, 75010 Paris";
+      document.getElementById("infoBox").innerHTML = fr
+        ? "⏰ Heures d'ouverture : 11:30-20:30<br>📞 Contact : +33 1 88 61 44 96"
+        : "⏰ 营业时间：11:30-20:30<br>📞 电话：+33 1 88 61 44 96";
 
-      document.getElementById("title").textContent = langMap[lang].title;
-      document.getElementById("submitBtn").textContent = langMap[lang].submit;
-      document.getElementById("notes").placeholder = langMap[lang].placeholderNote;
-      document.getElementById("address").placeholder = langMap[lang].placeholderAddr;
-      document.getElementById("infoBox").innerHTML = langMap[lang].info;
-      document.querySelectorAll(".label").forEach(el => {
-        if (el.dataset[lang]) el.textContent = el.dataset[lang];
+      document.querySelectorAll('[data-fr]').forEach(el => {
+        el.textContent = el.dataset[lang];
       });
     }
 
-    setLang("fr");
+    setLang('fr');
 
     document.getElementById("orderForm").addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -126,13 +119,12 @@
       const notes = form.notes.value;
 
       if (!main) {
-        document.getElementById("result").textContent = "⚠️ Veuillez choisir un plat principal";
+        document.getElementById("result").textContent = "⚠️ Veuillez choisir un plat principal / 主食未选";
         return;
       }
 
       const {
-        data: { user },
-        error
+        data: { user }, error
       } = await client.auth.getUser();
 
       if (!user || error) {
@@ -142,31 +134,14 @@
       }
 
       const items = [];
-      
-      // 处理主食
-      const cleanMainKey = Object.keys(priceMap).find(k => k.trim() === main.trim());
-      if (cleanMainKey) {
-        items.push({ name: cleanMainKey, qty: 1, price: priceMap[cleanMainKey] });
-      } else {
-        console.warn("主食未匹配到 priceMap 中的价格！main =", main);
-      }
-      
-      // 处理配菜
-      for (const side of sides) {
-        const cleanSideKey = Object.keys(priceMap).find(k => k.trim() === side.trim());
-        if (cleanSideKey) {
-          items.push({ name: cleanSideKey, qty: 1, price: priceMap[cleanSideKey] });
-        } else {
-          console.warn("配菜未匹配到 priceMap 中的价格！side =", side);
-        }
-      }
 
+      if (priceMap[main]) items.push({ name: main, qty: 1, price: priceMap[main] });
+      for (const s of sides) {
+        if (priceMap[s]) items.push({ name: s, qty: 1, price: priceMap[s] });
+      }
 
       const data = {
-        items,
-        address,
-        phone,
-        notes,
+        items, address, phone, notes,
         user_id: user.id,
         status: "新订单"
       };
@@ -182,16 +157,15 @@
         body: JSON.stringify(data)
       });
 
-      const lang = document.documentElement.lang || "fr";
-      const resultText = res.ok
-        ? (lang === "zh" ? "✅ 下单成功，感谢光临！" : "✅ Commande réussie ! Merci.")
-        : (lang === "zh" ? "❌ 下单失败" : "❌ Échec de la commande");
+      document.getElementById("result").textContent = res.ok
+        ? (document.documentElement.lang === "zh" ? "✅ 下单成功，感谢光临！" : "✅ Commande réussie ! Merci.")
+        : (document.documentElement.lang === "zh" ? "❌ 下单失败" : "❌ Échec de la commande");
 
-      document.getElementById("result").textContent = resultText;
       if (res.ok) form.reset();
     });
   </script>
 
+  <!-- Google Map -->
   <footer style="margin-top: 40px;">
     <h2 style="text-align:center; font-size: 18px;">📍 Nous trouver</h2>
     <div style="margin-top: 10px;">
