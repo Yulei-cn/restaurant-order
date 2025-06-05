@@ -4,181 +4,221 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CUBE - Commande</title>
-  <link rel="stylesheet" href="style.css">
   <style>
-    .lang-switch {
-      text-align: center;
-      margin-bottom: 20px;
-    }
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: auto; padding: 20px; line-height: 1.6; }
+    h1 { text-align: center; }
+    .lang-switch { text-align: center; margin-bottom: 20px; }
     .lang-switch button {
-      font-size: 20px;
-      padding: 10px 20px;
-      background-color: #aed581;
-      border: none;
-      border-radius: 8px;
-      margin: 0 10px;
-      cursor: pointer;
+      font-size: 20px; padding: 8px 16px; margin: 0 5px;
+      background-color: #aed581; border: none; border-radius: 6px; cursor: pointer;
+    }
+    .item-row {
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid #ddd; padding: 10px 0;
+    }
+    .item-name { flex: 1; }
+    .item-controls {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .item-controls button {
+      padding: 4px 10px; font-size: 16px; cursor: pointer;
+    }
+    .total-price {
+      text-align: right; font-size: 1.4em; margin-top: 20px; font-weight: bold;
+    }
+    label { display: block; margin-top: 15px; }
+    input[type="text"], input[type="tel"] {
+      width: 100%; padding: 8px; margin-top: 5px;
+    }
+    #submitBtn {
+      margin-top: 20px; font-size: 18px; padding: 10px 20px;
+      background: #81c784; border: none; border-radius: 6px; cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <div class="lang-switch">
-    <button onclick="setLang('fr')">🇫🇷 Français</button>
-    <button onclick="setLang('zh')">🇨🇳 中文</button>
-  </div>
 
-  <h1 id="title">🥡 CUBE - Commande</h1>
-  <div class="subtitle">7 Rue Blanche, 75009 Paris</div>
+<div class="lang-switch">
+  <button onclick="setLang('fr')">🇫🇷 Français</button>
+  <button onclick="setLang('zh')">🇨🇳 中文</button>
+</div>
 
-  <div class="info-block" id="infoBox">
-    ⏰ Heures d'ouverture : 11:30-20:30<br>
-    📞 Contact : +33 1 88 61 44 96
-  </div>
+<h1 id="title">🥡 CUBE - Commande</h1>
+<div id="infoBox">📍 7 Rue Blanche, 75009 Paris — ⏰ 11:30–20:30</div>
 
-  <form id="orderForm">
-    <h2>🍚 <span data-fr="Choisissez un accompagnement de base" data-zh="请选择主食">Choisissez un accompagnement de base</span></h2>
-    <label data-fr="Riz nature" data-zh="米饭"><input type="radio" name="main" value="Riz nature"> Riz nature</label>
-    <label data-fr="Riz sauté" data-zh="炒饭"><input type="radio" name="main" value="Riz sauté"> Riz sauté (+3.3€)</label>
-    <label data-fr="Nouilles sautées" data-zh="炒面"><input type="radio" name="main" value="Nouilles sautées"> Nouilles sautées (+4.3€)</label>
+<form id="orderForm">
+  <h2>🍱 <span data-fr="Composez votre repas" data-zh="选择你的餐品">Composez votre repas</span></h2>
 
-    <h2>🍛 <span data-fr="Choisissez vos plats chauds" data-zh="请选择热菜">Choisissez vos plats chauds</span></h2>
-    <label data-fr="Bœuf mijoté" data-zh="烧牛肉"><input type="checkbox" name="sides" value="Bœuf mijoté"> Bœuf mijoté (8.8€)</label>
-    <label data-fr="Porc braisé" data-zh="红烧肉"><input type="checkbox" name="sides" value="Porc braisé"> Porc braisé (8.8€)</label>
-    <label data-fr="Poulet aigre-doux" data-zh="糖醋鸡"><input type="checkbox" name="sides" value="Poulet aigre-doux"> Poulet aigre-doux (8.8€)</label>
-    <label data-fr="Porc sauté croustillant" data-zh="溜肉段"><input type="checkbox" name="sides" value="Porc sauté croustillant"> Porc sauté croustillant (8.8€)</label>
-    <label data-fr="Poulet frit" data-zh="炸鸡块"><input type="checkbox" name="sides" value="Poulet frit"> Poulet frit (8.8€)</label>
-    <label data-fr="Porc frit croustillant" data-zh="小酥肉"><input type="checkbox" name="sides" value="Porc frit croustillant"> Porc frit croustillant (8.8€)</label>
-    <label data-fr="Poulet Kung Pao" data-zh="宫保鸡丁"><input type="checkbox" name="sides" value="Poulet Kung Pao"> Poulet Kung Pao (8.8€)</label>
-    <label data-fr="Aubergines braisées" data-zh="烧茄子"><input type="checkbox" name="sides" value="Aubergines braisées"> Aubergines braisées (6.8€)</label>
-    <label data-fr="Haricots verts sautés" data-zh="干煸豆角"><input type="checkbox" name="sides" value="Haricots verts sautés"> Haricots verts sautés (6.8€)</label>
-    <label data-fr="Œufs aux tomates" data-zh="番茄炒鸡蛋"><input type="checkbox" name="sides" value="Œufs aux tomates"> Œufs aux tomates (6.8€)</label>
+  <div id="menuItems"></div>
 
-    <h2>🥗 <span data-fr="Choisissez une entrée (optionnelle)" data-zh="请选择前菜（可选）">Choisissez une entrée (optionnelle)</span></h2>
-    <label data-fr="Concombre mariné" data-zh="拍黄瓜"><input type="checkbox" name="sides" value="Concombre mariné"> Concombre mariné (5.8€)</label>
-    <label data-fr="Radis aigre-doux" data-zh="酸甜萝卜"><input type="checkbox" name="sides" value="Radis aigre-doux"> Radis aigre-doux (5.8€)</label>
-    <label data-fr="Pommes de terre râpées" data-zh="凉拌土豆丝"><input type="checkbox" name="sides" value="Pommes de terre râpées"> Pommes de terre râpées (5.8€)</label>
-    <label data-fr="Algues marinées" data-zh="海带丝"><input type="checkbox" name="sides" value="Algues marinées"> Algues marinées (5.8€)</label>
+  <div class="total-price">💰 Total : <span id="total">0.00</span> €</div>
 
-    <h2>📍 <span data-fr="Informations" data-zh="联系信息">Informations</span></h2>
-    <label class="label" data-fr="Adresse de livraison (optionnel)" data-zh="送餐地址（可选）" for="address">Adresse de livraison (optionnel)</label>
-    <input type="text" name="address" id="address" placeholder="ex: 22 Rue Truc, 75010 Paris">
-    
-    <label class="label" data-fr="Numéro de téléphone" data-zh="联系电话" for="phone">Numéro de téléphone</label>
-    <input type="tel" name="phone" id="phone" placeholder="ex: 06 12 34 56 78" required>
-    
-    <label class="label" data-fr="Remarque (optionnel)" data-zh="备注（可选）" for="notes">Remarque (optionnel)</label>
+  <h2 data-fr="Informations de livraison" data-zh="送餐信息">Informations de livraison</h2>
+
+  <label data-fr="Adresse (optionnel)" data-zh="地址（可选）">
+    <input type="text" name="address" id="address" placeholder="22 Rue Truc, 75010 Paris">
+  </label>
+
+  <label data-fr="Téléphone" data-zh="电话">
+    <input type="tel" name="phone" id="phone" required placeholder="06 12 34 56 78">
+  </label>
+
+  <label data-fr="Remarques (optionnel)" data-zh="备注（可选）">
     <input type="text" name="notes" id="notes" placeholder="Pas épicé, sans oignons...">
-    
-    <button type="submit" id="submitBtn">✅ Commander</button>
-  </form>
+  </label>
 
-  <p id="result"></p>
+  <button type="submit" id="submitBtn">✅ Commander</button>
+</form>
 
-  <!-- Supabase & Script -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.5/dist/umd/supabase.min.js"></script>
-  <script>
-    const SUPABASE_URL = "https://fdbcypvxuikhmxvyyvmb.supabase.co";
-    const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...";
-    const client = window.supabase.createClient(SUPABASE_URL, API_KEY);
+<p id="result"></p>
 
-    const priceMap = {
-      "Riz nature": 2.5, "Riz sauté": 5.8, "Nouilles sautées": 6.8,
-      "Bœuf mijoté": 8.8, "Porc braisé": 8.8, "Poulet aigre-doux": 8.8,
-      "Porc sauté croustillant": 8.8, "Poulet frit": 8.8, "Porc frit croustillant": 8.8,
-      "Poulet Kung Pao": 8.8, "Aubergines braisées": 6.8,
-      "Haricots verts sautés": 6.8, "Œufs aux tomates": 6.8,
-      "Concombre mariné": 5.8, "Radis aigre-doux": 5.8,
-      "Pommes de terre râpées": 5.8, "Algues marinées": 5.8
-    };
+<script>
+const menuData = [
+  { name: "Riz nature", price: 2.5 },
+  { name: "Riz sauté", price: 5.8 },
+  { name: "Nouilles sautées", price: 6.8 },
+  { name: "Bœuf mijoté", price: 8.8 },
+  { name: "Porc braisé", price: 8.8 },
+  { name: "Poulet aigre-doux", price: 8.8 },
+  { name: "Porc sauté croustillant", price: 8.8 },
+  { name: "Poulet frit", price: 8.8 },
+  { name: "Porc frit croustillant", price: 8.8 },
+  { name: "Poulet Kung Pao", price: 8.8 },
+  { name: "Aubergines braisées", price: 6.8 },
+  { name: "Haricots verts sautés", price: 6.8 },
+  { name: "Œufs aux tomates", price: 6.8 },
+  { name: "Concombre mariné", price: 5.8 },
+  { name: "Radis aigre-doux", price: 5.8 },
+  { name: "Pommes de terre râpées", price: 5.8 },
+  { name: "Algues marinées", price: 5.8 }
+];
 
-    function setLang(lang) {
-      const fr = lang === 'fr';
-      document.documentElement.lang = lang;
-      document.getElementById("title").textContent = fr ? "🥡 CUBE - Commande" : "🥡 CUBE盒饭点餐";
-      document.getElementById("submitBtn").textContent = fr ? "✅ Commander" : "✅ 提交订单";
-      document.getElementById("notes").placeholder = fr ? "Pas épicé, sans oignons..." : "比如：不要辣、不要洋葱等";
-      document.getElementById("address").placeholder = fr ? "ex: 22 Rue Truc, 75010 Paris" : "比如：22 Rue Truc, 75010 Paris";
-      document.getElementById("infoBox").innerHTML = fr
-        ? "⏰ Heures d'ouverture : 11:30-20:30<br>📞 Contact : +33 1 88 61 44 96"
-        : "⏰ 营业时间：11:30-20:30<br>📞 电话：+33 1 88 61 44 96";
+let cart = {};
+function renderMenu() {
+  const container = document.getElementById("menuItems");
+  container.innerHTML = "";
+  menuData.forEach(item => {
+    const qty = cart[item.name] || 0;
+    const row = document.createElement("div");
+    row.className = "item-row";
+    row.innerHTML = `
+      <div class="item-name">${item.name} - ${item.price.toFixed(2)}€</div>
+      <div class="item-controls">
+        <button type="button" onclick="changeQty('${item.name}', -1)">➖</button>
+        <span id="qty-${item.name}">${qty}</span>
+        <button type="button" onclick="changeQty('${item.name}', 1)">➕</button>
+      </div>
+    `;
+    container.appendChild(row);
+  });
+  updateTotal();
+}
 
-      document.querySelectorAll('[data-fr]').forEach(el => {
-        el.textContent = el.dataset[lang];
-      });
+function changeQty(name, delta) {
+  cart[name] = Math.max(0, (cart[name] || 0) + delta);
+  document.getElementById(`qty-${name}`).textContent = cart[name];
+  updateTotal();
+}
+
+function updateTotal() {
+  let total = 0;
+  for (const [name, qty] of Object.entries(cart)) {
+    const item = menuData.find(i => i.name === name);
+    if (item) total += item.price * qty;
+  }
+  document.getElementById("total").textContent = total.toFixed(2);
+}
+
+window.onload = renderMenu;
+// Supabase + 提交逻辑
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.5/dist/umd/supabase.min.js"></script>
+<script>
+const SUPABASE_URL = "https://fdbcypvxuikhmxvyyvmb.supabase.co";
+const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."; // 你的完整 key
+const client = window.supabase.createClient(SUPABASE_URL, API_KEY);
+
+document.getElementById("orderForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const items = [];
+  for (const [name, qty] of Object.entries(cart)) {
+    if (qty > 0) {
+      const price = menuData.find(i => i.name === name).price;
+      items.push({ name, qty, price });
     }
+  }
 
-    setLang('fr');
+  if (items.length === 0) {
+    document.getElementById("result").textContent = "⚠️ Veuillez sélectionner au moins un plat.";
+    return;
+  }
 
-    document.getElementById("orderForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const form = e.target;
-      const main = form.main.value;
-      const sides = Array.from(form.querySelectorAll('input[name="sides"]:checked')).map(cb => cb.value);
-      const address = form.address.value;
-      const phone = form.phone.value;
-      const notes = form.notes.value;
+  const address = document.getElementById("address").value;
+  const phone = document.getElementById("phone").value;
+  const notes = document.getElementById("notes").value;
 
-      if (!main) {
-        document.getElementById("result").textContent = "⚠️ Veuillez choisir un plat principal / 主食未选";
-        return;
-      }
+  const {
+    data: { user }, error
+  } = await client.auth.getUser();
 
-      const {
-        data: { user }, error
-      } = await client.auth.getUser();
+  if (!user || error) {
+    alert("Veuillez vous connecter d'abord.");
+    return;
+  }
 
-      if (!user || error) {
-        alert("Veuillez vous connecter d'abord.");
-        window.location.href = "mes-commandes.html";
-        return;
-      }
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/orders`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      apikey: API_KEY,
+      Authorization: `Bearer ${API_KEY}`,
+      Prefer: "return=minimal"
+    },
+    body: JSON.stringify({
+      items, address, phone, notes,
+      user_id: user.id,
+      status: "新订单"
+    })
+  });
 
-      const items = [];
+  document.getElementById("result").textContent = res.ok
+    ? "✅ Commande réussie !" : "❌ Erreur lors de la commande";
 
-      if (priceMap[main]) items.push({ name: main, qty: 1, price: priceMap[main] });
-      for (const s of sides) {
-        if (priceMap[s]) items.push({ name: s, qty: 1, price: priceMap[s] });
-      }
+  if (res.ok) {
+    cart = {};
+    renderMenu();
+    document.getElementById("orderForm").reset();
+    updateTotal();
+  }
+});
 
-      const data = {
-        items, address, phone, notes,
-        user_id: user.id,
-        status: "新订单"
-      };
+// 多语言切换
+function setLang(lang) {
+  document.documentElement.lang = lang;
+  document.getElementById("title").textContent =
+    lang === "zh" ? "🥡 CUBE盒饭点餐" : "🥡 CUBE - Commande";
+  document.getElementById("submitBtn").textContent =
+    lang === "zh" ? "✅ 提交订单" : "✅ Commander";
+  document.getElementById("infoBox").textContent =
+    lang === "zh" ? "📍 巴黎9区 Rue Blanche 7号 — ⏰ 营业时间 11:30–20:30"
+                 : "📍 7 Rue Blanche, 75009 Paris — ⏰ 11:30–20:30";
 
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/orders`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          apikey: API_KEY,
-          Authorization: `Bearer ${API_KEY}`,
-          Prefer: "return=minimal"
-        },
-        body: JSON.stringify(data)
-      });
+  document.querySelectorAll("[data-fr]").forEach(el => {
+    el.textContent = lang === "zh" ? el.dataset.zh : el.dataset.fr;
+  });
+}
+</script>
 
-      document.getElementById("result").textContent = res.ok
-        ? (document.documentElement.lang === "zh" ? "✅ 下单成功，感谢光临！" : "✅ Commande réussie ! Merci.")
-        : (document.documentElement.lang === "zh" ? "❌ 下单失败" : "❌ Échec de la commande");
+<!-- 📍 Google Maps -->
+<footer style="margin-top: 40px;">
+  <h2 style="text-align:center; font-size: 18px;">📍 Nous trouver</h2>
+  <div style="margin-top: 10px;">
+    <iframe
+      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d8825.590530254658!2d2.3290846801073477!3d48.87987362995386!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e66e49cbdef35d%3A0xb63d7e4ddc4223c7!2sHano%C3%AF%20Corner!5e0!3m2!1szh-CN!2sfr!4v1745323929492!5m2!1szh-CN!2sfr"
+      width="100%" height="300" style="border:0; border-radius: 8px;" allowfullscreen="" loading="lazy">
+    </iframe>
+  </div>
+</footer>
 
-      if (res.ok) form.reset();
-    });
-  </script>
-
-  <!-- Google Map -->
-  <footer style="margin-top: 40px;">
-    <h2 style="text-align:center; font-size: 18px;">📍 Nous trouver</h2>
-    <div style="margin-top: 10px;">
-      <iframe
-        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d8825.590530254658!2d2.3290846801073477!3d48.87987362995386!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e66e49cbdef35d%3A0xb63d7e4ddc4223c7!2sHano%C3%AF%20Corner!5e0!3m2!1szh-CN!2sfr!4v1745323929492!5m2!1szh-CN!2sfr"
-        width="100%"
-        height="300"
-        style="border:0; border-radius: 8px;"
-        allowfullscreen=""
-        loading="lazy"
-        referrerpolicy="no-referrer-when-downgrade">
-      </iframe>
-    </div>
-  </footer>
 </body>
 </html>
