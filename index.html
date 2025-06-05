@@ -52,6 +52,7 @@
   <div class="total-price">💰 Total : <span id="total">0.00</span> €</div>
 
   <h2 data-fr="Informations de retrait (optionnel)" data-zh="备注信息（可选）">Informations de retrait</h2>
+
   <label data-fr="Adresse (optionnel)" data-zh="地址（可选）">
     <input type="text" name="address" id="address">
   </label>
@@ -61,36 +62,25 @@
   <label data-fr="Remarques (optionnel)" data-zh="备注（可选）">
     <input type="text" name="notes" id="notes">
   </label>
+
   <button type="submit" id="submitBtn">✅ Commander</button>
 </form>
 
 <p id="result"></p>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.5/dist/umd/supabase.min.js"></script>
 <script>
-const SUPABASE_URL = "https://fdbcypvxuikhmxvyyvmb.supabase.co";
-const API_KEY = "你的真实API_KEY";
-const client = window.supabase.createClient(SUPABASE_URL, API_KEY);
-
 const menuData = [
-  // 主食
   { name: "Riz nature", price: 2.5 }, { name: "Riz sauté", price: 5.8 }, { name: "Nouilles sautées", price: 6.8 },
-  // 热菜
   { name: "Bœuf mijoté", price: 8.8 }, { name: "Porc braisé", price: 8.8 }, { name: "Poulet aigre-doux", price: 8.8 },
   { name: "Porc sauté croustillant", price: 8.8 }, { name: "Poulet frit", price: 8.8 }, { name: "Porc frit croustillant", price: 8.8 },
   { name: "Poulet Kung Pao", price: 8.8 }, { name: "Aubergines braisées", price: 6.8 }, { name: "Haricots verts sautés", price: 6.8 },
-  { name: "Œufs aux tomates", price: 6.8 },
-  // 前菜
-  { name: "Concombre mariné", price: 5.8 }, { name: "Radis aigre-doux", price: 5.8 },
+  { name: "Œufs aux tomates", price: 6.8 }, { name: "Concombre mariné", price: 5.8 }, { name: "Radis aigre-doux", price: 5.8 },
   { name: "Pommes de terre râpées", price: 5.8 }, { name: "Algues marinées", price: 5.8 },
-  // 小吃
   { name: "Roujiamo porc", price: 5.8 }, { name: "Roujiamo bœuf", price: 6.8 },
-  // 饮品
   { name: "Coca-Cola", price: 2.0 }, { name: "Sprite", price: 2.0 }, { name: "Fanta", price: 2.0 },
   { name: "Thé à la pêche", price: 2.0 }, { name: "Jus d’orange", price: 2.0 }, { name: "Eau minérale", price: 2.0 },
-  // 套餐（不会直接加购物车）
-  { name: "Formule 1", price: 11.8, isFormule: true, count: 2 },
-  { name: "Formule 2", price: 13.8, isFormule: true, count: 3 }
+  { name: "Formule 1", price: 11.8, isFormule: true, heat: 2 },
+  { name: "Formule 2", price: 13.8, isFormule: true, heat: 3 }
 ];
 
 let cart = {};
@@ -104,9 +94,11 @@ function renderMenu() {
       <div class="item-row">
         <div class="item-name">${item.name} - ${item.price.toFixed(2)}€</div>
         <div class="item-controls">
-          <button type="button" onclick="${item.isFormule ? `handleFormule(${item.count}, '${item.name}', ${item.price})` : `changeQty('${item.name}', -1)`}">${item.isFormule ? "🛒" : "➖"}</button>
-          <span id="qty-${item.name}">${qty}</span>
-          ${!item.isFormule ? `<button type="button" onclick="changeQty('${item.name}', 1)">➕</button>` : ""}
+          ${item.isFormule
+            ? `<button type="button" onclick="openFormule('${item.name}', ${item.price}, ${item.heat})">🛒 Choisir</button>`
+            : `<button onclick="changeQty('${item.name}', -1)">➖</button>
+               <span id="qty-${item.name}">${qty}</span>
+               <button onclick="changeQty('${item.name}', 1)">➕</button>`}
         </div>
       </div>`;
   });
@@ -128,25 +120,34 @@ function updateTotal() {
   document.getElementById("total").textContent = total.toFixed(2);
 }
 
-function handleFormule(heatCount, formuleName, basePrice) {
-  const base = prompt("Riz ou Nouilles sautées? (riz|nouilles)", "riz");
-  const entree = prompt("Choisissez 1 entrée:", "Concombre mariné");
+// Formule 弹窗选择
+function openFormule(formuleName, basePrice, heatCount) {
+  let content = `🧾 ${formuleName} 包含：主食1 + 前菜1 + 热菜${heatCount}\n`;
+  const base = prompt(content + "主食？(Riz / Nouilles)", "Riz");
+  const baseExtra = (base.toLowerCase() === "nouilles") ? 1.0 : 0;
+
+  const entree = prompt("前菜？(例如：Concombre mariné)", "Concombre mariné");
   const heats = [];
-  for (let i = 0; i < heatCount; i++) {
-    const h = prompt(`Choisissez plat chaud ${i+1}:`, "Poulet aigre-doux");
-    if (h) heats.push(h);
+  for (let i = 1; i <= heatCount; i++) {
+    heats.push(prompt(`热菜 ${i}？`, "Poulet frit"));
   }
-  const boisson = prompt("Souhaitez-vous une boisson? (nom ou laisser vide)", "");
-  const plats = [base, entree, ...heats];
-  plats.forEach(name => {
-    const item = menuData.find(i => i.name.toLowerCase().includes(name.toLowerCase()));
-    if (item) changeQty(item.name, 1);
-  });
-  if (boisson) {
-    const drink = menuData.find(i => i.name.toLowerCase().includes(boisson.toLowerCase()));
-    if (drink) changeQty(drink.name, 1);
-  }
+  const drink = prompt("是否加饮品？(写名称或空)", "");
+
+  const drinkExtra = drink ? 1.0 : 0;
+  const totalPrice = basePrice + baseExtra + drinkExtra;
+
+  const name = `${formuleName}: ${base} + ${entree} + ${heats.join(" + ")}${drink ? " + " + drink : ""}`;
+  cart[name] = (cart[name] || 0) + 1;
+  menuData.push({ name, price: totalPrice });
+  renderMenu();
 }
+// Supabase 提交 + 语言切换
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.5/dist/umd/supabase.min.js"></script>
+<script>
+const SUPABASE_URL = "https://fdbcypvxuikhmxvyyvmb.supabase.co";
+const API_KEY = "你的完整API_KEY";
+const client = window.supabase.createClient(SUPABASE_URL, API_KEY);
 
 document.getElementById("orderForm").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -157,7 +158,10 @@ document.getElementById("orderForm").addEventListener("submit", async (e) => {
       items.push({ name, qty, price: item.price });
     }
   }
-  if (items.length === 0) return alert("Veuillez sélectionner au moins un produit");
+  if (items.length === 0) {
+    document.getElementById("result").textContent = "⚠️ 请选择至少一个菜品 / Veuillez sélectionner au moins un produit";
+    return;
+  }
 
   const address = document.getElementById("address").value || "";
   const phone = document.getElementById("phone").value || "";
@@ -182,20 +186,20 @@ document.getElementById("orderForm").addEventListener("submit", async (e) => {
   });
 
   if (res.ok) {
-    cart = {}; renderMenu(); updateTotal();
+    cart = {}; renderMenu();
     document.getElementById("orderForm").reset();
-    document.getElementById("result").textContent = "✅ Commande enregistrée / 订单成功";
+    updateTotal();
+    document.getElementById("result").textContent = "✅ Commande enregistrée / 订单已提交";
   } else {
-    document.getElementById("result").textContent = "❌ Erreur lors de la commande";
+    document.getElementById("result").textContent = "❌ Échec / 提交失败";
   }
 });
 
+// 多语言切换
 function setLang(lang) {
   document.documentElement.lang = lang;
-  document.getElementById("title").textContent =
-    lang === "zh" ? "🥡 CUBE盒饭点餐" : "🥡 CUBE - Commande";
-  document.getElementById("submitBtn").textContent =
-    lang === "zh" ? "✅ 提交订单" : "✅ Commander";
+  document.getElementById("title").textContent = lang === "zh" ? "🥡 CUBE盒饭点餐" : "🥡 CUBE - Commande";
+  document.getElementById("submitBtn").textContent = lang === "zh" ? "✅ 提交订单" : "✅ Commander";
   document.getElementById("infoBox").textContent =
     lang === "zh" ? "📍 巴黎9区 Rue Blanche 7号 — ⏰ 营业时间 11:30–20:30"
                   : "📍 7 Rue Blanche, 75009 Paris — ⏰ 11:30–20:30";
@@ -203,10 +207,9 @@ function setLang(lang) {
     el.textContent = lang === "zh" ? el.dataset.zh : el.dataset.fr;
   });
 }
-window.onload = renderMenu;
 </script>
 
-<!-- 📍 地图 -->
+<!-- 📍 Google 地图 -->
 <footer style="margin-top: 40px;">
   <h2 style="text-align:center;">📍 Nous trouver</h2>
   <iframe
