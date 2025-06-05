@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CUBE - Commande</title>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 900px; margin: auto; padding: 20px; }
+    body { font-family: Arial; max-width: 900px; margin: auto; padding: 20px; }
     h1 { text-align: center; }
     .lang-switch { text-align: center; margin-bottom: 20px; }
     .lang-switch button {
@@ -52,42 +52,49 @@
   <div class="total-price">💰 Total : <span id="total">0.00</span> €</div>
 
   <h2 data-fr="Informations de retrait (optionnel)" data-zh="备注信息（可选）">Informations de retrait</h2>
-
   <label data-fr="Adresse (optionnel)" data-zh="地址（可选）">
-    <input type="text" name="address" id="address" placeholder="22 Rue Truc, 75010 Paris">
+    <input type="text" name="address" id="address">
   </label>
   <label data-fr="Téléphone (optionnel)" data-zh="电话（可选）">
-    <input type="tel" name="phone" id="phone" placeholder="06 12 34 56 78">
+    <input type="tel" name="phone" id="phone">
   </label>
   <label data-fr="Remarques (optionnel)" data-zh="备注（可选）">
-    <input type="text" name="notes" id="notes" placeholder="Pas épicé, sans oignons...">
+    <input type="text" name="notes" id="notes">
   </label>
   <button type="submit" id="submitBtn">✅ Commander</button>
 </form>
 
 <p id="result"></p>
 
-<!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.5/dist/umd/supabase.min.js"></script>
 <script>
 const SUPABASE_URL = "https://fdbcypvxuikhmxvyyvmb.supabase.co";
-const API_KEY = "你的完整API_KEY";
+const API_KEY = "你的真实API_KEY";
 const client = window.supabase.createClient(SUPABASE_URL, API_KEY);
 
 const menuData = [
+  // 主食
   { name: "Riz nature", price: 2.5 }, { name: "Riz sauté", price: 5.8 }, { name: "Nouilles sautées", price: 6.8 },
+  // 热菜
   { name: "Bœuf mijoté", price: 8.8 }, { name: "Porc braisé", price: 8.8 }, { name: "Poulet aigre-doux", price: 8.8 },
   { name: "Porc sauté croustillant", price: 8.8 }, { name: "Poulet frit", price: 8.8 }, { name: "Porc frit croustillant", price: 8.8 },
   { name: "Poulet Kung Pao", price: 8.8 }, { name: "Aubergines braisées", price: 6.8 }, { name: "Haricots verts sautés", price: 6.8 },
-  { name: "Œufs aux tomates", price: 6.8 }, { name: "Concombre mariné", price: 5.8 }, { name: "Radis aigre-doux", price: 5.8 },
+  { name: "Œufs aux tomates", price: 6.8 },
+  // 前菜
+  { name: "Concombre mariné", price: 5.8 }, { name: "Radis aigre-doux", price: 5.8 },
   { name: "Pommes de terre râpées", price: 5.8 }, { name: "Algues marinées", price: 5.8 },
+  // 小吃
   { name: "Roujiamo porc", price: 5.8 }, { name: "Roujiamo bœuf", price: 6.8 },
+  // 饮品
   { name: "Coca-Cola", price: 2.0 }, { name: "Sprite", price: 2.0 }, { name: "Fanta", price: 2.0 },
   { name: "Thé à la pêche", price: 2.0 }, { name: "Jus d’orange", price: 2.0 }, { name: "Eau minérale", price: 2.0 },
-  { name: "Formule 1", price: 11.8 }, { name: "Formule 2", price: 13.8 }
+  // 套餐（不会直接加购物车）
+  { name: "Formule 1", price: 11.8, isFormule: true, count: 2 },
+  { name: "Formule 2", price: 13.8, isFormule: true, count: 3 }
 ];
 
 let cart = {};
+
 function renderMenu() {
   const container = document.getElementById("menuItems");
   container.innerHTML = "";
@@ -97,19 +104,21 @@ function renderMenu() {
       <div class="item-row">
         <div class="item-name">${item.name} - ${item.price.toFixed(2)}€</div>
         <div class="item-controls">
-          <button type="button" onclick="changeQty('${item.name}', -1)">➖</button>
+          <button type="button" onclick="${item.isFormule ? `handleFormule(${item.count}, '${item.name}', ${item.price})` : `changeQty('${item.name}', -1)`}">${item.isFormule ? "🛒" : "➖"}</button>
           <span id="qty-${item.name}">${qty}</span>
-          <button type="button" onclick="changeQty('${item.name}', 1)">➕</button>
+          ${!item.isFormule ? `<button type="button" onclick="changeQty('${item.name}', 1)">➕</button>` : ""}
         </div>
       </div>`;
   });
   updateTotal();
 }
+
 function changeQty(name, delta) {
   cart[name] = Math.max(0, (cart[name] || 0) + delta);
   document.getElementById(`qty-${name}`).textContent = cart[name];
   updateTotal();
 }
+
 function updateTotal() {
   let total = 0;
   for (const [name, qty] of Object.entries(cart)) {
@@ -118,9 +127,27 @@ function updateTotal() {
   }
   document.getElementById("total").textContent = total.toFixed(2);
 }
-window.onload = renderMenu;
 
-// ✅ 提交订单逻辑（保留原 Supabase）
+function handleFormule(heatCount, formuleName, basePrice) {
+  const base = prompt("Riz ou Nouilles sautées? (riz|nouilles)", "riz");
+  const entree = prompt("Choisissez 1 entrée:", "Concombre mariné");
+  const heats = [];
+  for (let i = 0; i < heatCount; i++) {
+    const h = prompt(`Choisissez plat chaud ${i+1}:`, "Poulet aigre-doux");
+    if (h) heats.push(h);
+  }
+  const boisson = prompt("Souhaitez-vous une boisson? (nom ou laisser vide)", "");
+  const plats = [base, entree, ...heats];
+  plats.forEach(name => {
+    const item = menuData.find(i => i.name.toLowerCase().includes(name.toLowerCase()));
+    if (item) changeQty(item.name, 1);
+  });
+  if (boisson) {
+    const drink = menuData.find(i => i.name.toLowerCase().includes(boisson.toLowerCase()));
+    if (drink) changeQty(drink.name, 1);
+  }
+}
+
 document.getElementById("orderForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const items = [];
@@ -130,17 +157,11 @@ document.getElementById("orderForm").addEventListener("submit", async (e) => {
       items.push({ name, qty, price: item.price });
     }
   }
-  if (items.length === 0) {
-    document.getElementById("result").textContent = "⚠️ Veuillez choisir au moins un produit / 至少选一个菜";
-    return;
-  }
+  if (items.length === 0) return alert("Veuillez sélectionner au moins un produit");
 
   const address = document.getElementById("address").value || "";
   const phone = document.getElementById("phone").value || "";
   const notes = document.getElementById("notes").value || "";
-
-  const { data: { user }, error } = await client.auth.getUser();
-  if (!user || error) return alert("Veuillez vous connecter / 请先登录");
 
   const res = await fetch(`${SUPABASE_URL}/rest/v1/orders`, {
     method: "POST",
@@ -151,7 +172,7 @@ document.getElementById("orderForm").addEventListener("submit", async (e) => {
       Prefer: "return=minimal"
     },
     body: JSON.stringify({
-      user_id: user.id,
+      user_id: null,
       status: "新订单",
       items,
       address,
@@ -161,17 +182,14 @@ document.getElementById("orderForm").addEventListener("submit", async (e) => {
   });
 
   if (res.ok) {
-    cart = {};
-    renderMenu();
+    cart = {}; renderMenu(); updateTotal();
     document.getElementById("orderForm").reset();
-    updateTotal();
-    document.getElementById("result").textContent = "✅ Commande envoyée avec succès ! / 订单成功";
+    document.getElementById("result").textContent = "✅ Commande enregistrée / 订单成功";
   } else {
-    document.getElementById("result").textContent = "❌ Échec / 提交失败";
+    document.getElementById("result").textContent = "❌ Erreur lors de la commande";
   }
 });
 
-// 🌐 多语言
 function setLang(lang) {
   document.documentElement.lang = lang;
   document.getElementById("title").textContent =
@@ -185,17 +203,16 @@ function setLang(lang) {
     el.textContent = lang === "zh" ? el.dataset.zh : el.dataset.fr;
   });
 }
+window.onload = renderMenu;
 </script>
 
 <!-- 📍 地图 -->
 <footer style="margin-top: 40px;">
-  <h2 style="text-align:center; font-size: 18px;">📍 Nous trouver</h2>
-  <div style="margin-top: 10px;">
-    <iframe
-      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d8825.590530254658!2d2.3290846801073477!3d48.87987362995386!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e66e49cbdef35d%3A0xb63d7e4ddc4223c7!2sHano%C3%AF%20Corner!5e0!3m2!1szh-CN!2sfr!4v1745323929492!5m2!1szh-CN!2sfr"
-      width="100%" height="300" style="border:0; border-radius: 8px;" allowfullscreen="" loading="lazy">
-    </iframe>
-  </div>
+  <h2 style="text-align:center;">📍 Nous trouver</h2>
+  <iframe
+    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d8825.590530254658!2d2.3290846801073477!3d48.87987362995386!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e66e49cbdef35d%3A0xb63d7e4ddc4223c7!2sHano%C3%AF%20Corner!5e0!3m2!1szh-CN!2sfr!4v1745323929492!5m2!1szh-CN!2sfr"
+    width="100%" height="300" style="border:0; border-radius: 8px;" allowfullscreen="" loading="lazy">
+  </iframe>
 </footer>
 
 </body>
