@@ -13,7 +13,7 @@
       font-size: 20px; padding: 8px 16px; margin: 0 5px;
       background-color: #aed581; border: none; border-radius: 6px; cursor: pointer;
     }
-    table {
+    table {3
       width: 100%; border-collapse: collapse; margin-top: 10px;
     }
     table th, table td {
@@ -52,7 +52,11 @@
   <div class="total-price">💰 Total : <span id="total">0.00</span> €</div>
 
   <h2 data-fr="Informations de retrait (optionnel)" data-zh="备注信息（可选）">Informations de retrait (optionnel)</h2>
-  
+
+  <label data-fr="Nom du client (obligatoire)" data-zh="姓名（必填）">Nom du client (obligatoire)
+  <input type="text" name="customer_name" id="customer_name" required />
+  </label>
+
   <label data-fr="Adresse (optionnel)" data-zh="地址（可选）">Adresse (optionnel)
     <input type="text" name="address" id="address" />
   </label>
@@ -225,7 +229,8 @@ document.getElementById("orderForm").addEventListener("submit", async (e) => {
     document.getElementById("result").textContent = "⚠️ Veuillez choisir un produit.";
     return;
   }
-
+  
+  const customer_name = document.getElementById("customer_name").value;
   const address = document.getElementById("address").value;
   const phone = document.getElementById("phone").value;
   const notes = document.getElementById("notes").value;
@@ -238,14 +243,15 @@ document.getElementById("orderForm").addEventListener("submit", async (e) => {
       Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkYmN5cHZ4dWlraG14dnl5dm1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjY5MzUsImV4cCI6MjA2MDg0MjkzNX0.Ju8wyqBS1irCWgtpBT_RanrqVErQt-gQkWdzb69XMr4",
       Prefer: "return=minimal"
     },
-    body: JSON.stringify({
-      user_id: null,
-      status: "新订单",
-      items,
-      address,
-      phone,
-      notes
-    })
+  body: JSON.stringify({
+    user_id: null,
+    customer_name,
+    status: "新订单",
+    items,
+    address,
+    phone,
+    notes
+  })
   });
 
   if (res.ok) {
