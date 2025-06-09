@@ -68,6 +68,42 @@
 
   <button type="submit" id="submitBtn">✅ Commander</button>
 </form>
+<dialog id="formuleDialog">
+  <form method="dialog" id="formuleSelectForm" style="max-width:600px;margin:auto;">
+    <h2 id="formuleTitle">Formule</h2>
+
+    <label>🥗 Entrée :</label>
+    <select id="formuleEntree" required></select>
+
+    <label>🍛 Plats chauds :</label>
+    <select id="formulePlat1" required></select>
+    <select id="formulePlat2" required></select>
+    <select id="formulePlat3" class="extra-plat" style="display:none;"></select>
+
+    <label>🍚 Riz ou Nouilles :</label>
+    <select id="formuleBase">
+      <option value="Riz nature / 米饭">Riz nature / 米饭</option>
+      <option value="Riz sauté / 炒饭">Riz sauté / 炒饭 (+1€)</option>
+      <option value="Nouilles sautées / 炒面">Nouilles sautées / 炒面 (+1€)</option>
+    </select>
+
+    <label>🥤 Ajouter boisson ?</label>
+    <select id="formuleBoisson">
+      <option value="">Non</option>
+      <option value="Coca-Cola / 可乐">Coca-Cola / 可乐 (+1€)</option>
+      <option value="Sprite / 雪碧">Sprite / 雪碧 (+1€)</option>
+      <option value="Fanta / 芬达">Fanta / 芬达 (+1€)</option>
+      <option value="Thé à la pêche / 桃茶">Thé à la pêche / 桃茶 (+1€)</option>
+      <option value="Jus d’orange / 橙汁">Jus d’orange / 橙汁 (+1€)</option>
+      <option value="Eau minérale / 矿泉水">Eau minérale / 矿泉水 (+1€)</option>
+    </select>
+
+    <div style="margin-top: 15px; text-align: center;">
+      <button type="submit">✅ Ajouter au panier</button>
+      <button type="button" onclick="document.getElementById('formuleDialog').close()">❌ Annuler</button>
+    </div>
+  </form>
+</dialog>
 
 <p id="result"></p>
 
@@ -224,6 +260,60 @@ document.getElementById("orderForm").addEventListener("submit", async (e) => {
 });
 
 renderTables();
+
+function openFormule(type) {
+  const entrees = categories.find(c => c.title.includes("Entrées")).items;
+  const plats = categories.find(c => c.title.includes("Plats chauds")).items;
+
+  // 填充 entrée 下拉
+  const entreeSelect = document.getElementById("formuleEntree");
+  entreeSelect.innerHTML = entrees.map(([n]) => `<option>${n}</option>`).join("");
+
+  // 填充 plats 下拉
+  const plat1 = document.getElementById("formulePlat1");
+  const plat2 = document.getElementById("formulePlat2");
+  const plat3 = document.getElementById("formulePlat3");
+  [plat1, plat2, plat3].forEach(sel => {
+    sel.innerHTML = plats.map(([n]) => `<option>${n}</option>`).join("");
+  });
+
+  // 控制第3个菜是否可见
+  if (type === "Formule 2") {
+    plat3.style.display = "block";
+  } else {
+    plat3.style.display = "none";
+  }
+
+  document.getElementById("formuleTitle").textContent = type;
+  document.getElementById("formuleDialog").showModal();
+}
+
+document.getElementById("formuleSelectForm").addEventListener("submit", () => {
+  const type = document.getElementById("formuleTitle").textContent;
+  let price = type === "Formule 1" ? 11.80 : 13.80;
+
+  const entree = document.getElementById("formuleEntree").value;
+  const plat1 = document.getElementById("formulePlat1").value;
+  const plat2 = document.getElementById("formulePlat2").value;
+  const plat3 = document.getElementById("formulePlat3").value;
+  const base = document.getElementById("formuleBase").value;
+  const boisson = document.getElementById("formuleBoisson").value;
+
+  if (base.includes("sauté") || base.includes("Nouilles")) price += 1;
+  if (boisson) price += 1;
+
+  let desc = `${type}: ${entree}, ${plat1}, ${plat2}`;
+  if (type === "Formule 2") desc += `, ${plat3}`;
+  desc += ` + ${base}`;
+  if (boisson) desc += ` + ${boisson}`;
+
+  const key = `${desc} - ${price.toFixed(2)}€`;
+  cart[key] = (cart[key] || 0) + 1;
+
+  updateTotal();
+  document.getElementById(`formuleDialog`).close();
+});
+
 </script>
 
 <!-- 地图 -->
