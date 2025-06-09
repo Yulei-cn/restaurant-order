@@ -282,7 +282,7 @@ document.getElementById("orderForm").addEventListener("submit", async (e) => {
   }
 });
 
-renderTables();
+document.addEventListener("DOMContentLoaded", renderTables);
 
 function openFormule(type) {
   const entrees = categories.find(c => c.title.includes("Entrées")).items;
