@@ -17,9 +17,12 @@
       width: 100%; border-collapse: collapse; margin-top: 10px;
     }
     table th, table td {
-      border: 1px solid #ccc; padding: 8px; text-align: left;
+      border: 1px solid #ccc; padding: 8px; text-align: center;
     }
     table th { background-color: #f1f8e9; }
+    .item-controls button {
+      padding: 2px 8px; font-size: 16px; margin: 0 5px;
+    }
     .total-price {
       text-align: right; font-size: 1.4em; margin-top: 20px; font-weight: bold;
     }
@@ -44,176 +47,8 @@
 <div id="infoBox">📍 7 Rue Blanche, 75009 Paris — ⏰ 11:30–20:30</div>
 
 <form id="orderForm">
-  <h2>🥗 Entrées / 前菜</h2>
-  <div class="table-container">
-  <table>
-    <tr><th>Nom</th><th>Prix</th></tr>
-    <tr><td>Concombre mariné / 拍黄瓜 - 5.80€</td><td>
-      <button type="button" onclick="changeQty('Concombre mariné / 拍黄瓜 - 5.80€', -1)">➖</button>
-      <span id="qty-Concombre mariné / 拍黄瓜 - 5.80€">0</span>
-      <button type="button" onclick="changeQty('Concombre mariné / 拍黄瓜 - 5.80€', 1)">➕</button>
-    </td></tr>
-    <tr><td>Radis aigre-doux / 酸甜萝卜 - 5.80€</td><td>
-      <button type="button" onclick="changeQty('Radis aigre-doux / 酸甜萝卜 - 5.80€', -1)">➖</button>
-      <span id="qty-Radis aigre-doux / 酸甜萝卜 - 5.80€">0</span>
-      <button type="button" onclick="changeQty('Radis aigre-doux / 酸甜萝卜 - 5.80€', 1)">➕</button>
-    </td></tr>
-    <tr><td>Pommes de terre râpées / 凉拌土豆丝 - 5.80€</td><td>
-      <button type="button" onclick="changeQty('Pommes de terre râpées / 凉拌土豆丝 - 5.80€', -1)">➖</button>
-      <span id="qty-Pommes de terre râpées / 凉拌土豆丝 - 5.80€">0</span>
-      <button type="button" onclick="changeQty('Pommes de terre râpées / 凉拌土豆丝 - 5.80€', 1)">➕</button>
-    </td></tr>
-    <tr><td>Algues marinées / 海带丝 - 5.80€</td><td>
-      <button type="button" onclick="changeQty('Algues marinées / 海带丝 - 5.80€', -1)">➖</button>
-      <span id="qty-Algues marinées / 海带丝 - 5.80€">0</span>
-      <button type="button" onclick="changeQty('Algues marinées / 海带丝 - 5.80€', 1)">➕</button>
-    </td></tr>
-  </table>
-  </div>
+  <div id="menuTables"></div>
 
-  <h2>🍛 Plats chauds / 热菜</h2>
-  <div class="table-container">
-  <table>
-    <tr><th>Nom</th><th>Prix</th></tr>
-    <tr><td>Bœuf mijoté / 烧牛肉 - 8.80€</td><td>
-      <button type="button" onclick="changeQty('Bœuf mijoté / 烧牛肉 - 8.80€', -1)">➖</button>
-      <span id="qty-Bœuf mijoté / 烧牛肉 - 8.80€">0</span>
-      <button type="button" onclick="changeQty('Bœuf mijoté / 烧牛肉 - 8.80€', 1)">➕</button>
-    </td></tr>
-    <tr><td>Porc braisé / 红烧肉 - 8.80€</td><td>
-      <button type="button" onclick="changeQty('Porc braisé / 红烧肉 - 8.80€', -1)">➖</button>
-      <span id="qty-Porc braisé / 红烧肉 - 8.80€">0</span>
-      <button type="button" onclick="changeQty('Porc braisé / 红烧肉 - 8.80€', 1)">➕</button>
-    </td></tr>
-    <tr><td>Poulet aigre-doux / 糖醋鸡 - 8.80€</td><td>
-      <button type="button" onclick="changeQty('Poulet aigre-doux / 糖醋鸡 - 8.80€', -1)">➖</button>
-      <span id="qty-Poulet aigre-doux / 糖醋鸡 - 8.80€">0</span>
-      <button type="button" onclick="changeQty('Poulet aigre-doux / 糖醋鸡 - 8.80€', 1)">➕</button>
-    </td></tr>
-    <tr><td>Porc sauté croustillant / 溜肉段 - 8.80€</td><td>
-      <button type="button" onclick="changeQty('Porc sauté croustillant / 溜肉段 - 8.80€', -1)">➖</button>
-      <span id="qty-Porc sauté croustillant / 溜肉段 - 8.80€">0</span>
-      <button type="button" onclick="changeQty('Porc sauté croustillant / 溜肉段 - 8.80€', 1)">➕</button>
-    </td></tr>
-    <tr><td>Poulet frit / 炸鸡块 - 8.80€</td><td>
-      <button type="button" onclick="changeQty('Poulet frit / 炸鸡块 - 8.80€', -1)">➖</button>
-      <span id="qty-Poulet frit / 炸鸡块 - 8.80€">0</span>
-      <button type="button" onclick="changeQty('Poulet frit / 炸鸡块 - 8.80€', 1)">➕</button>
-    </td></tr>
-    <tr><td>Porc frit croustillant / 小酥肉 - 8.80€</td><td>
-      <button type="button" onclick="changeQty('Porc frit croustillant / 小酥肉 - 8.80€', -1)">➖</button>
-      <span id="qty-Porc frit croustillant / 小酥肉 - 8.80€">0</span>
-      <button type="button" onclick="changeQty('Porc frit croustillant / 小酥肉 - 8.80€', 1)">➕</button>
-    </td></tr>
-    <tr><td>Poulet Kung Pao / 宫保鸡丁 - 8.80€</td><td>
-      <button type="button" onclick="changeQty('Poulet Kung Pao / 宫保鸡丁 - 8.80€', -1)">➖</button>
-      <span id="qty-Poulet Kung Pao / 宫保鸡丁 - 8.80€">0</span>
-      <button type="button" onclick="changeQty('Poulet Kung Pao / 宫保鸡丁 - 8.80€', 1)">➕</button>
-    </td></tr>
-    <tr><td>Aubergines braisées / 烧茄子 - 6.80€</td><td>
-      <button type="button" onclick="changeQty('Aubergines braisées / 烧茄子 - 6.80€', -1)">➖</button>
-      <span id="qty-Aubergines braisées / 烧茄子 - 6.80€">0</span>
-      <button type="button" onclick="changeQty('Aubergines braisées / 烧茄子 - 6.80€', 1)">➕</button>
-    </td></tr>
-    <tr><td>Haricots verts sautés / 干煸豆角 - 6.80€</td><td>
-      <button type="button" onclick="changeQty('Haricots verts sautés / 干煸豆角 - 6.80€', -1)">➖</button>
-      <span id="qty-Haricots verts sautés / 干煸豆角 - 6.80€">0</span>
-      <button type="button" onclick="changeQty('Haricots verts sautés / 干煸豆角 - 6.80€', 1)">➕</button>
-    </td></tr>
-    <tr><td>Œufs aux tomates / 番茄炒鸡蛋 - 6.80€</td><td>
-      <button type="button" onclick="changeQty('Œufs aux tomates / 番茄炒鸡蛋 - 6.80€', -1)">➖</button>
-      <span id="qty-Œufs aux tomates / 番茄炒鸡蛋 - 6.80€">0</span>
-      <button type="button" onclick="changeQty('Œufs aux tomates / 番茄炒鸡蛋 - 6.80€', 1)">➕</button>
-    </td></tr>
-  </table>
-  </div>
-
-  <h2>🍚 Accompagnements / 主食</h2>
-  <div class="table-container">
-  <table>
-  <tr><th>Nom</th><th>Prix</th></tr>
-  <tr><td>Riz nature / 米饭 - 2.50€</td><td>
-    <button type="button" onclick="changeQty('Riz nature / 米饭 - 2.50€', -1)">➖</button>
-    <span id="qty-Riz nature / 米饭 - 2.50€">0</span>
-    <button type="button" onclick="changeQty('Riz nature / 米饭 - 2.50€', 1)">➕</button>
-  </td></tr>
-  <tr><td>Riz sauté / 炒饭 - 5.80€</td><td>
-    <button type="button" onclick="changeQty('Riz sauté / 炒饭 - 5.80€', -1)">➖</button>
-    <span id="qty-Riz sauté / 炒饭 - 5.80€">0</span>
-    <button type="button" onclick="changeQty('Riz sauté / 炒饭 - 5.80€', 1)">➕</button>
-  </td></tr>
-  <tr><td>Nouilles sautées / 炒面 - 6.80€</td><td>
-    <button type="button" onclick="changeQty('Nouilles sautées / 炒面 - 6.80€', -1)">➖</button>
-    <span id="qty-Nouilles sautées / 炒面 - 6.80€">0</span>
-    <button type="button" onclick="changeQty('Nouilles sautées / 炒面 - 6.80€', 1)">➕</button>
-  </td></tr>
-  </table>
-  </div>
-
-  <h2>🥯 Snacks / 小吃</h2>
-  <div class="table-container">
-  <table>
-  <tr><th>Nom</th><th>Prix</th></tr>
-  <tr><td>Roujiamo porc / 猪肉肉夹馍 - 5.80€</td><td>
-    <button type="button" onclick="changeQty('Roujiamo porc / 猪肉肉夹馍 - 5.80€', -1)">➖</button>
-    <span id="qty-Roujiamo porc / 猪肉肉夹馍 - 5.80€">0</span>
-    <button type="button" onclick="changeQty('Roujiamo porc / 猪肉肉夹馍 - 5.80€', 1)">➕</button>
-  </td></tr>
-  <tr><td>Roujiamo bœuf / 牛肉肉夹馍 - 6.80€</td><td>
-    <button type="button" onclick="changeQty('Roujiamo bœuf / 牛肉肉夹馍 - 6.80€', -1)">➖</button>
-    <span id="qty-Roujiamo bœuf / 牛肉肉夹馍 - 6.80€">0</span>
-    <button type="button" onclick="changeQty('Roujiamo bœuf / 牛肉肉夹馍 - 6.80€', 1)">➕</button>
-  </td></tr>
-</table>
-  </div>
-
-  <h2>🥤 Boissons / 饮品</h2>
-  <div class="table-container">
-  <table>
-  <tr><th>Nom</th><th>Prix</th></tr>
-  <tr><td>Coca-Cola / 可乐 - 2.00€</td><td>
-    <button type="button" onclick="changeQty('Coca-Cola / 可乐 - 2.00€', -1)">➖</button>
-    <span id="qty-Coca-Cola / 可乐 - 2.00€">0</span>
-    <button type="button" onclick="changeQty('Coca-Cola / 可乐 - 2.00€', 1)">➕</button>
-  </td></tr>
-  <tr><td>Sprite / 雪碧 - 2.00€</td><td>
-    <button type="button" onclick="changeQty('Sprite / 雪碧 - 2.00€', -1)">➖</button>
-    <span id="qty-Sprite / 雪碧 - 2.00€">0</span>
-    <button type="button" onclick="changeQty('Sprite / 雪碧 - 2.00€', 1)">➕</button>
-  </td></tr>
-  <tr><td>Fanta / 芬达 - 2.00€</td><td>
-    <button type="button" onclick="changeQty('Fanta / 芬达 - 2.00€', -1)">➖</button>
-    <span id="qty-Fanta / 芬达 - 2.00€">0</span>
-    <button type="button" onclick="changeQty('Fanta / 芬达 - 2.00€', 1)">➕</button>
-  </td></tr>
-  <tr><td>Thé à la pêche / 桃茶 - 2.00€</td><td>
-    <button type="button" onclick="changeQty('Thé à la pêche / 桃茶 - 2.00€', -1)">➖</button>
-    <span id="qty-Thé à la pêche / 桃茶 - 2.00€">0</span>
-    <button type="button" onclick="changeQty('Thé à la pêche / 桃茶 - 2.00€', 1)">➕</button>
-  </td></tr>
-  <tr><td>Jus d’orange / 橙汁 - 2.00€</td><td>
-    <button type="button" onclick="changeQty('Jus d’orange / 橙汁 - 2.00€', -1)">➖</button>
-    <span id="qty-Jus d’orange / 橙汁 - 2.00€">0</span>
-    <button type="button" onclick="changeQty('Jus d’orange / 橙汁 - 2.00€', 1)">➕</button>
-  </td></tr>
-  <tr><td>Eau minérale / 矿泉水 - 2.00€</td><td>
-    <button type="button" onclick="changeQty('Eau minérale / 矿泉水 - 2.00€', -1)">➖</button>
-    <span id="qty-Eau minérale / 矿泉水 - 2.00€">0</span>
-    <button type="button" onclick="changeQty('Eau minérale / 矿泉水 - 2.00€', 1)">➕</button>
-  </td></tr>
-</table>
-  </div>
-
-  <h2>🍱 Formules / 套餐</h2>
-  <div class="table-container">
-    <table>
-      <tr><th>Nom</th><th>Action</th></tr>
-      <tr><td>Formule 1 — 11,80 €<br>米饭或炒面（+1€）+ 前菜1 + 热菜2 + 饮品（+1€）</td>
-          <td><button type="button" onclick="openFormule('Formule 1', 11.8, 2)">🛒 Choisir</button></td></tr>
-      <tr><td>Formule 2 — 13,80 €<br>米饭或炒面（+1€）+ 前菜1 + 热菜3 + 饮品（+1€）</td>
-          <td><button type="button" onclick="openFormule('Formule 2', 13.8, 3)">🛒 Choisir</button></td></tr>
-    </table>
-  </div>
   <div class="total-price">💰 Total : <span id="total">0.00</span> €</div>
 
   <h2 data-fr="Informations de retrait (optionnel)" data-zh="备注信息（可选）">Informations de retrait</h2>
@@ -234,49 +69,115 @@
 
 <script>
 let cart = {};
-
-function openFormule(label, basePrice, heatCount) {
-  const base = prompt("主食？(Riz / Nouilles)", "Riz") || "Riz";
-  const entree = prompt("前菜？", "Concombre mariné") || "Concombre mariné";
-  const heats = [];
-  for (let i = 1; i <= heatCount; i++) {
-    heats.push(prompt(`热菜 ${i}？`, "Poulet frit") || "Poulet frit");
+const categories = [
+  {
+    title: "🥗 Entrées / 前菜",
+    items: [
+      ["Concombre mariné / 拍黄瓜", 5.80],
+      ["Radis aigre-doux / 酸甜萝卜", 5.80],
+      ["Pommes de terre râpées / 凉拌土豆丝", 5.80],
+      ["Algues marinées / 海带丝", 5.80],
+    ]
+  },
+  {
+    title: "🍛 Plats chauds / 热菜",
+    items: [
+      ["Bœuf mijoté / 烧牛肉", 8.80],
+      ["Porc braisé / 红烧肉", 8.80],
+      ["Poulet aigre-doux / 糖醋鸡", 8.80],
+      ["Porc sauté croustillant / 溜肉段", 8.80],
+      ["Poulet frit / 炸鸡块", 8.80],
+      ["Porc frit croustillant / 小酥肉", 8.80],
+      ["Poulet Kung Pao / 宫保鸡丁", 8.80],
+      ["Aubergines braisées / 烧茄子", 6.80],
+      ["Haricots verts sautés / 干煸豆角", 6.80],
+      ["Œufs aux tomates / 番茄炒鸡蛋", 6.80],
+    ]
+  },
+  {
+    title: "🍚 Accompagnements / 主食",
+    items: [
+      ["Riz nature / 米饭", 2.50],
+      ["Riz sauté / 炒饭", 5.80],
+      ["Nouilles sautées / 炒面", 6.80],
+    ]
+  },
+  {
+    title: "🥯 Snacks / 小吃",
+    items: [
+      ["Roujiamo porc / 猪肉肉夹馍", 5.80],
+      ["Roujiamo bœuf / 牛肉肉夹馍", 6.80],
+    ]
+  },
+  {
+    title: "🥤 Boissons / 饮品",
+    items: [
+      ["Coca-Cola / 可乐", 2.00],
+      ["Sprite / 雪碧", 2.00],
+      ["Fanta / 芬达", 2.00],
+      ["Thé à la pêche / 桃茶", 2.00],
+      ["Jus d’orange / 橙汁", 2.00],
+      ["Eau minérale / 矿泉水", 2.00],
+    ]
   }
-  const drink = prompt("是否加饮品？(留空为不加)", "") || "";
-  const extra = (base.toLowerCase() === "nouilles" ? 1 : 0) + (drink ? 1 : 0);
-  const name = `${label}: ${base} + ${entree} + ${heats.join(" + ")}${drink ? " + " + drink : ""}`;
-  const fullPrice = basePrice + extra;
-  cart[name] = (cart[name] || 0) + 1;
-  document.getElementById("menuItems")?.insertAdjacentHTML('beforeend',
-    `<div class="item-row"><div class="item-name">${name} - ${fullPrice.toFixed(2)}€</div><div class="item-controls">
-      <button onclick="changeQty('${name}', -1)">➖</button>
-      <span id="qty-${name}">${cart[name]}</span>
-      <button onclick="changeQty('${name}', 1)">➕</button></div></div>`);
-  updateTotal();
+];
+
+function renderTables() {
+  const container = document.getElementById("menuTables");
+  categories.forEach(cat => {
+    const section = document.createElement("section");
+    section.innerHTML = `<h2>${cat.title}</h2><table>
+      <tr><th>Nom</th><th>Prix</th><th>Quantité</th></tr>
+      ${cat.items.map(([label, price]) => {
+        const key = `${label} - ${price.toFixed(2)}€`;
+        return `<tr>
+          <td>${label}</td>
+          <td>${price.toFixed(2)} €</td>
+          <td class="item-controls">
+            <button type="button" onclick="changeQty('${key}', -1)">➖</button>
+            <span id="qty-${key}">0</span>
+            <button type="button" onclick="changeQty('${key}', 1)">➕</button>
+          </td>
+        </tr>`;
+      }).join("")}
+    </table>`;
+    container.appendChild(section);
+  });
 }
 
 function changeQty(name, delta) {
   cart[name] = Math.max(0, (cart[name] || 0) + delta);
-  document.getElementById(`qty-${name}`)?.textContent = cart[name];
+  document.getElementById(`qty-${name}`).textContent = cart[name];
   updateTotal();
 }
 
 function updateTotal() {
   let total = 0;
   for (const [name, qty] of Object.entries(cart)) {
-    const price = parseFloat(name.match(/- ([\d.]+)€/)?.[1] || 0);
+    const price = parseFloat(name.match(/- ([\d.]+)€/)[1]);
     total += price * qty;
   }
   document.getElementById("total").textContent = total.toFixed(2);
 }
 
-// 表单提交
+function setLang(lang) {
+  document.documentElement.lang = lang;
+  document.getElementById("title").textContent = lang === "zh" ? "🥡 CUBE盒饭点餐" : "🥡 CUBE - Commande";
+  document.getElementById("submitBtn").textContent = lang === "zh" ? "✅ 提交订单" : "✅ Commander";
+  document.getElementById("infoBox").textContent = lang === "zh"
+    ? "📍 巴黎9区 Rue Blanche 7号 — ⏰ 营业时间 11:30–20:30"
+    : "📍 7 Rue Blanche, 75009 Paris — ⏰ 11:30–20:30";
+  document.querySelectorAll("[data-fr]").forEach(el => {
+    el.textContent = lang === "zh" ? el.dataset.zh : el.dataset.fr;
+  });
+}
+
 document.getElementById("orderForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const items = [];
   for (const [name, qty] of Object.entries(cart)) {
     if (qty > 0) {
-      const price = parseFloat(name.match(/- ([\d.]+)€/)?.[1] || 0);
+      const price = parseFloat(name.match(/- ([\d.]+)€/)[1]);
       items.push({ name, qty, price });
     }
   }
@@ -285,16 +186,16 @@ document.getElementById("orderForm").addEventListener("submit", async (e) => {
     return;
   }
 
-  const address = document.getElementById("address").value || "";
-  const phone = document.getElementById("phone").value || "";
-  const notes = document.getElementById("notes").value || "";
+  const address = document.getElementById("address").value;
+  const phone = document.getElementById("phone").value;
+  const notes = document.getElementById("notes").value;
 
   const res = await fetch("https://fdbcypvxuikhmxvyyvmb.supabase.co/rest/v1/orders", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      apikey: "你的完整API_KEY",
-      Authorization: `Bearer ${"你的完整API_KEY"}`,
+      apikey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkYmN5cHZ4dWlraG14dnl5dm1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjY5MzUsImV4cCI6MjA2MDg0MjkzNX0.Ju8wyqBS1irCWgtpBT_RanrqVErQt-gQkWdzb69XMr4",
+      Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkYmN5cHZ4dWlraG14dnl5dm1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjY5MzUsImV4cCI6MjA2MDg0MjkzNX0.Ju8wyqBS1irCWgtpBT_RanrqVErQt-gQkWdzb69XMr4",
       Prefer: "return=minimal"
     },
     body: JSON.stringify({
@@ -310,7 +211,7 @@ document.getElementById("orderForm").addEventListener("submit", async (e) => {
   if (res.ok) {
     cart = {};
     document.getElementById("orderForm").reset();
-    document.getElementById("menuItems").innerHTML = "";
+    for (const key in cart) document.getElementById(`qty-${key}`).textContent = "0";
     updateTotal();
     document.getElementById("result").textContent = "✅ Commande envoyée / 订单已提交";
   } else {
@@ -318,18 +219,7 @@ document.getElementById("orderForm").addEventListener("submit", async (e) => {
   }
 });
 
-// 语言切换
-function setLang(lang) {
-  document.documentElement.lang = lang;
-  document.getElementById("title").textContent = lang === "zh" ? "🥡 CUBE盒饭点餐" : "🥡 CUBE - Commande";
-  document.getElementById("submitBtn").textContent = lang === "zh" ? "✅ 提交订单" : "✅ Commander";
-  document.getElementById("infoBox").textContent =
-    lang === "zh" ? "📍 巴黎9区 Rue Blanche 7号 — ⏰ 营业时间 11:30–20:30"
-                  : "📍 7 Rue Blanche, 75009 Paris — ⏰ 11:30–20:30";
-  document.querySelectorAll("[data-fr]").forEach(el => {
-    el.textContent = lang === "zh" ? el.dataset.zh : el.dataset.fr;
-  });
-}
+renderTables();
 </script>
 
 <!-- 地图 -->
