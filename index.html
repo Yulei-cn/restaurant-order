@@ -52,23 +52,22 @@
   <div class="total-price">💰 Total : <span id="total">0.00</span> €</div>
 
   <h2 data-fr="Informations de retrait (optionnel)" data-zh="备注信息（可选）">Informations de retrait (optionnel)</h2>
-
+  
   <label data-fr="Adresse (optionnel)" data-zh="地址（可选）">Adresse (optionnel)
     <input type="text" name="address" id="address" />
   </label>
-
+  
   <label data-fr="Téléphone (optionnel)" data-zh="电话（可选）">Téléphone (optionnel)
     <input type="tel" name="phone" id="phone" />
   </label>
-
+  
   <label data-fr="Remarques (optionnel)" data-zh="备注（可选）">Remarques (optionnel)
     <input type="text" name="notes" id="notes" />
   </label>
 
+
   <button type="submit" id="submitBtn">✅ Commander</button>
 </form>
-
-<!-- Formule 套餐弹窗 -->
 <dialog id="formuleDialog">
   <form method="dialog" id="formuleSelectForm" style="max-width:600px;margin:auto;">
     <h2 id="formuleTitle">Formule</h2>
@@ -184,44 +183,22 @@ function renderTables() {
     </table>`;
     container.appendChild(section);
   });
-
-  const formuleSection = document.createElement("section");
-  formuleSection.innerHTML = `<h2>🍱 Formules</h2><table>
-    <tr><th>Nom</th><th>Description</th><th>Prix</th><th>Quantité</th></tr>
-    <tr>
-      <td>Formule 1</td>
-      <td>1 entrée + 2 plats chauds + riz ou nouilles (+1€), boisson optionnelle (+1€)</td>
-      <td>11.80 €</td>
-      <td class="item-controls">
-        <button type="button" onclick="openFormule('Formule 1')">➕</button>
-      </td>
-    </tr>
-    <tr>
-      <td>Formule 2</td>
-      <td>1 entrée + 3 plats chauds + riz ou nouilles (+1€), boisson optionnelle (+1€)</td>
-      <td>13.80 €</td>
-      <td class="item-controls">
-        <button type="button" onclick="openFormule('Formule 2')">➕</button>
-      </td>
-    </tr>
-  </table>`;
-  container.appendChild(formuleSection);
 }
 
 function changeQty(name, delta) {
   cart[name] = Math.max(0, (cart[name] || 0) + delta);
-  document.getElementById(`qty-${name}`)?.textContent = cart[name];
+  document.getElementById(`qty-${name}`).textContent = cart[name];
   updateTotal();
 }
 
-for (const [name, qty] of Object.entries(cart)) {
-  if (qty > 0) {
-    const match = name.match(/- ([\d.]+)€/);
-    const price = match ? parseFloat(match[1]) : 0;
-    items.push({ name, qty, price });
+function updateTotal() {
+  let total = 0;
+  for (const [name, qty] of Object.entries(cart)) {
+    const price = parseFloat(name.match(/- ([\d.]+)€/)[1]);
+    total += price * qty;
   }
+  document.getElementById("total").textContent = total.toFixed(2);
 }
-
 
 function setLang(lang) {
   document.documentElement.lang = lang;
@@ -274,7 +251,7 @@ document.getElementById("orderForm").addEventListener("submit", async (e) => {
   if (res.ok) {
     cart = {};
     document.getElementById("orderForm").reset();
-    for (const key in cart) document.getElementById(`qty-${key}`)?.textContent = "0";
+    for (const key in cart) document.getElementById(`qty-${key}`).textContent = "0";
     updateTotal();
     document.getElementById("result").textContent = "✅ Commande envoyée / 订单已提交";
   } else {
@@ -282,18 +259,31 @@ document.getElementById("orderForm").addEventListener("submit", async (e) => {
   }
 });
 
-document.addEventListener("DOMContentLoaded", renderTables);
+renderTables();
 
 function openFormule(type) {
   const entrees = categories.find(c => c.title.includes("Entrées")).items;
   const plats = categories.find(c => c.title.includes("Plats chauds")).items;
 
-  document.getElementById("formuleEntree").innerHTML = entrees.map(([n]) => `<option>${n}</option>`).join("");
-  ["formulePlat1", "formulePlat2", "formulePlat3"].forEach(id => {
-    document.getElementById(id).innerHTML = plats.map(([n]) => `<option>${n}</option>`).join("");
+  // 填充 entrée 下拉
+  const entreeSelect = document.getElementById("formuleEntree");
+  entreeSelect.innerHTML = entrees.map(([n]) => `<option>${n}</option>`).join("");
+
+  // 填充 plats 下拉
+  const plat1 = document.getElementById("formulePlat1");
+  const plat2 = document.getElementById("formulePlat2");
+  const plat3 = document.getElementById("formulePlat3");
+  [plat1, plat2, plat3].forEach(sel => {
+    sel.innerHTML = plats.map(([n]) => `<option>${n}</option>`).join("");
   });
 
-  document.getElementById("formulePlat3").style.display = type === "Formule 2" ? "block" : "none";
+  // 控制第3个菜是否可见
+  if (type === "Formule 2") {
+    plat3.style.display = "block";
+  } else {
+    plat3.style.display = "none";
+  }
+
   document.getElementById("formuleTitle").textContent = type;
   document.getElementById("formuleDialog").showModal();
 }
@@ -301,6 +291,7 @@ function openFormule(type) {
 document.getElementById("formuleSelectForm").addEventListener("submit", () => {
   const type = document.getElementById("formuleTitle").textContent;
   let price = type === "Formule 1" ? 11.80 : 13.80;
+
   const entree = document.getElementById("formuleEntree").value;
   const plat1 = document.getElementById("formulePlat1").value;
   const plat2 = document.getElementById("formulePlat2").value;
@@ -318,17 +309,20 @@ document.getElementById("formuleSelectForm").addEventListener("submit", () => {
 
   const key = `${desc} - ${price.toFixed(2)}€`;
   cart[key] = (cart[key] || 0) + 1;
+
   updateTotal();
-  document.getElementById("formuleDialog").close();
+  document.getElementById(`formuleDialog`).close();
 });
+
 </script>
 
 <!-- 地图 -->
 <footer style="margin-top: 40px;">
   <h2 style="text-align:center;">📍 Nous trouver</h2>
   <iframe
-    src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d8826.566768564202!2d2.327968040327757!3d48.87434070843596!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e66f9eb79f4ec3%3A0x8afbe2aac1fe8dd8!2sCUBE!5e0!3m2!1szh-CN!2sfr!4v1749454247270!5m2!1szh-CN!2sfr"
-    width="100%" height="300" style="border:0; border-radius: 8px;" allowfullscreen="" loading="lazy"></iframe>
+    src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d8826.566768564202!2d2.327968040327757!3d48.87434070843596!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e66f9eb79f4ec3%3A0x8afbe2aac1fe8dd8!2sCUBE!5e0!3m2!1szh-CN!2sfr!4v1749454247270!5m2!1szh-CN!2sfr" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+    width="100%" height="300" style="border:0; border-radius: 8px;" allowfullscreen="" loading="lazy">
+  </iframe>
 </footer>
 
 </body>
