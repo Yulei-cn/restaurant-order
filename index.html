@@ -217,11 +217,13 @@ function changeQty(name, delta) {
 function updateTotal() {
   let total = 0;
   for (const [name, qty] of Object.entries(cart)) {
-    const price = parseFloat(name.match(/- ([\d.]+)€/)[1]);
+    const match = name.match(/- ([\d.]+)€/);
+    const price = match ? parseFloat(match[1]) : 0;
     total += price * qty;
   }
   document.getElementById("total").textContent = total.toFixed(2);
 }
+
 
 function setLang(lang) {
   document.documentElement.lang = lang;
