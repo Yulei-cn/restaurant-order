@@ -52,15 +52,15 @@
   <div class="total-price">💰 Total : <span id="total">0.00</span> €</div>
 
   <h2 data-fr="Informations de retrait (optionnel)" data-zh="备注信息（可选）">Informations de retrait (optionnel)</h2>
-  
+
   <label data-fr="Adresse (optionnel)" data-zh="地址（可选）">Adresse (optionnel)
     <input type="text" name="address" id="address" />
   </label>
-  
+
   <label data-fr="Téléphone (optionnel)" data-zh="电话（可选）">Téléphone (optionnel)
     <input type="tel" name="phone" id="phone" />
   </label>
-  
+
   <label data-fr="Remarques (optionnel)" data-zh="备注（可选）">Remarques (optionnel)
     <input type="text" name="notes" id="notes" />
   </label>
@@ -78,7 +78,7 @@
     <label>🍛 Plats chauds :</label>
     <select id="formulePlat1" required></select>
     <select id="formulePlat2" required></select>
-    <select id="formulePlat3" class="extra-plat" style="display:none;"></select>
+    <select id="formulePlat3" style="display:none;"></select>
 
     <label>🍚 Riz ou Nouilles :</label>
     <select id="formuleBase">
@@ -104,7 +104,6 @@
     </div>
   </form>
 </dialog>
-
 <p id="result"></p>
 
 <script>
@@ -164,6 +163,8 @@ const categories = [
 
 function renderTables() {
   const container = document.getElementById("menuTables");
+  container.innerHTML = "";
+
   categories.forEach(cat => {
     const section = document.createElement("section");
     section.innerHTML = `<h2>${cat.title}</h2><table>
@@ -188,22 +189,22 @@ function renderTables() {
   formuleSection.innerHTML = `<h2>🍱 Formules</h2>
     <table>
       <tr><th>Nom</th><th>Description</th><th>Prix</th><th>Quantité</th></tr>
-      <tr>
-        <td>Formule 1</td>
-        <td>1 entrée + 2 plats chauds + riz ou nouilles (+1€) / boisson optionnelle (+1€)</td>
-        <td>11.80 €</td>
-        <td class="item-controls">
-          <button type="button" onclick="openFormule('Formule 1')">➕</button>
-        </td>
-      </tr>
-      <tr>
-        <td>Formule 2</td>
-        <td>1 entrée + 3 plats chauds + riz ou nouilles (+1€) / boisson optionnelle (+1€)</td>
-        <td>13.80 €</td>
-        <td class="item-controls">
-          <button type="button" onclick="openFormule('Formule 2')">➕</button>
-        </td>
-      </tr>
+      ${[
+        ["Formule 1", 11.80, "1 entrée + 2 plats chauds + riz ou nouilles (+1€) / boisson optionnelle (+1€)"],
+        ["Formule 2", 13.80, "1 entrée + 3 plats chauds + riz ou nouilles (+1€) / boisson optionnelle (+1€)"]
+      ].map(([name, basePrice, desc]) => {
+        const key = `${name} - ${basePrice.toFixed(2)}€`;
+        const qty = cart[key] || 0;
+        return `<tr>
+          <td>${name}</td>
+          <td>${desc}</td>
+          <td>${basePrice.toFixed(2)} €</td>
+          <td class="item-controls">
+            <button type="button" onclick="openFormule('${name}')">➕</button>
+            <span id="qty-${key}">${qty}</span>
+          </td>
+        </tr>`;
+      }).join("")}
     </table>`;
   container.appendChild(formuleSection);
 }
@@ -257,8 +258,8 @@ document.getElementById("orderForm").addEventListener("submit", async (e) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      apikey: "xxx",  // 替换为你的真实密钥
-      Authorization: "Bearer xxx",  // 替换为你的真实密钥
+      apikey: "xxx",
+      Authorization: "Bearer xxx",
       Prefer: "return=minimal"
     },
     body: JSON.stringify({
@@ -274,14 +275,13 @@ document.getElementById("orderForm").addEventListener("submit", async (e) => {
   if (res.ok) {
     cart = {};
     document.getElementById("orderForm").reset();
+    renderTables();
     updateTotal();
     document.getElementById("result").textContent = "✅ Commande envoyée / 订单已提交";
   } else {
     document.getElementById("result").textContent = "❌ Erreur / 提交失败";
   }
 });
-
-renderTables();
 
 function openFormule(type) {
   const entrees = categories.find(c => c.title.includes("Entrées")).items;
@@ -323,11 +323,15 @@ document.getElementById("formuleSelectForm").addEventListener("submit", () => {
 
   const key = `${desc} - ${price.toFixed(2)}€`;
   cart[key] = (cart[key] || 0) + 1;
+  renderTables();
   updateTotal();
   document.getElementById("formuleDialog").close();
 });
+
+renderTables();
 </script>
 
+<!-- 地图 -->
 <footer style="margin-top: 40px;">
   <h2 style="text-align:center;">📍 Nous trouver</h2>
   <iframe
