@@ -174,10 +174,18 @@ function setLang(lang) {
   document.getElementById("infoBox").textContent = lang === "zh"
     ? "📍 巴黎9区 Rue Blanche 7号 — ⏰ 营业时间 11:30–20:30"
     : "📍 7 Rue Blanche, 75009 Paris — ⏰ 11:30–20:30";
-  document.querySelectorAll("[data-fr]").forEach(el => {
-    el.textContent = lang === "zh" ? el.dataset.zh : el.dataset.fr;
+
+  // ✅ 修复：只替换文本节点，保留 input
+  document.querySelectorAll("[data-fr]").forEach(label => {
+    const text = lang === "zh" ? label.dataset.zh : label.dataset.fr;
+    // 如果 label 有子节点，找到第一个 text 节点替换它
+    const firstTextNode = [...label.childNodes].find(n => n.nodeType === 3);
+    if (firstTextNode) {
+      firstTextNode.nodeValue = text;
+    }
   });
 }
+
 
 document.getElementById("orderForm").addEventListener("submit", async (e) => {
   e.preventDefault();
