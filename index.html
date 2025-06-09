@@ -13,7 +13,7 @@
       font-size: 20px; padding: 8px 16px; margin: 0 5px;
       background-color: #aed581; border: none; border-radius: 6px; cursor: pointer;
     }
-    table {3
+    table {
       width: 100%; border-collapse: collapse; margin-top: 10px;
     }
     table th, table td {
@@ -54,60 +54,23 @@
   <h2 data-fr="Informations de retrait (optionnel)" data-zh="备注信息（可选）">Informations de retrait (optionnel)</h2>
 
   <label data-fr="Nom du client (obligatoire)" data-zh="姓名（必填）">Nom du client (obligatoire)
-  <input type="text" name="customer_name" id="customer_name" required />
+    <input type="text" name="customer_name" id="customer_name" required />
   </label>
 
   <label data-fr="Adresse (optionnel)" data-zh="地址（可选）">Adresse (optionnel)
     <input type="text" name="address" id="address" />
   </label>
-  
+
   <label data-fr="Téléphone (optionnel)" data-zh="电话（可选）">Téléphone (optionnel)
     <input type="tel" name="phone" id="phone" />
   </label>
-  
+
   <label data-fr="Remarques (optionnel)" data-zh="备注（可选）">Remarques (optionnel)
     <input type="text" name="notes" id="notes" />
   </label>
 
-
   <button type="submit" id="submitBtn">✅ Commander</button>
 </form>
-<dialog id="formuleDialog">
-  <form method="dialog" id="formuleSelectForm" style="max-width:600px;margin:auto;">
-    <h2 id="formuleTitle">Formule</h2>
-
-    <label>🥗 Entrée :</label>
-    <select id="formuleEntree" required></select>
-
-    <label>🍛 Plats chauds :</label>
-    <select id="formulePlat1" required></select>
-    <select id="formulePlat2" required></select>
-    <select id="formulePlat3" class="extra-plat" style="display:none;"></select>
-
-    <label>🍚 Riz ou Nouilles :</label>
-    <select id="formuleBase">
-      <option value="Riz nature / 米饭">Riz nature / 米饭</option>
-      <option value="Riz sauté / 炒饭">Riz sauté / 炒饭 (+1€)</option>
-      <option value="Nouilles sautées / 炒面">Nouilles sautées / 炒面 (+1€)</option>
-    </select>
-
-    <label>🥤 Ajouter boisson ?</label>
-    <select id="formuleBoisson">
-      <option value="">Non</option>
-      <option value="Coca-Cola / 可乐">Coca-Cola / 可乐 (+1€)</option>
-      <option value="Sprite / 雪碧">Sprite / 雪碧 (+1€)</option>
-      <option value="Fanta / 芬达">Fanta / 芬达 (+1€)</option>
-      <option value="Thé à la pêche / 桃茶">Thé à la pêche / 桃茶 (+1€)</option>
-      <option value="Jus d’orange / 橙汁">Jus d’orange / 橙汁 (+1€)</option>
-      <option value="Eau minérale / 矿泉水">Eau minérale / 矿泉水 (+1€)</option>
-    </select>
-
-    <div style="margin-top: 15px; text-align: center;">
-      <button type="submit">✅ Ajouter au panier</button>
-      <button type="button" onclick="document.getElementById('formuleDialog').close()">❌ Annuler</button>
-    </div>
-  </form>
-</dialog>
 
 <p id="result"></p>
 
@@ -229,7 +192,7 @@ document.getElementById("orderForm").addEventListener("submit", async (e) => {
     document.getElementById("result").textContent = "⚠️ Veuillez choisir un produit.";
     return;
   }
-  
+
   const customer_name = document.getElementById("customer_name").value;
   const address = document.getElementById("address").value;
   const phone = document.getElementById("phone").value;
@@ -243,15 +206,15 @@ document.getElementById("orderForm").addEventListener("submit", async (e) => {
       Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkYmN5cHZ4dWlraG14dnl5dm1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjY5MzUsImV4cCI6MjA2MDg0MjkzNX0.Ju8wyqBS1irCWgtpBT_RanrqVErQt-gQkWdzb69XMr4",
       Prefer: "return=minimal"
     },
-  body: JSON.stringify({
-    user_id: null,
-    customer_name,
-    status: "新订单",
-    items,
-    address,
-    phone,
-    notes
-  })
+    body: JSON.stringify({
+      user_id: null,
+      customer_name,
+      status: "新订单",
+      items,
+      address,
+      phone,
+      notes
+    })
   });
 
   if (res.ok) {
@@ -266,67 +229,13 @@ document.getElementById("orderForm").addEventListener("submit", async (e) => {
 });
 
 renderTables();
-
-function openFormule(type) {
-  const entrees = categories.find(c => c.title.includes("Entrées")).items;
-  const plats = categories.find(c => c.title.includes("Plats chauds")).items;
-
-  // 填充 entrée 下拉
-  const entreeSelect = document.getElementById("formuleEntree");
-  entreeSelect.innerHTML = entrees.map(([n]) => `<option>${n}</option>`).join("");
-
-  // 填充 plats 下拉
-  const plat1 = document.getElementById("formulePlat1");
-  const plat2 = document.getElementById("formulePlat2");
-  const plat3 = document.getElementById("formulePlat3");
-  [plat1, plat2, plat3].forEach(sel => {
-    sel.innerHTML = plats.map(([n]) => `<option>${n}</option>`).join("");
-  });
-
-  // 控制第3个菜是否可见
-  if (type === "Formule 2") {
-    plat3.style.display = "block";
-  } else {
-    plat3.style.display = "none";
-  }
-
-  document.getElementById("formuleTitle").textContent = type;
-  document.getElementById("formuleDialog").showModal();
-}
-
-document.getElementById("formuleSelectForm").addEventListener("submit", () => {
-  const type = document.getElementById("formuleTitle").textContent;
-  let price = type === "Formule 1" ? 11.80 : 13.80;
-
-  const entree = document.getElementById("formuleEntree").value;
-  const plat1 = document.getElementById("formulePlat1").value;
-  const plat2 = document.getElementById("formulePlat2").value;
-  const plat3 = document.getElementById("formulePlat3").value;
-  const base = document.getElementById("formuleBase").value;
-  const boisson = document.getElementById("formuleBoisson").value;
-
-  if (base.includes("sauté") || base.includes("Nouilles")) price += 1;
-  if (boisson) price += 1;
-
-  let desc = `${type}: ${entree}, ${plat1}, ${plat2}`;
-  if (type === "Formule 2") desc += `, ${plat3}`;
-  desc += ` + ${base}`;
-  if (boisson) desc += ` + ${boisson}`;
-
-  const key = `${desc} - ${price.toFixed(2)}€`;
-  cart[key] = (cart[key] || 0) + 1;
-
-  updateTotal();
-  document.getElementById(`formuleDialog`).close();
-});
-
 </script>
 
 <!-- 地图 -->
 <footer style="margin-top: 40px;">
   <h2 style="text-align:center;">📍 Nous trouver</h2>
   <iframe
-    src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d8826.566768564202!2d2.327968040327757!3d48.87434070843596!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e66f9eb79f4ec3%3A0x8afbe2aac1fe8dd8!2sCUBE!5e0!3m2!1szh-CN!2sfr!4v1749454247270!5m2!1szh-CN!2sfr" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+    src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d8826.566768564202!2d2.327968040327757!3d48.87434070843596!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e66f9eb79f4ec3%3A0x8afbe2aac1fe8dd8!2sCUBE!5e0!3m2!1szh-CN!2sfr!4v1749454247270!5m2!1szh-CN!2sfr"
     width="100%" height="300" style="border:0; border-radius: 8px;" allowfullscreen="" loading="lazy">
   </iframe>
 </footer>
