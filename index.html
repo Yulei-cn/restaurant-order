@@ -65,9 +65,9 @@
     <input type="text" name="notes" id="notes" />
   </label>
 
-
   <button type="submit" id="submitBtn">✅ Commander</button>
 </form>
+
 <dialog id="formuleDialog">
   <form method="dialog" id="formuleSelectForm" style="max-width:600px;margin:auto;">
     <h2 id="formuleTitle">Formule</h2>
@@ -183,11 +183,34 @@ function renderTables() {
     </table>`;
     container.appendChild(section);
   });
+
+  const formuleSection = document.createElement("section");
+  formuleSection.innerHTML = `<h2>🍱 Formules</h2>
+    <table>
+      <tr><th>Nom</th><th>Description</th><th>Prix</th><th>Quantité</th></tr>
+      <tr>
+        <td>Formule 1</td>
+        <td>1 entrée + 2 plats chauds + riz ou nouilles (+1€) / boisson optionnelle (+1€)</td>
+        <td>11.80 €</td>
+        <td class="item-controls">
+          <button type="button" onclick="openFormule('Formule 1')">➕</button>
+        </td>
+      </tr>
+      <tr>
+        <td>Formule 2</td>
+        <td>1 entrée + 3 plats chauds + riz ou nouilles (+1€) / boisson optionnelle (+1€)</td>
+        <td>13.80 €</td>
+        <td class="item-controls">
+          <button type="button" onclick="openFormule('Formule 2')">➕</button>
+        </td>
+      </tr>
+    </table>`;
+  container.appendChild(formuleSection);
 }
 
 function changeQty(name, delta) {
   cart[name] = Math.max(0, (cart[name] || 0) + delta);
-  document.getElementById(`qty-${name}`).textContent = cart[name];
+  document.getElementById(`qty-${name}`)?.textContent = cart[name];
   updateTotal();
 }
 
@@ -234,8 +257,8 @@ document.getElementById("orderForm").addEventListener("submit", async (e) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      apikey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkYmN5cHZ4dWlraG14dnl5dm1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjY5MzUsImV4cCI6MjA2MDg0MjkzNX0.Ju8wyqBS1irCWgtpBT_RanrqVErQt-gQkWdzb69XMr4",
-      Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkYmN5cHZ4dWlraG14dnl5dm1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjY5MzUsImV4cCI6MjA2MDg0MjkzNX0.Ju8wyqBS1irCWgtpBT_RanrqVErQt-gQkWdzb69XMr4",
+      apikey: "xxx",  // 替换为你的真实密钥
+      Authorization: "Bearer xxx",  // 替换为你的真实密钥
       Prefer: "return=minimal"
     },
     body: JSON.stringify({
@@ -251,7 +274,6 @@ document.getElementById("orderForm").addEventListener("submit", async (e) => {
   if (res.ok) {
     cart = {};
     document.getElementById("orderForm").reset();
-    for (const key in cart) document.getElementById(`qty-${key}`).textContent = "0";
     updateTotal();
     document.getElementById("result").textContent = "✅ Commande envoyée / 订单已提交";
   } else {
@@ -265,11 +287,9 @@ function openFormule(type) {
   const entrees = categories.find(c => c.title.includes("Entrées")).items;
   const plats = categories.find(c => c.title.includes("Plats chauds")).items;
 
-  // 填充 entrée 下拉
   const entreeSelect = document.getElementById("formuleEntree");
   entreeSelect.innerHTML = entrees.map(([n]) => `<option>${n}</option>`).join("");
 
-  // 填充 plats 下拉
   const plat1 = document.getElementById("formulePlat1");
   const plat2 = document.getElementById("formulePlat2");
   const plat3 = document.getElementById("formulePlat3");
@@ -277,13 +297,7 @@ function openFormule(type) {
     sel.innerHTML = plats.map(([n]) => `<option>${n}</option>`).join("");
   });
 
-  // 控制第3个菜是否可见
-  if (type === "Formule 2") {
-    plat3.style.display = "block";
-  } else {
-    plat3.style.display = "none";
-  }
-
+  plat3.style.display = (type === "Formule 2") ? "block" : "none";
   document.getElementById("formuleTitle").textContent = type;
   document.getElementById("formuleDialog").showModal();
 }
@@ -309,18 +323,15 @@ document.getElementById("formuleSelectForm").addEventListener("submit", () => {
 
   const key = `${desc} - ${price.toFixed(2)}€`;
   cart[key] = (cart[key] || 0) + 1;
-
   updateTotal();
-  document.getElementById(`formuleDialog`).close();
+  document.getElementById("formuleDialog").close();
 });
-
 </script>
 
-<!-- 地图 -->
 <footer style="margin-top: 40px;">
   <h2 style="text-align:center;">📍 Nous trouver</h2>
   <iframe
-    src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d8826.566768564202!2d2.327968040327757!3d48.87434070843596!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e66f9eb79f4ec3%3A0x8afbe2aac1fe8dd8!2sCUBE!5e0!3m2!1szh-CN!2sfr!4v1749454247270!5m2!1szh-CN!2sfr" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+    src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d8826.566768564202!2d2.327968040327757!3d48.87434070843596!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e66f9eb79f4ec3%3A0x8afbe2aac1fe8dd8!2sCUBE!5e0!3m2!1szh-CN!2sfr!4v1749454247270!5m2!1szh-CN!2sfr"
     width="100%" height="300" style="border:0; border-radius: 8px;" allowfullscreen="" loading="lazy">
   </iframe>
 </footer>
