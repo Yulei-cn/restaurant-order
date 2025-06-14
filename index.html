@@ -215,24 +215,18 @@ document.getElementById("orderForm").addEventListener("submit", async (e) => {
   const phone = document.getElementById("phone").value;
   const notes = document.getElementById("notes").value;
 
-  const res = await fetch("https://fdbcypvxuikhmxvyyvmb.supabase.co/rest/v1/orders", {
+  const res = await fetch("/api/submit-order", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      apikey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkYmN5cHZ4dWlraG14dnl5dm1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjY5MzUsImV4cCI6MjA2MDg0MjkzNX0.Ju8wyqBS1irCWgtpBT_RanrqVErQt-gQkWdzb69XMr4",
-      Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkYmN5cHZ4dWlraG14dnl5dm1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjY5MzUsImV4cCI6MjA2MDg0MjkzNX0.Ju8wyqBS1irCWgtpBT_RanrqVErQt-gQkWdzb69XMr4",
-      Prefer: "return=minimal"
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      user_id: null,
       customer_name,
-      status: "新订单",
       items,
       address,
       phone,
       notes
     })
   });
+
 
   if (res.ok) {
     cart = {};
