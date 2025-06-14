@@ -61,7 +61,7 @@
     }
 
     async function loadOrders() {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/orders?status=eq.新订单&order=created_at.desc`, {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/orders?status=eq.新订单&select=id,created_at,items,notes,address,phone,customer_name&order=created_at.desc`, {
         headers: { apikey: API_KEY, Authorization: `Bearer ${API_KEY}` }
       });
       const orders = await res.json();
@@ -88,6 +88,7 @@
 
         div.innerHTML = `
           🕒 <strong>下单时间：</strong> ${new Date(order.created_at).toLocaleString("zh-CN")}<br>
+          👤 <strong>姓名：</strong> ${order.customer_name || "未填写"}<br>
           🍰 <strong>主食：</strong> ${mainText}<br>
           🥗 <strong>配菜：</strong>
           <ul>${sideHTML}</ul>
