@@ -31,6 +31,7 @@
 </head>
 <body>
   <h2>📋 当前新订单</h2>
+  <audio id="alertSound" src="新订单.mp3" preload="auto"></audio>
   <div id="orders">加载中...</div>
   <button onclick="loadOrders()">🔄 手动刷新订单</button>
 
@@ -42,28 +43,25 @@
       window.location.href = "https://www.baidu.com";
     }
 
-    const SUPABASE_URL = "https://fdbcypvxuikhmxvyyvmb.supabase.co";
-    const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkYmN5cHZ4dWlraG14dnl5dm1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjY5MzUsImV4cCI6MjA2MDg0MjkzNX0.Ju8wyqBS1irCWgtpBT_RanrqVErQt-gQkWdzb69XMr4";
-
     let lastOrderIds = new Set();
 
     async function loadOrdersIfChanged() {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/orders?status=eq.新订单&select=id&order=created_at.desc`, {
-        headers: { apikey: API_KEY, Authorization: `Bearer ${API_KEY}` }
-      });
+      const res = await fetch("/api/list-orders");
       const orders = await res.json();
       const currentIds = new Set(orders.map(o => o.id));
       const changed = currentIds.size !== lastOrderIds.size || [...currentIds].some(id => !lastOrderIds.has(id));
       if (changed) {
         lastOrderIds = currentIds;
+        const audio = document.getElementById("alertSound");
+        if (document.visibilityState === "visible" && audio) {
+          audio.play().catch(() => {});
+        }
         loadOrders();
       }
     }
 
     async function loadOrders() {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/orders?status=eq.新订单&select=id,created_at,items,notes,address,phone,customer_name&order=created_at.desc`, {
-        headers: { apikey: API_KEY, Authorization: `Bearer ${API_KEY}` }
-      });
+      const res = await fetch("/api/list-orders");
       const orders = await res.json();
       const container = document.getElementById("orders");
       container.innerHTML = "";
@@ -105,14 +103,10 @@
     }
 
     async function markPrinted(id) {
-      await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${id}`, {
+      await fetch("/api/mark-printed", {
         method: "PATCH",
-        headers: {
-          apikey: API_KEY,
-          Authorization: `Bearer ${API_KEY}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ status: "已打印" })
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id })
       });
       loadOrders();
     }
@@ -131,7 +125,7 @@
           alert("❌ 打印失败：" + data.detail);
         }
       })
-      .catch(err => {
+      .catch(() => {
         alert("❌ 打印请求失败，可能是打印服务未启动。");
       });
     }
