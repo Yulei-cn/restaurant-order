@@ -2,6 +2,7 @@
 <html lang="zh">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CUBE 打印管理</title>
   <link rel="icon" href="logo.png" type="image/png">
   <style>
@@ -32,7 +33,10 @@
 </head>
 <body>
   <h2>📋 当前新订单</h2>
+
+  <!-- 音频播放器 -->
   <audio id="alertSound" src="新订单.mp3" preload="auto"></audio>
+
   <div id="orders">加载中...</div>
   <button onclick="loadOrders()">🔄 手动刷新订单</button>
 
@@ -44,6 +48,15 @@
       window.location.href = "https://www.baidu.com";
     }
 
+    // 🔊 自动静音播放一次，解锁后续音频
+    const audio = document.getElementById("alertSound");
+    audio.muted = true;
+    audio.play().then(() => {
+      audio.muted = false;
+    }).catch(() => {
+      console.warn("音频自动播放初始化失败，浏览器可能限制了");
+    });
+
     let lastOrderIds = new Set();
 
     async function loadOrdersIfChanged() {
@@ -53,7 +66,6 @@
       const changed = currentIds.size !== lastOrderIds.size || [...currentIds].some(id => !lastOrderIds.has(id));
       if (changed) {
         lastOrderIds = currentIds;
-        const audio = document.getElementById("alertSound");
         if (document.visibilityState === "visible" && audio) {
           audio.play().catch(() => {});
         }
