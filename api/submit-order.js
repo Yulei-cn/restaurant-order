@@ -1,3 +1,34 @@
+// 根据您的菜单创建价格表
+const menuPrices = {
+  "Concombre mariné / 拍黄瓜 - 5.80€": 5.80,
+  "Radis aigre-doux / 酸甜萝卜 - 5.80€": 5.80,
+  "Pommes de terre râpées / 凉拌土豆丝 - 5.80€": 5.80,
+  "Algues marinées / 海带丝 - 5.80€": 5.80,
+  "Bœuf mijoté / 烧牛肉 - 8.80€": 8.80,
+  "Porc braisé / 红烧肉 - 8.80€": 8.80,
+  "Poulet aigre-doux / 糖醋鸡 - 8.80€": 8.80,
+  "Porc sauté croustillant / 溜肉段 - 8.80€": 8.80,
+  "Poulet frit / 炸鸡块 - 8.80€": 8.80,
+  "Porc frit croustillant / 小酥肉 - 8.80€": 8.80,
+  "Poulet Kung Pao / 宫保鸡丁 - 8.80€": 8.80,
+  "Aubergines braisées / 烧茄子 - 6.80€": 6.80,
+  "Haricots verts sautés / 干煸豆角 - 6.80€": 6.80,
+  "Œufs aux tomates / 番茄炒鸡蛋 - 6.80€": 6.80,
+  "Riz nature / 米饭 - 2.50€": 2.50,
+  "Riz sauté / 炒饭 - 5.80€": 5.80,
+  "Nouilles sautées / 炒面 - 6.80€": 6.80,
+  "Roujiamo porc / 猪肉肉夹馍 - 5.80€": 5.80,
+  "Roujiamo bœuf / 牛肉肉夹馍 - 6.80€": 6.80,
+  "Coca-Cola / 可乐 - 2.00€": 2.00,
+  "Sprite / 雪碧 - 2.00€": 2.00,
+  "Fanta / 芬达 - 2.00€": 2.00,
+  "Thé à la pêche / 桃茶 - 2.00€": 2.00,
+  "Jus d'orange / 橙汁 - 2.00€": 2.00,
+  "Eau minérale / 矿泉水 - 2.00€": 2.00,
+  "Formule 1 — 米饭/炒面 + 前菜1 + 热菜2 + 饮品 - 11.80€": 11.80,
+  "Formule 2 — 米饭/炒面 + 前菜1 + 热菜3 + 饮品 - 13.80€": 13.80
+};
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Méthode non autorisée" });
@@ -5,9 +36,43 @@ export default async function handler(req, res) {
 
   const { items, address, phone, notes, customer_name } = req.body;
 
-  // 基本验证
-  if (!Array.isArray(items) || items.length === 0 || !customer_name) {
-    return res.status(400).json({ error: "Commande invalide" });
+  // 验证客户姓名
+  if (!customer_name || customer_name.trim().length === 0) {
+    return res.status(400).json({ error: "Nom du client requis" });
+  }
+
+  if (customer_name.length > 50) {
+    return res.status(400).json({ error: "Nom trop long" });
+  }
+
+  // 验证订单
+  if (!Array.isArray(items) || items.length === 0) {
+    return res.status(400).json({ error: "Commande vide" });
+  }
+
+  // 重新计算价格防止篡改
+  let serverTotal = 0;
+  const validatedItems = [];
+
+  for (const item of items) {
+    const correctPrice = menuPrices[item.name];
+    
+    if (!correctPrice) {
+      return res.status(400).json({ error: `Produit invalide: ${item.name}` });
+    }
+
+    if (item.qty <= 0 || item.qty > 10) {
+      return res.status(400).json({ error: `Quantité invalide: ${item.qty}` });
+    }
+
+    // 使用服务端正确价格
+    validatedItems.push({
+      name: item.name,
+      qty: item.qty,
+      price: correctPrice
+    });
+
+    serverTotal += correctPrice * item.qty;
   }
 
   try {
@@ -21,17 +86,20 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         status: "新订单",
-        items,
-        address,
-        phone,
-        notes,
-        customer_name
+        items: validatedItems, // 使用验证后的商品
+        address: address ? address.trim() : null,
+        phone: phone ? phone.trim() : null,
+        notes: notes ? notes.trim() : null,
+        customer_name: customer_name.trim()
       })
     });
 
     if (!supabaseRes.ok) throw new Error("Erreur Supabase");
 
-    res.status(200).json({ status: "ok" });
+    res.status(200).json({ 
+      status: "ok",
+      serverTotal: serverTotal 
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Erreur serveur" });
