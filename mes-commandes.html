@@ -267,18 +267,21 @@
       
       const audio = document.getElementById('alertSound');
       
-      // 尝试播放音频文件
-      if (audio.src && !audio.src.includes('undefined')) {
-        audio.currentTime = 0;
-        const playPromise = audio.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(error => {
-            console.warn('音频播放失败，使用 Web Audio API:', error);
-            playWebAudioAlert();
-          });
-        }
+      // 强制使用 mp3 文件
+      audio.currentTime = 0;
+      audio.volume = 1.0;
+      
+      console.log('播放 mp3 文件:', audio.src);
+      
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          console.log('mp3 播放成功');
+        }).catch(error => {
+          console.warn('mp3 播放失败:', error);
+          playWebAudioAlert();
+        });
       } else {
-        // 使用 Web Audio API 生成提示音
         playWebAudioAlert();
       }
     }
