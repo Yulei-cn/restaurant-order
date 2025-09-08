@@ -151,6 +151,7 @@
     // Supabase 配置
     const SUPABASE_URL = 'https://fdbcypvxuikhmxvyyvmb.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkYmN5cHZ4dWlraG14dnl5dm1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjY5MzUsImV4cCI6MjA2MDg0MjkzNX0.Ju8wyqBS1irCWgtpBT_RanrqVErQt-gQkWdzb69XMr4';
+    
     // 如果没有配置 Supabase，将使用轮询模式
     let supabase = null;
     let realtimeChannel = null;
@@ -199,8 +200,8 @@
         audioContext.resume();
       }
       
-      // 检查音频文件是否存在
-      audio.volume = 0.8;
+      // 设置最大音量
+      audio.volume = 1.0;
       
       const playPromise = audio.play();
       if (playPromise !== undefined) {
@@ -210,11 +211,15 @@
           audio.currentTime = 0;
           
           isAudioEnabled = true;
-          enableBtn.disabled = true;
-          enableBtn.textContent = '✅ 音频已启用';
+          enableBtn.style.display = 'none'; // 隐藏按钮
+          testBtn.style.display = 'inline-block'; // 显示测试按钮
           testBtn.disabled = false;
           statusEl.className = 'audio-status audio-enabled';
-          statusEl.textContent = '音频已激活';
+          statusEl.textContent = '✅ 声音提醒已启用';
+          
+          // 隐藏整个音频控制面板
+          document.querySelector('.audio-controls').style.background = '#d4edda';
+          document.querySelector('.audio-controls').style.border = '2px solid #28a745';
           
           console.log('音频已成功激活！');
         }).catch(error => {
