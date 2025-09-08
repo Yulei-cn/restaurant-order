@@ -112,6 +112,24 @@
     .manual-refresh:hover {
       background: #0056b3;
     }
+
+    #enableAudioBtn {
+      padding: 24px 40px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 32px;
+      font-weight: bold;
+      margin: 0 10px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
   </style>
 </head>
 <body>
@@ -122,7 +140,7 @@
   <!-- 音频控制面板 -->
   <div class="audio-controls">
     <strong>🔊 音频设置：</strong>
-    <button id="enableAudioBtn" onclick="enableAudio()">🎵 启用提示音</button>
+    <button id="enableAudioBtn" onclick="enableAudio()" style="background: #28a745; color: white; font-weight: bold; animation: pulse 2s infinite;">🔔 点击启用声音提醒</button>
     <button id="testSoundBtn" onclick="testSound()" disabled>🔔 测试音效</button>
     <span id="audioStatus" class="audio-status audio-disabled">音频未激活</span>
   </div>
