@@ -1,3 +1,33 @@
+// 速率限制：15分钟内最多5次下单
+const rateLimitMap = new Map();
+
+function checkRateLimit(ip) {
+  const now = Date.now();
+  const windowMs = 15 * 60 * 1000; // 15分钟
+  const maxRequests = 5;
+
+  if (!rateLimitMap.has(ip)) {
+    rateLimitMap.set(ip, { count: 1, resetTime: now + windowMs });
+    return true;
+  }
+
+  const record = rateLimitMap.get(ip);
+  
+  if (now > record.resetTime) {
+    // 重置计数器
+    record.count = 1;
+    record.resetTime = now + windowMs;
+    return true;
+  }
+
+  if (record.count >= maxRequests) {
+    return false;
+  }
+
+  record.count++;
+  return true;
+}
+
 // 根据您的菜单创建价格表
 const menuPrices = {
   "Concombre mariné / 拍黄瓜 - 5.80€": 5.80,
@@ -30,6 +60,19 @@ const menuPrices = {
 };
 
 export default async function handler(req, res) {
+  // 获取客户端IP
+  const clientIP = req.headers['x-forwarded-for'] || 
+                   req.headers['x-real-ip'] || 
+                   req.connection.remoteAddress || 
+                   'unknown';
+  
+  // 检查速率限制
+  if (!checkRateLimit(clientIP)) {
+    return res.status(429).json({ 
+      error: "Trop de commandes. Veuillez patienter 15 minutes." 
+    });
+  }
+
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Méthode non autorisée" });
   }
