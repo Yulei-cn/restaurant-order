@@ -28,6 +28,12 @@ function checkRateLimit(ip) {
   return true;
 }
 
+// 安全日志记录
+function logSuspiciousActivity(ip, reason, data) {
+  const timestamp = new Date().toISOString();
+  console.error(`[SECURITY] ${timestamp} - IP: ${ip} - ${reason}`, data);
+}
+
 // 根据您的菜单创建价格表
 const menuPrices = {
   "Concombre mariné / 拍黄瓜 - 5.80€": 5.80,
@@ -68,6 +74,9 @@ export default async function handler(req, res) {
   
   // 检查速率限制
   if (!checkRateLimit(clientIP)) {
+    logSuspiciousActivity(clientIP, 'Rate limit exceeded', { 
+      attempts: rateLimitMap.get(clientIP)?.count 
+    });
     return res.status(429).json({ 
       error: "Trop de commandes. Veuillez patienter 15 minutes." 
     });
@@ -81,15 +90,20 @@ export default async function handler(req, res) {
 
   // 验证客户姓名
   if (!customer_name || customer_name.trim().length === 0) {
+    logSuspiciousActivity(clientIP, 'Empty customer name', { customer_name });
     return res.status(400).json({ error: "Nom du client requis" });
   }
 
   if (customer_name.length > 50) {
+    logSuspiciousActivity(clientIP, 'Customer name too long', { 
+      length: customer_name.length 
+    });
     return res.status(400).json({ error: "Nom trop long" });
   }
 
   // 验证订单
   if (!Array.isArray(items) || items.length === 0) {
+    logSuspiciousActivity(clientIP, 'Empty order attempt', { items });
     return res.status(400).json({ error: "Commande vide" });
   }
 
@@ -101,10 +115,17 @@ export default async function handler(req, res) {
     const correctPrice = menuPrices[item.name];
     
     if (!correctPrice) {
+      logSuspiciousActivity(clientIP, 'Invalid product attempted', { 
+        productName: item.name 
+      });
       return res.status(400).json({ error: `Produit invalide: ${item.name}` });
     }
 
     if (item.qty <= 0 || item.qty > 10) {
+      logSuspiciousActivity(clientIP, 'Invalid quantity attempted', { 
+        product: item.name, 
+        quantity: item.qty 
+      });
       return res.status(400).json({ error: `Quantité invalide: ${item.qty}` });
     }
 
@@ -129,7 +150,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         status: "新订单",
-        items: validatedItems, // 使用验证后的商品
+        items: validatedItems,
         address: address ? address.trim() : null,
         phone: phone ? phone.trim() : null,
         notes: notes ? notes.trim() : null,
@@ -137,14 +158,24 @@ export default async function handler(req, res) {
       })
     });
 
-    if (!supabaseRes.ok) throw new Error("Erreur Supabase");
+    if (!supabaseRes.ok) {
+      const errorText = await supabaseRes.text();
+      console.error('Supabase error:', errorText);
+      throw new Error("Erreur Supabase");
+    }
+
+    // 记录成功的订单
+    console.log(`[ORDER] ${new Date().toISOString()} - IP: ${clientIP} - Order: €${serverTotal} - Customer: ${customer_name.trim()}`);
 
     res.status(200).json({ 
       status: "ok",
       serverTotal: serverTotal 
     });
   } catch (err) {
-    console.error(err);
+    console.error('Order processing error:', err);
+    logSuspiciousActivity(clientIP, 'Database error', { 
+      error: err.message 
+    });
     res.status(500).json({ error: "Erreur serveur" });
   }
 }
