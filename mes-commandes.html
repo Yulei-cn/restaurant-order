@@ -195,16 +195,18 @@
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
       }
       
-      // 尝试播放静音音频来解锁
-      audio.muted = true;
-      audio.volume = 0;
+      // 尝试恢复 AudioContext
+      if (audioContext.state === 'suspended') {
+        audioContext.resume();
+      }
+      
+      // 检查音频文件是否存在
+      audio.volume = 0.8;
       
       const playPromise = audio.play();
       if (playPromise !== undefined) {
         playPromise.then(() => {
-          // 成功播放，现在可以取消静音
-          audio.muted = false;
-          audio.volume = 0.8;
+          // 成功播放，现在暂停
           audio.pause();
           audio.currentTime = 0;
           
@@ -217,7 +219,7 @@
           
           console.log('音频已成功激活！');
         }).catch(error => {
-          console.warn('音频激活失败:', error);
+          console.warn('音频文件播放失败，使用 Web Audio API:', error);
           // 如果音频文件不存在，使用 Web Audio API 生成提示音
           setupWebAudioFallback();
         });
