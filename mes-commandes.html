@@ -485,8 +485,8 @@
     // 开始轮询
     function startPolling() {
       stopPolling(); // 先停止现有轮询
-      updateConnectionStatus('connected', '🟡 轮询模式');
-      pollingInterval = setInterval(loadOrdersIfChanged, 5000); // 5秒检查一次
+      updateConnectionStatus('connected', '🟡 轮询模式 (3秒)');
+      pollingInterval = setInterval(loadOrdersIfChanged, 3000); // 3秒检查一次，更快响应
     }
 
     // 停止轮询
