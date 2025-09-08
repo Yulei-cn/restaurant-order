@@ -228,11 +228,27 @@ document.getElementById("orderForm").addEventListener("submit", async (e) => {
   });
 
 
-  if (res.ok) {
+if (res.ok) {
+    // 先保存所有商品的 key
+    const allKeys = Object.keys(cart);
+    
+    // 清空购物车
     cart = {};
+    
+    // 重置表单
     document.getElementById("orderForm").reset();
-    for (const key in cart) document.getElementById(`qty-${key}`).textContent = "0";
+    
+    // 重置所有商品的数量显示
+    allKeys.forEach(key => {
+        const qtyElement = document.getElementById(`qty-${key}`);
+        if (qtyElement) {
+            qtyElement.textContent = "0";
+        }
+    });
+    
+    // 更新总价
     updateTotal();
+    
     document.getElementById("result").textContent = "✅ Commande envoyée / 订单已提交";
   } else {
     document.getElementById("result").textContent = "❌ Erreur / 提交失败";
