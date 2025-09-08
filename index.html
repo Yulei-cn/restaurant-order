@@ -45,7 +45,7 @@
 </div>
 
 <h1 id="title">🥡 CUBE - Commande</h1>
-<div id="infoBox">📍 7 Rue Blanche, 75009 Paris — ⏰ 11:30–20:30</div>
+<div id="infoBox">⏰ 11:30–20:30 📍</div>
 
 <form id="orderForm">
   <div id="menuTables"></div>
@@ -198,60 +198,71 @@ function setLang(lang) {
 
 document.getElementById("orderForm").addEventListener("submit", async (e) => {
   e.preventDefault();
+  
   const items = [];
+  let clientTotal = 0;
+  
   for (const [name, qty] of Object.entries(cart)) {
     if (qty > 0) {
       const price = parseFloat(name.match(/- ([\d.]+)€/)[1]);
       items.push({ name, qty, price });
+      clientTotal += price * qty;
     }
   }
+  
   if (items.length === 0) {
-    document.getElementById("result").textContent = "⚠️ Veuillez choisir un produit.";
+    document.getElementById("result").textContent = "⚠️ 请选择商品";
     return;
   }
 
   const customer_name = document.getElementById("customer_name").value;
-  const address = document.getElementById("address").value;
-  const phone = document.getElementById("phone").value;
-  const notes = document.getElementById("notes").value;
+  
+  // 验证姓名
+  if (!customer_name.trim()) {
+    document.getElementById("result").textContent = "⚠️ 请填写姓名";
+    return;
+  }
 
-  const res = await fetch("/api/submit-order", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      customer_name,
-      items,
-      address,
-      phone,
-      notes
-    })
-  });
+  try {
+    const res = await fetch("/api/submit-order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        customer_name: customer_name.trim(),
+        items,
+        address: document.getElementById("address").value.trim(),
+        phone: document.getElementById("phone").value.trim(),
+        notes: document.getElementById("notes").value.trim()
+      })
+    });
 
+    const data = await res.json();
 
-if (res.ok) {
-    // 先保存所有商品的 key
-    const allKeys = Object.keys(cart);
-    
-    // 清空购物车
-    cart = {};
-    
-    // 重置表单
-    document.getElementById("orderForm").reset();
-    
-    // 重置所有商品的数量显示
-    allKeys.forEach(key => {
+    if (res.ok) {
+      // 验证价格
+      if (data.serverTotal && Math.abs(data.serverTotal - clientTotal) > 0.01) {
+        document.getElementById("result").textContent = "❌ 价格验证失败，请刷新重试";
+        return;
+      }
+
+      // 清空购物车（您现有的代码）
+      const allKeys = Object.keys(cart);
+      cart = {};
+      document.getElementById("orderForm").reset();
+      allKeys.forEach(key => {
         const qtyElement = document.getElementById(`qty-${key}`);
         if (qtyElement) {
-            qtyElement.textContent = "0";
+          qtyElement.textContent = "0";
         }
-    });
-    
-    // 更新总价
-    updateTotal();
-    
-    document.getElementById("result").textContent = "✅ Commande envoyée / 订单已提交";
-  } else {
-    document.getElementById("result").textContent = "❌ Erreur / 提交失败";
+      });
+      updateTotal();
+      
+      document.getElementById("result").textContent = "✅ 订单提交成功";
+    } else {
+      document.getElementById("result").textContent = `❌ ${data.error}`;
+    }
+  } catch (error) {
+    document.getElementById("result").textContent = "❌ 网络错误，请重试";
   }
 });
 
