@@ -130,17 +130,136 @@
       box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     }
 
-    .test-notice {
-      background: linear-gradient(135deg, #fffde7, #fff9c4);
-      border: 3px dashed #fbc02d;
-      border-radius: 15px;
-      padding: 20px;
+    /* 今日优惠滑动区域 */
+    .offers-container {
       margin: 20px;
-      text-align: center;
-      color: #f57f17;
+      background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 8px 25px rgba(255, 152, 0, 0.2);
+      position: relative;
+    }
+
+    .offers-slider {
+      display: flex;
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      width: 200%;
+    }
+
+    .offer-card {
+      width: 50%;
+      display: flex;
+      align-items: center;
+      padding: 30px;
+      gap: 25px;
+      min-height: 200px;
+    }
+
+    .offer-image {
+      flex-shrink: 0;
+      width: 150px;
+      height: 150px;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      position: relative;
+    }
+
+    .offer-image::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, rgba(255,193,7,0.1), rgba(255,152,0,0.1));
+      z-index: 1;
+    }
+
+    .offer-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .offer-image:hover img {
+      transform: scale(1.05);
+    }
+
+    .offer-content {
+      flex: 1;
+      position: relative;
+    }
+
+    .offer-badge {
+      background: linear-gradient(135deg, #ff6f00, #ff8f00);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.9rem;
       font-weight: bold;
-      font-size: clamp(1rem, 3vw, 1.1rem);
-      box-shadow: 0 4px 15px rgba(251, 192, 45, 0.2);
+      display: inline-block;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 10px rgba(255, 111, 0, 0.3);
+      animation: pulse-badge 2s infinite;
+    }
+
+    .offer-content h3 {
+      font-size: clamp(1.2rem, 4vw, 1.5rem);
+      color: #d84315;
+      margin-bottom: 15px;
+      font-weight: bold;
+    }
+
+    .offer-content p {
+      color: #bf360c;
+      line-height: 1.6;
+      font-size: clamp(0.9rem, 2.5vw, 1rem);
+    }
+
+    .offer-content strong {
+      color: #d84315;
+    }
+
+    .slider-dots {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      z-index: 10;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.5);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .dot.active {
+      background: #ff6f00;
+      transform: scale(1.2);
+      box-shadow: 0 2px 8px rgba(255, 111, 0, 0.4);
+    }
+
+    .dot:hover {
+      background: rgba(255, 111, 0, 0.7);
+      transform: scale(1.1);
+    }
+
+    /* 自动播放动画 */
+    @keyframes pulse-badge {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
+      }
     }
 
     .section {
@@ -327,7 +446,7 @@
       box-shadow: 0 6px 20px rgba(174, 213, 129, 0.4);
     }
 
-    /* 响应式设计 */
+    /* 移动端优化 */
     @media (max-width: 768px) {
       .container {
         margin: 10px;
@@ -350,10 +469,21 @@
       table th, table td {
         padding: 10px 8px;
       }
+
+      .offer-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 25px 20px;
+      }
+
+      .offer-image {
+        width: 120px;
+        height: 120px;
+      }
     }
 
     @media (max-width: 480px) {
-      .vip-notice, .test-notice {
+      .vip-notice, .offers-container {
         margin: 10px;
         padding: 15px;
       }
@@ -364,6 +494,15 @@
 
       .section-content {
         padding: 15px;
+      }
+
+      .offer-card {
+        padding: 20px 15px;
+      }
+
+      .offer-image {
+        width: 100px;
+        height: 100px;
       }
     }
 
@@ -403,7 +542,7 @@
         border-radius: 0;
       }
       
-      .lang-switch {
+      .lang-switch, .offers-container {
         display: none;
       }
     }
@@ -438,9 +577,61 @@
     <button onclick="switchLanguage('zh')">🇨🇳 中文</button>
   </div>
 
-  <div class="test-notice">
-    ⚠️ En phase de test : nous acceptons uniquement les commandes anticipées.<br>
-    Merci de venir retirer votre boîte repas au comptoir extérieur. 自提窗口取餐。
+  <!-- 今日优惠横向滑动区域 -->
+  <div class="offers-container">
+    <div class="offers-slider">
+      <!-- 小菜优惠 -->
+      <div class="offer-card">
+        <div class="offer-image">
+          <img src="Photo/xiaocai.jpg" alt="免费小菜" />
+        </div>
+        <div class="offer-content">
+          <div class="offer-badge">🎁 今日优惠</div>
+          <h3 class="fr-only">Accompagnement Offert !</h3>
+          <h3 class="zh-only">免费赠送小菜！</h3>
+          <p class="fr-only">
+            Avec toute commande, choisissez un accompagnement gratuit :<br>
+            <strong>• Concombre mariné</strong><br>
+            <strong>• Pommes de terre sucrées-aigres</strong><br>
+            <strong>• Radis aigre-doux</strong><br>
+            <strong>• Algues marinées</strong>
+          </p>
+          <p class="zh-only">
+            每份订单免费赠送小菜一份，任选其一：<br>
+            <strong>• 拍黄瓜</strong><br>
+            <strong>• 糖醋土豆丝</strong><br>
+            <strong>• 糖醋萝卜</strong><br>
+            <strong>• 海带丝</strong>
+          </p>
+        </div>
+      </div>
+
+      <!-- 水果优惠 -->
+      <div class="offer-card">
+        <div class="offer-image">
+          <img src="Photo/shuiguo.jpg" alt="免费水果" />
+        </div>
+        <div class="offer-content">
+          <div class="offer-badge">🍎 今日特惠</div>
+          <h3 class="fr-only">Fruits Frais Offerts !</h3>
+          <h3 class="zh-only">新鲜水果免费送！</h3>
+          <p class="fr-only">
+            Fruits de saison offerts avec votre commande.<br>
+            <strong>Fraîcheur et vitamines garanties !</strong>
+          </p>
+          <p class="zh-only">
+            订单满额即送当季新鲜水果<br>
+            <strong>新鲜维生素，健康加倍！</strong>
+          </p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 滑动指示器 -->
+    <div class="slider-dots">
+      <span class="dot active" onclick="showSlide(0)"></span>
+      <span class="dot" onclick="showSlide(1)"></span>
+    </div>
   </div>
 
   <div class="content">
@@ -711,6 +902,8 @@
   function showSlide(index) {
     const slider = document.querySelector('.offers-slider');
     const dots = document.querySelectorAll('.dot');
+    
+    if (!slider) return;
     
     currentSlide = index;
     
