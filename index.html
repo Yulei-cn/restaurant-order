@@ -6,74 +6,467 @@
   <title>CUBE - Commande</title>
   <link rel="icon" href="logo.png" type="image/png">
   <style>
-    body { font-family: Arial; max-width: 900px; margin: auto; padding: 20px; }
-    h1 { text-align: center; }
-    h2 { margin-top: 30px; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
-    .lang-switch { text-align: center; margin-bottom: 20px; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      overflow: hidden;
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #4CAF50, #45a049);
+      color: white;
+      padding: 30px 20px;
+      text-align: center;
+      position: relative;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="1" fill="white" opacity="0.1"/><circle cx="80" cy="40" r="1" fill="white" opacity="0.1"/><circle cx="40" cy="80" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+      opacity: 0.3;
+    }
+
+    .header h1 {
+      font-size: clamp(1.8rem, 5vw, 2.5rem);
+      margin-bottom: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .info-box {
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+      padding: 15px;
+      border-radius: 15px;
+      margin-top: 20px;
+      font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+      position: relative;
+      z-index: 1;
+    }
+
+    .lang-switch {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 30px 20px;
+    }
+
     .lang-switch button {
-      font-size: 20px; padding: 8px 16px; margin: 0 5px;
-      background-color: #aed581; border: none; border-radius: 6px; cursor: pointer;
+      background: linear-gradient(135deg, #81c784, #66bb6a);
+      border: none;
+      border-radius: 25px;
+      padding: 12px 20px;
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      min-height: 48px; /* 移动端触控友好 */
     }
-    table {
-      width: 100%; border-collapse: collapse; margin-top: 10px;
+
+    .lang-switch button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
     }
-    table th, table td {
-      border: 1px solid #ccc; padding: 8px; text-align: center;
+
+    .lang-switch button:active {
+      transform: translateY(0);
     }
-    table th { background-color: #f1f8e9; }
-    .item-controls button {
-      padding: 2px 8px; font-size: 16px; margin: 0 5px;
+
+    .content {
+      padding: 20px;
     }
+
+    .category {
+      margin-bottom: 40px;
+      background: #fafafa;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    .category h2 {
+      background: linear-gradient(135deg, #f1f8e9, #e8f5e8);
+      padding: 20px;
+      margin: 0;
+      font-size: clamp(1.2rem, 4vw, 1.5rem);
+      border-bottom: 3px solid #4CAF50;
+    }
+
+    /* 移动端优化：卡片式布局替代表格 */
+    .menu-grid {
+      display: grid;
+      gap: 15px;
+      padding: 20px;
+    }
+
+    .menu-item {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .menu-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    }
+
+    .item-info {
+      flex: 1;
+      margin-right: 15px;
+    }
+
+    .item-name {
+      font-weight: 600;
+      font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+      color: #333;
+      margin-bottom: 5px;
+    }
+
+    .item-price {
+      color: #4CAF50;
+      font-weight: 700;
+      font-size: clamp(1rem, 3vw, 1.2rem);
+    }
+
+    .item-controls {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex-shrink: 0;
+    }
+
+    .qty-button {
+      background: linear-gradient(135deg, #4CAF50, #45a049);
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      min-height: 44px; /* 移动端触控标准 */
+      min-width: 44px;
+    }
+
+    .qty-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+    }
+
+    .qty-button:active {
+      transform: scale(0.95);
+    }
+
+    .qty-display {
+      background: #f5f5f5;
+      border-radius: 8px;
+      padding: 8px 16px;
+      min-width: 50px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .cart-summary {
+      position: sticky;
+      bottom: 0;
+      background: linear-gradient(135deg, #4CAF50, #45a049);
+      color: white;
+      padding: 20px;
+      margin: 30px -20px -20px -20px;
+      text-align: center;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+    }
+
     .total-price {
-      text-align: right; font-size: 1.4em; margin-top: 20px; font-weight: bold;
+      font-size: clamp(1.5rem, 5vw, 2rem);
+      font-weight: bold;
+      margin-bottom: 20px;
     }
-    label { display: block; margin-top: 15px; }
-    input[type="text"], input[type="tel"] {
-      width: 100%; padding: 8px; margin-top: 5px;
+
+    .form-section {
+      background: #f8f9fa;
+      padding: 30px 20px;
+      margin: 0 -20px;
     }
-    #submitBtn {
-      margin-top: 20px; font-size: 18px; padding: 10px 20px;
-      background: #81c784; border: none; border-radius: 6px; cursor: pointer;
+
+    .form-section h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #333;
+      font-size: clamp(1.3rem, 4vw, 1.6rem);
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 20px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-field label {
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #555;
+    }
+
+    .form-field input {
+      padding: 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 16px;
+      transition: border-color 0.3s ease;
+      background: white;
+    }
+
+    .form-field input:focus {
+      outline: none;
+      border-color: #4CAF50;
+      box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+    }
+
+    .submit-btn {
+      background: linear-gradient(135deg, #4CAF50, #45a049);
+      border: none;
+      border-radius: 25px;
+      padding: 18px 40px;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+      min-height: 56px; /* 移动端标准 */
+      margin-top: 20px;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(76, 175, 80, 0.4);
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .map-section {
+      margin-top: 40px;
+      padding: 30px 20px;
+      text-align: center;
+    }
+
+    .map-section h2 {
+      margin-bottom: 25px;
+      font-size: clamp(1.3rem, 4vw, 1.6rem);
+    }
+
+    .map-container {
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+
+    .result-message {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .result-message.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .result-message.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+      .container {
+        margin: 10px;
+        border-radius: 15px;
+      }
+
+      .menu-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+      }
+
+      .item-info {
+        margin-right: 0;
+      }
+
+      .lang-switch {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .form-grid {
+        padding: 0 10px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .qty-button {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+      }
+
+      .item-controls {
+        gap: 10px;
+      }
+    }
+
+    /* 暗色模式适配 */
+    @media (prefers-color-scheme: dark) {
+      .menu-item {
+        background: #f9f9f9;
+      }
+      
+      .category {
+        background: #f5f5f5;
+      }
+    }
+
+    /* 动画效果 */
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .category {
+      animation: slideIn 0.6s ease forwards;
+    }
+
+    .category:nth-child(odd) {
+      animation-delay: 0.1s;
+    }
+
+    .category:nth-child(even) {
+      animation-delay: 0.2s;
     }
   </style>
 </head>
 <body>
 
-<div class="lang-switch">
-  <button onclick="setLang('fr')">🇫🇷 Français</button>
-  <button onclick="setLang('zh')">🇨🇳 中文</button>
+<div class="container">
+  <div class="header">
+    <h1 id="title">🥡 CUBE - Commande</h1>
+    <div class="info-box" id="infoBox">📍 7 Rue Blanche, 75009 Paris — ⏰ 11:30–20:30</div>
+  </div>
+
+  <div class="lang-switch">
+    <button onclick="setLang('fr')" aria-label="Français">🇫🇷 Français</button>
+    <button onclick="setLang('zh')" aria-label="中文">🇨🇳 中文</button>
+  </div>
+
+  <div class="content">
+    <form id="orderForm">
+      <div id="menuCategories"></div>
+
+      <div class="cart-summary">
+        <div class="total-price">💰 Total : <span id="total">0.00</span> €</div>
+      </div>
+
+      <div class="form-section">
+        <h2 data-fr="Informations de retrait" data-zh="订单信息">Informations de retrait</h2>
+        
+        <div class="form-grid">
+          <div class="form-field">
+            <label data-fr="Nom du client (obligatoire)" data-zh="姓名（必填）">Nom du client (obligatoire)</label>
+            <input type="text" name="customer_name" id="customer_name" required />
+          </div>
+
+          <div class="form-field">
+            <label data-fr="Adresse (optionnel)" data-zh="地址（可选）">Adresse (optionnel)</label>
+            <input type="text" name="address" id="address" />
+          </div>
+
+          <div class="form-field">
+            <label data-fr="Téléphone (optionnel)" data-zh="电话（可选）">Téléphone (optionnel)</label>
+            <input type="tel" name="phone" id="phone" />
+          </div>
+
+          <div class="form-field">
+            <label data-fr="Remarques (optionnel)" data-zh="备注（可选）">Remarques (optionnel)</label>
+            <input type="text" name="notes" id="notes" />
+          </div>
+
+          <button type="submit" class="submit-btn" id="submitBtn">✅ Commander</button>
+        </div>
+      </div>
+    </form>
+
+    <div id="result"></div>
+
+    <div class="map-section">
+      <h2>📍 Nous trouver</h2>
+      <div class="map-container">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d8826.566768564202!2d2.327968040327757!3d48.87434070843596!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e66f9eb79f4ec3%3A0x8afbe2aac1fe8dd8!2sCUBE!5e0!3m2!1szh-CN!2sfr!4v1749454247270!5m2!1szh-CN!2sfr"
+          width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy">
+        </iframe>
+      </div>
+    </div>
+  </div>
 </div>
-
-<h1 id="title">🥡 CUBE - Commande</h1>
-<div id="infoBox">⏰ 11:30–20:30 📍</div>
-
-<form id="orderForm">
-  <div id="menuTables"></div>
-
-  <div class="total-price">💰 Total : <span id="total">0.00</span> €</div>
-
-  <h2 data-fr="Informations de retrait (optionnel)" data-zh="备注信息（可选）">Informations de retrait (optionnel)</h2>
-
-  <label data-fr="Nom du client (obligatoire)" data-zh="姓名（必填）">Nom du client (obligatoire)
-    <input type="text" name="customer_name" id="customer_name" required />
-  </label>
-
-  <label data-fr="Adresse (optionnel)" data-zh="地址（可选）">Adresse (optionnel)
-    <input type="text" name="address" id="address" />
-  </label>
-
-  <label data-fr="Téléphone (optionnel)" data-zh="电话（可选）">Téléphone (optionnel)
-    <input type="tel" name="phone" id="phone" />
-  </label>
-
-  <label data-fr="Remarques (optionnel)" data-zh="备注（可选）">Remarques (optionnel)
-    <input type="text" name="notes" id="notes" />
-  </label>
-
-  <button type="submit" id="submitBtn">✅ Commander</button>
-</form>
-
-<p id="result"></p>
 
 <script>
 let cart = {};
@@ -124,47 +517,63 @@ const categories = [
       ["Sprite / 雪碧", 2.00],
       ["Fanta / 芬达", 2.00],
       ["Thé à la pêche / 桃茶", 2.00],
-      ["Jus d’orange / 橙汁", 2.00],
+      ["Jus d'orange / 橙汁", 2.00],
       ["Eau minérale / 矿泉水", 2.00],
     ]
   },
   {
-  title: "🍱 Formules / 套餐",
-  items: [
-    ["Formule 1 — 米饭/炒面 + 前菜1 + 热菜2 + 饮品", 11.80],
-    ["Formule 2 — 米饭/炒面 + 前菜1 + 热菜3 + 饮品", 13.80],
-  ]
-}
+    title: "🍱 Formules / 套餐",
+    items: [
+      ["Formule 1 — 米饭/炒面 + 前菜1 + 热菜2 + 饮品", 11.80],
+      ["Formule 2 — 米饭/炒面 + 前菜1 + 热菜3 + 饮品", 13.80],
+    ]
+  }
 ];
 
-
-function renderTables() {
-  const container = document.getElementById("menuTables");
-  categories.forEach(cat => {
-    const section = document.createElement("section");
-    section.innerHTML = `<h2>${cat.title}</h2><table>
-      <tr><th>Nom</th><th>Prix</th><th>Quantité</th></tr>
-      ${cat.items.map(([label, price]) => {
-        const key = `${label} - ${price.toFixed(2)}€`;
-        return `<tr>
-          <td>${label}</td>
-          <td>${price.toFixed(2)} €</td>
-          <td class="item-controls">
-            <button type="button" onclick="changeQty('${key}', -1)">➖</button>
-            <span id="qty-${key}">0</span>
-            <button type="button" onclick="changeQty('${key}', 1)">➕</button>
-          </td>
-        </tr>`;
-      }).join("")}
-    </table>`;
+function renderCategories() {
+  const container = document.getElementById("menuCategories");
+  container.innerHTML = '';
+  
+  categories.forEach((cat, index) => {
+    const section = document.createElement("div");
+    section.className = "category";
+    section.style.animationDelay = `${index * 0.1}s`;
+    
+    section.innerHTML = `
+      <h2>${cat.title}</h2>
+      <div class="menu-grid">
+        ${cat.items.map(([label, price]) => {
+          const key = `${label} - ${price.toFixed(2)}€`;
+          const sanitizedKey = key.replace(/['"]/g, '&quot;');
+          return `
+            <div class="menu-item">
+              <div class="item-info">
+                <div class="item-name">${label}</div>
+                <div class="item-price">${price.toFixed(2)} €</div>
+              </div>
+              <div class="item-controls">
+                <button type="button" class="qty-button" onclick="changeQty('${sanitizedKey}', -1)" aria-label="Diminuer">−</button>
+                <div class="qty-display" id="qty-${sanitizedKey}">0</div>
+                <button type="button" class="qty-button" onclick="changeQty('${sanitizedKey}', 1)" aria-label="Augmenter">+</button>
+              </div>
+            </div>
+          `;
+        }).join("")}
+      </div>
+    `;
     container.appendChild(section);
   });
 }
 
 function changeQty(name, delta) {
   cart[name] = Math.max(0, (cart[name] || 0) + delta);
-  document.getElementById(`qty-${name}`).textContent = cart[name];
+  const sanitizedName = name.replace(/['"]/g, '&quot;');
+  const qtyElement = document.getElementById(`qty-${sanitizedName}`);
+  if (qtyElement) {
+    qtyElement.textContent = cart[name];
+  }
   updateTotal();
+  updateCartSummary();
 }
 
 function updateTotal() {
@@ -176,25 +585,42 @@ function updateTotal() {
   document.getElementById("total").textContent = total.toFixed(2);
 }
 
+function updateCartSummary() {
+  const totalItems = Object.values(cart).reduce((sum, qty) => sum + qty, 0);
+  const submitBtn = document.getElementById("submitBtn");
+  
+  if (totalItems === 0) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = document.documentElement.lang === 'zh' ? '选择商品后提交' : 'Sélectionnez des articles';
+  } else {
+    submitBtn.disabled = false;
+    submitBtn.textContent = document.documentElement.lang === 'zh' ? '✅ 提交订单' : '✅ Commander';
+  }
+}
+
 function setLang(lang) {
   document.documentElement.lang = lang;
   document.getElementById("title").textContent = lang === "zh" ? "🥡 CUBE盒饭点餐" : "🥡 CUBE - Commande";
-  document.getElementById("submitBtn").textContent = lang === "zh" ? "✅ 提交订单" : "✅ Commander";
   document.getElementById("infoBox").textContent = lang === "zh"
     ? "📍 巴黎9区 Rue Blanche 7号 — ⏰ 营业时间 11:30–20:30"
     : "📍 7 Rue Blanche, 75009 Paris — ⏰ 11:30–20:30";
 
-  // ✅ 修复：只替换文本节点，保留 input
-  document.querySelectorAll("[data-fr]").forEach(label => {
-    const text = lang === "zh" ? label.dataset.zh : label.dataset.fr;
-    // 如果 label 有子节点，找到第一个 text 节点替换它
-    const firstTextNode = [...label.childNodes].find(n => n.nodeType === 3);
-    if (firstTextNode) {
-      firstTextNode.nodeValue = text;
+  document.querySelectorAll("[data-fr]").forEach(element => {
+    const text = lang === "zh" ? element.dataset.zh : element.dataset.fr;
+    if (element.tagName === 'LABEL') {
+      // For labels, replace only the text content, preserve the input
+      element.childNodes.forEach(node => {
+        if (node.nodeType === 3) { // Text node
+          node.nodeValue = text;
+        }
+      });
+    } else {
+      element.textContent = text;
     }
   });
+  
+  updateCartSummary();
 }
-
 
 document.getElementById("orderForm").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -211,17 +637,21 @@ document.getElementById("orderForm").addEventListener("submit", async (e) => {
   }
   
   if (items.length === 0) {
-    document.getElementById("result").textContent = "⚠️ 请选择商品";
+    showResult("⚠️ " + (document.documentElement.lang === 'zh' ? '请选择商品' : 'Veuillez sélectionner des articles'), 'error');
     return;
   }
 
   const customer_name = document.getElementById("customer_name").value;
   
-  // 验证姓名
   if (!customer_name.trim()) {
-    document.getElementById("result").textContent = "⚠️ 请填写姓名";
+    showResult("⚠️ " + (document.documentElement.lang === 'zh' ? '请填写姓名' : 'Veuillez remplir le nom'), 'error');
     return;
   }
+
+  // Disable submit button during submission
+  const submitBtn = document.getElementById("submitBtn");
+  submitBtn.disabled = true;
+  submitBtn.textContent = document.documentElement.lang === 'zh' ? '提交中...' : 'Envoi en cours...';
 
   try {
     const res = await fetch("/api/submit-order", {
@@ -239,44 +669,57 @@ document.getElementById("orderForm").addEventListener("submit", async (e) => {
     const data = await res.json();
 
     if (res.ok) {
-      // 验证价格
       if (data.serverTotal && Math.abs(data.serverTotal - clientTotal) > 0.01) {
-        document.getElementById("result").textContent = "❌ 价格验证失败，请刷新重试";
+        showResult("❌ " + (document.documentElement.lang === 'zh' ? '价格验证失败，请刷新重试' : 'Erreur de validation du prix'), 'error');
         return;
       }
 
-      // 清空购物车（您现有的代码）
+      // Clear cart
       const allKeys = Object.keys(cart);
       cart = {};
       document.getElementById("orderForm").reset();
       allKeys.forEach(key => {
-        const qtyElement = document.getElementById(`qty-${key}`);
+        const sanitizedKey = key.replace(/['"]/g, '&quot;');
+        const qtyElement = document.getElementById(`qty-${sanitizedKey}`);
         if (qtyElement) {
           qtyElement.textContent = "0";
         }
       });
       updateTotal();
+      updateCartSummary();
       
-      document.getElementById("result").textContent = "✅ 订单提交成功";
+      showResult("✅ " + (document.documentElement.lang === 'zh' ? '订单提交成功！' : 'Commande envoyée avec succès !'), 'success');
     } else {
-      document.getElementById("result").textContent = `❌ ${data.error}`;
+      showResult(`❌ ${data.error}`, 'error');
     }
   } catch (error) {
-    document.getElementById("result").textContent = "❌ 网络错误，请重试";
+    showResult("❌ " + (document.documentElement.lang === 'zh' ? '网络错误，请重试' : 'Erreur réseau, veuillez réessayer'), 'error');
+  } finally {
+    updateCartSummary();
   }
 });
 
-renderTables();
-</script>
+function showResult(message, type) {
+  const resultDiv = document.getElementById("result");
+  resultDiv.textContent = message;
+  resultDiv.className = `result-message ${type}`;
+  
+  // Auto-hide success messages after 5 seconds
+  if (type === 'success') {
+    setTimeout(() => {
+      resultDiv.textContent = '';
+      resultDiv.className = '';
+    }, 5000);
+  }
+}
 
-<!-- 地图 -->
-<footer style="margin-top: 40px;">
-  <h2 style="text-align:center;">📍 Nous trouver</h2>
-  <iframe
-    src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d8826.566768564202!2d2.327968040327757!3d48.87434070843596!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e66f9eb79f4ec3%3A0x8afbe2aac1fe8dd8!2sCUBE!5e0!3m2!1szh-CN!2sfr!4v1749454247270!5m2!1szh-CN!2sfr"
-    width="100%" height="300" style="border:0; border-radius: 8px;" allowfullscreen="" loading="lazy">
-  </iframe>
-</footer>
+// Initialize
+renderCategories();
+updateCartSummary();
+
+// Add touch feedback for mobile
+document.addEventListener('touchstart', function() {}, { passive: true });
+</script>
 
 </body>
 </html>
