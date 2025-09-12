@@ -491,7 +491,7 @@
 
     // 自动打印
     function autoPrint(orderId) {
-      fetch("http://localhost:5005/print", {
+      fetch("https://localhost:5005/print", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: orderId })
