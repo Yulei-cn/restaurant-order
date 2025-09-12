@@ -1,0 +1,210 @@
+给你一份已修正 UUID（不再转 int）+ HTTPS(证书文件) + CORS + 预检 + 日志的完整后端。直接覆盖 printer_server.py 使用即可（Python 3.8 兼容）。
+
+# -*- coding: utf-8 -*-
+# printer_server.py —— Python 3.8 兼容 + HTTPS(本地证书) + CORS + 预检 + 打印
+
+import json
+from datetime import datetime
+from typing import Optional, List
+
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+import requests
+
+import win32print
+import win32ui
+from win32con import LOGPIXELSX, LOGPIXELSY
+
+# ====================== 配置区 ======================
+
+# 允许的前端来源（可按需增删）
+ALLOWED_ORIGINS: List[str] = [
+    "https://restaurant-order-omega.vercel.app",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
+SUPABASE_URL = "https://fdbcypvxuikhmxvyyvmb.supabase.co"
+API_KEY = "PASTE_YOUR_SUPABASE_API_KEY_HERE"  # ← 换成你的
+
+# 用 mkcert 生成： mkcert -install && mkcert localhost 127.0.0.1 ::1
+SSL_CERT_FILE = "localhost.pem"
+SSL_KEY_FILE  = "localhost-key.pem"
+
+# 优先使用名为“Ticket”的票据机；找不到就用默认打印机
+PREFERRED_PRINTER_NAME = "Ticket"
+
+# ====================== Flask 应用 ===================
+
+app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": ALLOWED_ORIGINS}}, supports_credentials=False)
+
+@app.route("/health", methods=["GET"])
+def health():
+    return jsonify({"ok": True})
+
+# ====================== 业务函数 =====================
+
+def fetch_order(order_id: str) -> dict:
+    """按 UUID/字符串 ID 从 Supabase 取订单"""
+    url = f"{SUPABASE_URL}/rest/v1/orders"
+    params = {"id": f"eq.{order_id}", "select": "*"}
+    headers = {
+        "apikey": API_KEY,
+        "Authorization": f"Bearer {API_KEY}",
+        "Accept": "application/json",
+    }
+    r = requests.get(url, headers=headers, params=params, timeout=10)
+    r.raise_for_status()
+    data = r.json()
+    if not data:
+        raise ValueError("Order not found: {}".format(order_id))
+    order = data[0]
+
+    # items 可能是 JSON 字符串；统一转为 list
+    items = order.get("items", [])
+    if isinstance(items, str):
+        try:
+            items = json.loads(items)
+        except Exception:
+            items = []
+    order["items"] = items
+    return order
+
+def _mm_to_px(hdc, mm: float, axis: str = "y") -> int:
+    dpi = hdc.GetDeviceCaps(LOGPIXELSY if axis == "y" else LOGPIXELSX)
+    return int(mm * dpi / 25.4)
+
+def _choose_printer() -> str:
+    names = [p[2] for p in win32print.EnumPrinters(
+        win32print.PRINTER_ENUM_LOCAL | win32print.PRINTER_ENUM_CONNECTIONS)]
+    if PREFERRED_PRINTER_NAME and PREFERRED_PRINTER_NAME in names:
+        return PREFERRED_PRINTER_NAME
+    return win32print.GetDefaultPrinter()
+
+def print_order(order: dict, printer_name: Optional[str] = None):
+    if printer_name is None:
+        printer_name = _choose_printer()
+
+    hprinter = win32print.OpenPrinter(printer_name)
+    try:
+        hdc = win32ui.CreateDC()
+        hdc.CreatePrinterDC(printer_name)
+        hdc.StartDoc("CUBE Order")
+        hdc.StartPage()
+
+        x = _mm_to_px(hdc, 5, "x")
+        y = _mm_to_px(hdc, 5, "y")
+        gap = _mm_to_px(hdc, 5, "y")
+
+        def draw(s: str):
+            nonlocal y
+            for line in s.splitlines():
+                hdc.TextOut(x, y, line)
+                y += gap
+
+        created = order.get("created_at")
+        try:
+            created = datetime.fromisoformat(created.replace("Z", "+00:00")).strftime("%Y-%m-%d %H:%M:%S")
+        except Exception:
+            pass
+
+        lines = [
+            "CUBE 订单",
+            "------------------------------",
+            "时间:  {}".format(created),
+            "电话:  {}".format(order.get("phone") or "无"),
+            "地址:  {}".format(order.get("address") or "无"),
+            "",
+            "内容:",
+        ]
+
+        total = 0.0
+        for item in order["items"]:
+            name = item.get("name", "")
+            try:
+                qty = float(item.get("qty", 0))
+            except Exception:
+                qty = 0.0
+            try:
+                price = float(item.get("price", 0))
+            except Exception:
+                price = 0.0
+
+            subtotal = qty * price
+            total += subtotal
+            qty_text = str(int(qty)) if hasattr(qty, "is_integer") and qty.is_integer() else str(qty)
+            lines.append("{} ×{}  = €{:.2f}".format(name, qty_text, subtotal))
+
+        lines += [
+            "",
+            "备注:  {}".format(order.get("notes") or "无"),
+            "总计:  €{:.2f}".format(total),
+            "------------------------------",
+            "Merci & bon appétit!",
+        ]
+
+        draw("\n".join(lines))
+        hdc.EndPage()
+        hdc.EndDoc()
+        hdc.DeleteDC()
+    finally:
+        win32print.ClosePrinter(hprinter)
+
+# ====================== 接口 ========================
+
+@app.route("/print", methods=["POST", "OPTIONS"])
+def print_api():
+    # 预检
+    if request.method == "OPTIONS":
+        return ("", 204)
+
+    data = request.get_json(silent=True) or {}
+    order_id = data.get("id") or data.get("order_id")
+    if not order_id:
+        return jsonify({"status": "error", "detail": "missing order id"}), 400
+
+    try:
+        print(">>> /print hit, order_id =", order_id)
+        order = fetch_order(str(order_id))   # 不再转 int —— 支持 UUID
+        print_order(order)
+        return jsonify({"status": "success"})
+    except Exception as e:
+        print("Print error:", repr(e))
+        return jsonify({"status": "error", "detail": str(e)}), 500
+
+# ====================== 启动 ========================
+
+if __name__ == "__main__":
+    # 使用本地证书；若文件名不同，请改成 mkcert 生成的实际文件名
+    app.run(host="0.0.0.0", port=5005, ssl_context=(SSL_CERT_FILE, SSL_KEY_FILE))
+
+必做两步
+
+1. 先用 mkcert 生成证书（同目录）：
+
+
+
+mkcert -install
+mkcert localhost 127.0.0.1 ::1
+
+会得到 localhost.pem / localhost-key.pem（或类似 localhost+2.pem 的文件名），把上面代码中的 SSL_CERT_FILE/SSL_KEY_FILE 改成你的实际文件名即可。
+
+2. 把 API_KEY 换成你的 Supabase 匿名键（你已有）。
+
+
+
+完成后运行：
+
+python printer_server.py
+
+前端仍然用：
+
+fetch('https://localhost:5005/print', {
+  method: 'POST',
+  headers: {'Content-Type': 'application/json'},
+  body: JSON.stringify({ id: '<你的订单UUID>' })
+})
+
+如还报错，把后端黑框里最后一条 Print error: 的整行贴出来，我继续对症修。
+
