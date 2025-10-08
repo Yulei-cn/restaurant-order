@@ -7,19 +7,23 @@
     <style>
         @media print {
             body { 
-                margin: 0;
-                padding: 0;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: white !important;
             }
             .invoice-container { 
-                box-shadow: none;
-                margin: 0;
-                padding: 15mm;
-                min-height: auto;
+                box-shadow: none !important;
+                margin: 0 !important;
+                padding: 10mm !important;
+                page-break-after: avoid !important;
+                max-height: none !important;
+                min-height: 0 !important;
             }
-            .controls { display: none; }
+            .controls { display: none !important; }
+            .login-container { display: none !important; }
             @page {
+                size: A4;
                 margin: 0;
-                size: A4 portrait;
             }
         }
         
@@ -35,6 +39,66 @@
             background-color: #f5f5f5;
         }
 
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .login-container h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .login-container .form-group {
+            margin-bottom: 20px;
+        }
+
+        .login-container label {
+            display: block;
+            margin-bottom: 8px;
+            color: #666;
+            font-weight: bold;
+        }
+
+        .login-container input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .login-container .btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .login-container .btn:hover {
+            background-color: #0052a3;
+        }
+
+        .error-msg {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        #appContent {
+            display: none;
+        }
+
         .controls {
             max-width: 210mm;
             margin: 0 auto 20px;
@@ -48,6 +112,21 @@
             font-size: 18px;
             margin-bottom: 15px;
             color: #333;
+        }
+
+        .logout-btn {
+            float: right;
+            padding: 6px 12px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .logout-btn:hover {
+            background-color: #c82333;
         }
 
         .form-group {
@@ -152,7 +231,6 @@
             margin: 0 auto;
             background-color: white;
             padding: 15mm;
-            min-height: 297mm;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         
@@ -310,190 +388,239 @@
     </style>
 </head>
 <body>
-    <div class="controls">
-        <h2>📝 控制面板</h2>
-        
-        <div class="form-row">
-            <div class="form-group">
-                <label>票号</label>
-                <input type="text" id="ticketNumber" value="T003218">
-            </div>
-            <div class="form-group">
-                <label>数量</label>
-                <input type="number" id="quantity" value="32">
-            </div>
-            <div class="form-group">
-                <label>单价含税 (€)</label>
-                <input type="number" step="0.01" id="pricePerUnit" value="11.80">
-            </div>
-        </div>
-
+    <!-- 登录界面 -->
+    <div class="login-container" id="loginContainer">
+        <h2>🔐 CUBE 发票系统</h2>
         <div class="form-group">
-            <label>支付方式</label>
-            <select id="paymentMethod">
-                <option value="Carte Bleue">Carte Bleue (银行卡)</option>
-                <option value="Espèces">Espèces (现金)</option>
-                <option value="Virement bancaire">Virement bancaire (银行转账)</option>
-                <option value="Chèque">Chèque (支票)</option>
-            </select>
+            <label>管理员密码</label>
+            <input type="password" id="passwordInput" placeholder="请输入管理员密码">
         </div>
-
-        <div class="client-manager">
-            <h3 style="font-size: 14px; margin-bottom: 10px;">已保存客户</h3>
-            <div class="client-list" id="clientList"></div>
-            
-            <h3 style="font-size: 14px; margin: 15px 0 10px;">添加/修改客户</h3>
-            <div class="form-group">
-                <label>公司名称</label>
-                <input type="text" id="clientName" placeholder="例如: Alibaba France SASU">
-            </div>
-            <div class="form-group">
-                <label>地址</label>
-                <input type="text" id="clientAddress" placeholder="例如: 36 Rue La Fayette">
-            </div>
-            <div class="form-group">
-                <label>城市</label>
-                <input type="text" id="clientCity" placeholder="例如: 75009 Paris, France">
-            </div>
-            <div class="form-group">
-                <label>TVA税号</label>
-                <input type="text" id="clientTVA" placeholder="例如: FR85812604106">
-            </div>
-            <button class="btn btn-success" onclick="saveClient()">💾 保存客户</button>
-        </div>
-
-        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd;">
-            <button class="btn btn-primary" onclick="updateInvoice()">🔄 更新发票</button>
-            <button class="btn btn-secondary" onclick="window.print()">🖨️ 打印 / PDF</button>
-        </div>
+        <button class="btn" onclick="login()">登录</button>
+        <div class="error-msg" id="errorMsg">密码错误！</div>
     </div>
 
-    <div class="invoice-container">
-        <div class="header">
-            <h1>FACTURE</h1>
-            <div class="header-info">
-                <strong>CUBE</strong> | 7 RUE Blanche, 75009 PARIS FRANCE | Tél : 01 88 61 44 96<br>
-                N° SIRET : 92858697300010 | N° TVA : FR83928586973 | Code NAF/APE : 5610C
+    <!-- 主应用内容 -->
+    <div id="appContent">
+        <div class="controls">
+            <h2>📝 控制面板 <button class="logout-btn" onclick="logout()">退出登录</button></h2>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>票号</label>
+                    <input type="text" id="ticketNumber" value="T003218">
+                </div>
+                <div class="form-group">
+                    <label>数量</label>
+                    <input type="number" id="quantity" value="1">
+                </div>
+                <div class="form-group">
+                    <label>单价含税 (€)</label>
+                    <input type="number" step="0.01" id="pricePerUnit" value="11.80">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>支付方式</label>
+                <select id="paymentMethod">
+                    <option value="Carte Bleue">Carte Bleue (银行卡)</option>
+                    <option value="Espèces">Espèces (现金)</option>
+                    <option value="Virement bancaire">Virement bancaire (银行转账)</option>
+                    <option value="Chèque">Chèque (支票)</option>
+                </select>
+            </div>
+
+            <div class="client-manager">
+                <h3 style="font-size: 14px; margin-bottom: 10px;">已保存客户</h3>
+                <div class="client-list" id="clientList"></div>
+                
+                <h3 style="font-size: 14px; margin: 15px 0 10px;">添加/修改客户</h3>
+                <div class="form-group">
+                    <label>公司名称</label>
+                    <input type="text" id="clientName" placeholder="例如: ABC Company SARL">
+                </div>
+                <div class="form-group">
+                    <label>地址</label>
+                    <input type="text" id="clientAddress" placeholder="例如: 123 Rue Example">
+                </div>
+                <div class="form-group">
+                    <label>城市</label>
+                    <input type="text" id="clientCity" placeholder="例如: 75001 Paris, France">
+                </div>
+                <div class="form-group">
+                    <label>TVA税号</label>
+                    <input type="text" id="clientTVA" placeholder="例如: FR12345678901">
+                </div>
+                <button class="btn btn-success" onclick="saveClient()">💾 保存客户</button>
+            </div>
+
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd;">
+                <button class="btn btn-primary" onclick="updateInvoice()">🔄 更新发票</button>
+                <button class="btn btn-secondary" onclick="window.print()">🖨️ 打印 / PDF</button>
             </div>
         </div>
-        
-        <div class="invoice-meta">
-            <div>
-                <strong>Facture</strong><br>
-                Date : <span id="invoiceDate"></span> | Ticket n.<span id="displayTicket">T003218</span>
+
+        <div class="invoice-container">
+            <div class="header">
+                <h1>FACTURE</h1>
+                <div class="header-info">
+                    <strong>CUBE</strong> | 7 RUE Blanche, 75009 PARIS FRANCE | Tél : 01 88 61 44 96<br>
+                    N° SIRET : 92858697300010 | N° TVA : FR83928586973 | Code NAF/APE : 5610C
+                </div>
             </div>
-            <div style="text-align: right;">
-                <strong>Vendeur</strong><br>
-                Admin(1) | POS# 001
+            
+            <div class="invoice-meta">
+                <div>
+                    <strong>Facture</strong><br>
+                    Date : <span id="invoiceDate"></span> | Ticket n.<span id="displayTicket">T003218</span>
+                </div>
+                <div style="text-align: right;">
+                    <strong>Vendeur</strong><br>
+                    Admin(1) | POS# 001
+                </div>
             </div>
-        </div>
-        
-        <div class="company-info">
-            <div class="company-box">
-                <h3>Facturé par</h3>
-                <p>
-                    <strong>CUBE</strong><br>
-                    7 Rue Blanche<br>
-                    75009 Paris, France<br>
-                    TVA : FR83928586973
-                </p>
+            
+            <div class="company-info">
+                <div class="company-box">
+                    <h3>Facturé par</h3>
+                    <p>
+                        <strong>CUBE</strong><br>
+                        7 Rue Blanche<br>
+                        75009 Paris, France<br>
+                        TVA : FR83928586973
+                    </p>
+                </div>
+                <div class="company-box">
+                    <h3>Facturé à</h3>
+                    <p id="clientInfo">
+                        <strong>Client</strong><br>
+                        Adresse<br>
+                        Ville, Pays<br>
+                        TVA : -
+                    </p>
+                </div>
             </div>
-            <div class="company-box">
-                <h3>Facturé à</h3>
-                <p id="clientInfo">
-                    <strong>Alibaba France SASU</strong><br>
-                    36 Rue La Fayette<br>
-                    75009 Paris, France<br>
-                    TVA : FR85812604106
-                </p>
-            </div>
-        </div>
-        
-        <table class="items-table">
-            <thead>
-                <tr>
-                    <th>Description</th>
-                    <th>Qté</th>
-                    <th>P.U. HT</th>
-                    <th>TVA</th>
-                    <th>P.U. TTC</th>
-                    <th>Total TTC</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Formule 1</td>
-                    <td style="text-align: center;" id="displayQty">32</td>
-                    <td id="displayPriceHT">10,73 €</td>
-                    <td style="text-align: center;">10%</td>
-                    <td id="displayPriceTTC">11,80 €</td>
-                    <td style="text-align: right;" id="displayTotal">377,60 €</td>
-                </tr>
-            </tbody>
-        </table>
-        
-        <div class="totals">
-            <div class="total-row subtotal">
-                <span>Total HT</span>
-                <span id="totalHT">343,27 €</span>
-            </div>
-            <div class="total-row subtotal">
-                <span>TVA (10%)</span>
-                <span id="totalTVA">34,33 €</span>
-            </div>
-            <div class="total-row final">
-                <span>Total TTC</span>
-                <span id="totalTTC">377,60 €</span>
-            </div>
-        </div>
-        
-        <div class="tax-breakdown">
-            <h3>Récapitulatif TVA</h3>
-            <table class="tax-table">
+            
+            <table class="items-table">
                 <thead>
                     <tr>
-                        <th>Taux</th>
-                        <th>Base HT</th>
+                        <th>Description</th>
+                        <th>Qté</th>
+                        <th>P.U. HT</th>
                         <th>TVA</th>
-                        <th>TTC</th>
+                        <th>P.U. TTC</th>
+                        <th>Total TTC</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>10%</td>
-                        <td id="taxHT">343,27 €</td>
-                        <td id="taxAmount">34,33 €</td>
-                        <td id="taxTTC">377,60 €</td>
-                    </tr>
-                    <tr>
-                        <td>20%</td>
-                        <td>0,00 €</td>
-                        <td>0,00 €</td>
-                        <td>0,00 €</td>
-                    </tr>
-                    <tr style="font-weight: bold;">
-                        <td>Total</td>
-                        <td id="taxTotalHT">343,27 €</td>
-                        <td id="taxTotalAmount">34,33 €</td>
-                        <td id="taxTotalTTC">377,60 €</td>
+                        <td>Formule 1</td>
+                        <td style="text-align: center;" id="displayQty">1</td>
+                        <td id="displayPriceHT">10,73 €</td>
+                        <td style="text-align: center;">10%</td>
+                        <td id="displayPriceTTC">11,80 €</td>
+                        <td style="text-align: right;" id="displayTotal">11,80 €</td>
                     </tr>
                 </tbody>
             </table>
-        </div>
-        
-        <div class="payment-info">
-            <strong>Mode de paiement :</strong> <span id="paymentMethodDisplay">Carte Bleue</span> - <span id="paymentAmount">377,60 €</span> | Type : Credit | Rendu : 0,00 €
-        </div>
-        
-        <div class="footer">
-            Logiciel : 10.00.28.08.24 | Category B | Certificat (NF525)0410-6 | Signature : geWo<br>
-            Merci de votre visite, À bientôt !
+            
+            <div class="totals">
+                <div class="total-row subtotal">
+                    <span>Total HT</span>
+                    <span id="totalHT">10,73 €</span>
+                </div>
+                <div class="total-row subtotal">
+                    <span>TVA (10%)</span>
+                    <span id="totalTVA">1,07 €</span>
+                </div>
+                <div class="total-row final">
+                    <span>Total TTC</span>
+                    <span id="totalTTC">11,80 €</span>
+                </div>
+            </div>
+            
+            <div class="tax-breakdown">
+                <h3>Récapitulatif TVA</h3>
+                <table class="tax-table">
+                    <thead>
+                        <tr>
+                            <th>Taux</th>
+                            <th>Base HT</th>
+                            <th>TVA</th>
+                            <th>TTC</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>10%</td>
+                            <td id="taxHT">10,73 €</td>
+                            <td id="taxAmount">1,07 €</td>
+                            <td id="taxTTC">11,80 €</td>
+                        </tr>
+                        <tr>
+                            <td>20%</td>
+                            <td>0,00 €</td>
+                            <td>0,00 €</td>
+                            <td>0,00 €</td>
+                        </tr>
+                        <tr style="font-weight: bold;">
+                            <td>Total</td>
+                            <td id="taxTotalHT">10,73 €</td>
+                            <td id="taxTotalAmount">1,07 €</td>
+                            <td id="taxTotalTTC">11,80 €</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="payment-info">
+                <strong>Mode de paiement :</strong> <span id="paymentMethodDisplay">Carte Bleue</span> - <span id="paymentAmount">11,80 €</span> | Type : Credit | Rendu : 0,00 €
+            </div>
+            
+            <div class="footer">
+                Logiciel : 10.00.28.08.24 | Category B | Certificat (NF525)0410-6 | Signature : geWo<br>
+                Merci de votre visite, À bientôt !
+            </div>
         </div>
     </div>
 
     <script>
+        // 默认密码，可以自己修改
+        const ADMIN_PASSWORD = 'cube2025';
+        
         let clients = {};
         let currentClient = null;
+        let isLoggedIn = false;
+
+        function login() {
+            const password = document.getElementById('passwordInput').value;
+            if (password === ADMIN_PASSWORD) {
+                isLoggedIn = true;
+                document.getElementById('loginContainer').style.display = 'none';
+                document.getElementById('appContent').style.display = 'block';
+                document.getElementById('errorMsg').style.display = 'none';
+                initApp();
+            } else {
+                document.getElementById('errorMsg').style.display = 'block';
+            }
+        }
+
+        function logout() {
+            if (confirm('确定退出登录吗？')) {
+                isLoggedIn = false;
+                document.getElementById('loginContainer').style.display = 'block';
+                document.getElementById('appContent').style.display = 'none';
+                document.getElementById('passwordInput').value = '';
+            }
+        }
+
+        // 回车登录
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    login();
+                }
+            });
+        });
 
         function initApp() {
             loadClients();
@@ -518,31 +645,26 @@
         }
 
         function loadClients() {
-            const saved = window.localStorage ? localStorage.getItem('cube_clients') : null;
+            const saved = sessionStorage.getItem('cube_clients');
             if (saved) {
                 clients = JSON.parse(saved);
             } else {
-                clients = {
-                    'alibaba': {
-                        name: 'Alibaba France SASU',
-                        address: '36 Rue La Fayette',
-                        city: '75009 Paris, France',
-                        tva: 'FR85812604106'
-                    }
-                };
-                saveClientsToStorage();
+                clients = {};
             }
         }
 
         function saveClientsToStorage() {
-            if (window.localStorage) {
-                localStorage.setItem('cube_clients', JSON.stringify(clients));
-            }
+            sessionStorage.setItem('cube_clients', JSON.stringify(clients));
         }
 
         function renderClientList() {
             const list = document.getElementById('clientList');
             list.innerHTML = '';
+            
+            if (Object.keys(clients).length === 0) {
+                list.innerHTML = '<div style="color: #999; font-size: 12px;">暂无客户，请添加客户信息</div>';
+                return;
+            }
             
             for (const [key, client] of Object.entries(clients)) {
                 const tag = document.createElement('div');
@@ -601,6 +723,14 @@
                 renderClientList();
                 if (currentClient) {
                     selectClient(currentClient);
+                } else {
+                    // 清空客户信息显示
+                    document.getElementById('clientInfo').innerHTML = `
+                        <strong>Client</strong><br>
+                        Adresse<br>
+                        Ville, Pays<br>
+                        TVA : -
+                    `;
                 }
             }
         }
@@ -647,8 +777,6 @@
                 `;
             }
         }
-
-        initApp();
     </script>
 </body>
 </html>
