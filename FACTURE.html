@@ -8,6 +8,7 @@
         @media print {
             body { margin: 0; }
             .invoice-container { box-shadow: none; }
+            .controls { display: none; }
         }
         
         * {
@@ -19,7 +20,119 @@
         body {
             font-family: Arial, sans-serif;
             padding: 20px;
-            background-color: #fff;
+            background-color: #f5f5f5;
+        }
+
+        .controls {
+            max-width: 210mm;
+            margin: 0 auto 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .controls h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #666;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 8px;
+            font-size: 13px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            font-size: 13px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .btn-primary {
+            background-color: #0066cc;
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .client-manager {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+
+        .client-list {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .client-tag {
+            padding: 5px 12px;
+            background-color: #e9ecef;
+            border-radius: 15px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .client-tag:hover {
+            background-color: #d1d5db;
+        }
+
+        .client-tag.active {
+            background-color: #0066cc;
+            color: white;
+        }
+
+        .client-tag .delete {
+            color: #dc3545;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .client-tag.active .delete {
+            color: white;
         }
         
         .invoice-container {
@@ -28,6 +141,7 @@
             background-color: white;
             padding: 15mm;
             min-height: 297mm;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         
         .header {
@@ -184,6 +298,54 @@
     </style>
 </head>
 <body>
+    <div class="controls">
+        <h2>📝 Contrôle de la facture</h2>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label>Numéro de ticket</label>
+                <input type="text" id="ticketNumber" value="T003218">
+            </div>
+            <div class="form-group">
+                <label>Quantité</label>
+                <input type="number" id="quantity" value="32">
+            </div>
+            <div class="form-group">
+                <label>Prix unitaire TTC (€)</label>
+                <input type="number" step="0.01" id="pricePerUnit" value="11.80">
+            </div>
+        </div>
+
+        <div class="client-manager">
+            <h3 style="font-size: 14px; margin-bottom: 10px;">Clients enregistrés</h3>
+            <div class="client-list" id="clientList"></div>
+            
+            <h3 style="font-size: 14px; margin: 15px 0 10px;">Ajouter/Modifier un client</h3>
+            <div class="form-group">
+                <label>Nom de l'entreprise</label>
+                <input type="text" id="clientName" placeholder="ex: Alibaba France SASU">
+            </div>
+            <div class="form-group">
+                <label>Adresse</label>
+                <input type="text" id="clientAddress" placeholder="ex: 36 Rue La Fayette 75009">
+            </div>
+            <div class="form-group">
+                <label>Ville</label>
+                <input type="text" id="clientCity" placeholder="ex: Paris">
+            </div>
+            <div class="form-group">
+                <label>TVA</label>
+                <input type="text" id="clientTVA" placeholder="ex: FR85812604106">
+            </div>
+            <button class="btn btn-success" onclick="saveClient()">💾 Enregistrer ce client</button>
+        </div>
+
+        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd;">
+            <button class="btn btn-primary" onclick="updateInvoice()">🔄 Mettre à jour la facture</button>
+            <button class="btn btn-secondary" onclick="window.print()">🖨️ Imprimer / PDF</button>
+        </div>
+    </div>
+
     <div class="invoice-container">
         <div class="header">
             <h1>FACTURE</h1>
@@ -196,7 +358,7 @@
         <div class="invoice-meta">
             <div>
                 <strong>Facture</strong><br>
-                Date : 08.10.2025 | Ticket n.T003218
+                Date : <span id="invoiceDate"></span> | Ticket n.<span id="displayTicket">T003218</span>
             </div>
             <div style="text-align: right;">
                 <strong>Vendeur</strong><br>
@@ -216,9 +378,9 @@
             </div>
             <div class="company-box">
                 <h3>Facturé à</h3>
-                <p>
+                <p id="clientInfo">
                     <strong>Alibaba France SASU</strong><br>
-                    5 Rue d'athenes<br>
+                    36 Rue La Fayette<br>
                     75009 Paris, France<br>
                     TVA : FR85812604106
                 </p>
@@ -239,11 +401,11 @@
             <tbody>
                 <tr>
                     <td>Formule 1</td>
-                    <td style="text-align: center;">32</td>
-                    <td>10,73 €</td>
+                    <td style="text-align: center;" id="displayQty">32</td>
+                    <td id="displayPriceHT">10,73 €</td>
                     <td style="text-align: center;">10%</td>
-                    <td>11,80 €</td>
-                    <td style="text-align: right;">377,60 €</td>
+                    <td id="displayPriceTTC">11,80 €</td>
+                    <td style="text-align: right;" id="displayTotal">377,60 €</td>
                 </tr>
             </tbody>
         </table>
@@ -251,15 +413,15 @@
         <div class="totals">
             <div class="total-row subtotal">
                 <span>Total HT</span>
-                <span>343,27 €</span>
+                <span id="totalHT">343,27 €</span>
             </div>
             <div class="total-row subtotal">
                 <span>TVA (10%)</span>
-                <span>34,33 €</span>
+                <span id="totalTVA">34,33 €</span>
             </div>
             <div class="total-row final">
                 <span>Total TTC</span>
-                <span>377,60 €</span>
+                <span id="totalTTC">377,60 €</span>
             </div>
         </div>
         
@@ -277,9 +439,9 @@
                 <tbody>
                     <tr>
                         <td>10%</td>
-                        <td>343,27 €</td>
-                        <td>34,33 €</td>
-                        <td>377,60 €</td>
+                        <td id="taxHT">343,27 €</td>
+                        <td id="taxAmount">34,33 €</td>
+                        <td id="taxTTC">377,60 €</td>
                     </tr>
                     <tr>
                         <td>20%</td>
@@ -289,16 +451,16 @@
                     </tr>
                     <tr style="font-weight: bold;">
                         <td>Total</td>
-                        <td>343,27 €</td>
-                        <td>34,33 €</td>
-                        <td>377,60 €</td>
+                        <td id="taxTotalHT">343,27 €</td>
+                        <td id="taxTotalAmount">34,33 €</td>
+                        <td id="taxTotalTTC">377,60 €</td>
                     </tr>
                 </tbody>
             </table>
         </div>
         
         <div class="payment-info">
-            <strong>Mode de paiement :</strong> Carte Bleue - 377,60 € | Type : Credit | Rendu : 0,00 €
+            <strong>Mode de paiement :</strong> Carte Bleue - <span id="paymentAmount">377,60 €</span> | Type : Credit | Rendu : 0,00 €
         </div>
         
         <div class="footer">
@@ -306,5 +468,167 @@
             Merci de votre visite, À bientôt !
         </div>
     </div>
+
+    <script>
+        let clients = {};
+        let currentClient = null;
+
+        function initApp() {
+            loadClients();
+            updateDate();
+            renderClientList();
+            updateInvoice();
+            
+            // 如果有客户，加载第一个
+            const clientKeys = Object.keys(clients);
+            if (clientKeys.length > 0) {
+                selectClient(clientKeys[0]);
+            }
+        }
+
+        function updateDate() {
+            const today = new Date();
+            const day = String(today.getDate()).padStart(2, '0');
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const year = today.getFullYear();
+            const hours = String(today.getHours()).padStart(2, '0');
+            const minutes = String(today.getMinutes()).padStart(2, '0');
+            document.getElementById('invoiceDate').textContent = `${day}.${month}.${year} ${hours}:${minutes}`;
+        }
+
+        function loadClients() {
+            const saved = localStorage.getItem('cube_clients');
+            if (saved) {
+                clients = JSON.parse(saved);
+            } else {
+                // 默认客户
+                clients = {
+                    'alibaba': {
+                        name: 'Alibaba France SASU',
+                        address: '36 Rue La Fayette',
+                        city: '75009 Paris, France',
+                        tva: 'FR85812604106'
+                    }
+                };
+                saveClientsToStorage();
+            }
+        }
+
+        function saveClientsToStorage() {
+            localStorage.setItem('cube_clients', JSON.stringify(clients));
+        }
+
+        function renderClientList() {
+            const list = document.getElementById('clientList');
+            list.innerHTML = '';
+            
+            for (const [key, client] of Object.entries(clients)) {
+                const tag = document.createElement('div');
+                tag.className = 'client-tag' + (currentClient === key ? ' active' : '');
+                tag.innerHTML = `
+                    <span onclick="selectClient('${key}')">${client.name}</span>
+                    <span class="delete" onclick="deleteClient('${key}', event)">×</span>
+                `;
+                list.appendChild(tag);
+            }
+        }
+
+        function selectClient(key) {
+            currentClient = key;
+            const client = clients[key];
+            
+            document.getElementById('clientName').value = client.name;
+            document.getElementById('clientAddress').value = client.address;
+            document.getElementById('clientCity').value = client.city;
+            document.getElementById('clientTVA').value = client.tva;
+            
+            renderClientList();
+            updateInvoice();
+        }
+
+        function saveClient() {
+            const name = document.getElementById('clientName').value.trim();
+            const address = document.getElementById('clientAddress').value.trim();
+            const city = document.getElementById('clientCity').value.trim();
+            const tva = document.getElementById('clientTVA').value.trim();
+            
+            if (!name || !address || !city || !tva) {
+                alert('Veuillez remplir tous les champs du client');
+                return;
+            }
+            
+            const key = name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+            clients[key] = { name, address, city, tva };
+            currentClient = key;
+            
+            saveClientsToStorage();
+            renderClientList();
+            updateInvoice();
+            
+            alert('Client enregistré avec succès !');
+        }
+
+        function deleteClient(key, event) {
+            event.stopPropagation();
+            if (confirm('Supprimer ce client ?')) {
+                delete clients[key];
+                if (currentClient === key) {
+                    currentClient = Object.keys(clients)[0] || null;
+                }
+                saveClientsToStorage();
+                renderClientList();
+                if (currentClient) {
+                    selectClient(currentClient);
+                }
+            }
+        }
+
+        function updateInvoice() {
+            const qty = parseInt(document.getElementById('quantity').value) || 0;
+            const priceTTC = parseFloat(document.getElementById('pricePerUnit').value) || 0;
+            const ticket = document.getElementById('ticketNumber').value;
+            
+            // 计算
+            const priceHT = priceTTC / 1.10;
+            const totalTTC = qty * priceTTC;
+            const totalHT = totalTTC / 1.10;
+            const totalTVA = totalTTC - totalHT;
+            
+            // 更新显示
+            document.getElementById('displayTicket').textContent = ticket;
+            document.getElementById('displayQty').textContent = qty;
+            document.getElementById('displayPriceHT').textContent = priceHT.toFixed(2).replace('.', ',') + ' €';
+            document.getElementById('displayPriceTTC').textContent = priceTTC.toFixed(2).replace('.', ',') + ' €';
+            document.getElementById('displayTotal').textContent = totalTTC.toFixed(2).replace('.', ',') + ' €';
+            
+            document.getElementById('totalHT').textContent = totalHT.toFixed(2).replace('.', ',') + ' €';
+            document.getElementById('totalTVA').textContent = totalTVA.toFixed(2).replace('.', ',') + ' €';
+            document.getElementById('totalTTC').textContent = totalTTC.toFixed(2).replace('.', ',') + ' €';
+            
+            document.getElementById('taxHT').textContent = totalHT.toFixed(2).replace('.', ',') + ' €';
+            document.getElementById('taxAmount').textContent = totalTVA.toFixed(2).replace('.', ',') + ' €';
+            document.getElementById('taxTTC').textContent = totalTTC.toFixed(2).replace('.', ',') + ' €';
+            
+            document.getElementById('taxTotalHT').textContent = totalHT.toFixed(2).replace('.', ',') + ' €';
+            document.getElementById('taxTotalAmount').textContent = totalTVA.toFixed(2).replace('.', ',') + ' €';
+            document.getElementById('taxTotalTTC').textContent = totalTTC.toFixed(2).replace('.', ',') + ' €';
+            
+            document.getElementById('paymentAmount').textContent = totalTTC.toFixed(2).replace('.', ',') + ' €';
+            
+            // 更新客户信息
+            if (currentClient && clients[currentClient]) {
+                const client = clients[currentClient];
+                document.getElementById('clientInfo').innerHTML = `
+                    <strong>${client.name}</strong><br>
+                    ${client.address}<br>
+                    ${client.city}<br>
+                    TVA : ${client.tva}
+                `;
+            }
+        }
+
+        // 初始化
+        initApp();
+    </script>
 </body>
 </html>
