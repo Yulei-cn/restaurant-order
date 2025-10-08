@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facture CUBE</title>
+    <style>
+        @media print {
+            body { margin: 0; }
+            .invoice-container { box-shadow: none; }
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #fff;
+        }
+        
+        .invoice-container {
+            max-width: 210mm;
+            margin: 0 auto;
+            background-color: white;
+            padding: 15mm;
+            min-height: 297mm;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #333;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .header-info {
+            font-size: 10px;
+            color: #666;
+            line-height: 1.4;
+        }
+        
+        .invoice-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 11px;
+        }
+        
+        .company-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            gap: 20px;
+        }
+        
+        .company-box {
+            flex: 1;
+            padding: 12px;
+            background-color: #f9f9f9;
+        }
+        
+        .company-box h3 {
+            font-size: 11px;
+            margin-bottom: 8px;
+            color: #0066cc;
+        }
+        
+        .company-box p {
+            font-size: 10px;
+            line-height: 1.6;
+        }
+        
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .items-table thead {
+            background-color: #333;
+            color: white;
+        }
+        
+        .items-table th {
+            padding: 8px;
+            text-align: left;
+            font-size: 10px;
+            font-weight: normal;
+        }
+        
+        .items-table td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+            font-size: 11px;
+        }
+        
+        .items-table th:last-child,
+        .items-table td:last-child {
+            text-align: right;
+        }
+        
+        .items-table th:nth-child(2),
+        .items-table td:nth-child(2) {
+            text-align: center;
+        }
+        
+        .totals {
+            margin-left: auto;
+            width: 300px;
+        }
+        
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 10px;
+            font-size: 11px;
+        }
+        
+        .total-row.subtotal {
+            background-color: #f9f9f9;
+        }
+        
+        .total-row.final {
+            background-color: #333;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+        
+        .tax-breakdown {
+            margin-top: 20px;
+            padding: 12px;
+            background-color: #f9f9f9;
+        }
+        
+        .tax-breakdown h3 {
+            font-size: 11px;
+            margin-bottom: 10px;
+        }
+        
+        .tax-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .tax-table th,
+        .tax-table td {
+            padding: 6px;
+            text-align: right;
+            font-size: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tax-table th:first-child,
+        .tax-table td:first-child {
+            text-align: left;
+        }
+        
+        .payment-info {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #e8f4f8;
+            font-size: 10px;
+        }
+        
+        .footer {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            font-size: 9px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <div class="header">
+            <h1>FACTURE</h1>
+            <div class="header-info">
+                <strong>CUBE</strong> | 7 RUE Blanche, 75009 PARIS FRANCE | Tél : 01 88 61 44 96<br>
+                N° SIRET : 92858697300010 | N° TVA : FR83928586973 | Code NAF/APE : 5610C
+            </div>
+        </div>
+        
+        <div class="invoice-meta">
+            <div>
+                <strong>Facture</strong><br>
+                Date : 08.10.2025 | Ticket n.T003218
+            </div>
+            <div style="text-align: right;">
+                <strong>Vendeur</strong><br>
+                Admin(1) | POS# 001
+            </div>
+        </div>
+        
+        <div class="company-info">
+            <div class="company-box">
+                <h3>Facturé par</h3>
+                <p>
+                    <strong>CUBE</strong><br>
+                    7 Rue Blanche<br>
+                    75009 Paris, France<br>
+                    TVA : FR83928586973
+                </p>
+            </div>
+            <div class="company-box">
+                <h3>Facturé à</h3>
+                <p>
+                    <strong>Alibaba France SASU</strong><br>
+                    5 Rue d'athenes<br>
+                    75009 Paris, France<br>
+                    TVA : FR85812604106
+                </p>
+            </div>
+        </div>
+        
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Qté</th>
+                    <th>P.U. HT</th>
+                    <th>TVA</th>
+                    <th>P.U. TTC</th>
+                    <th>Total TTC</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Formule 1</td>
+                    <td style="text-align: center;">32</td>
+                    <td>10,73 €</td>
+                    <td style="text-align: center;">10%</td>
+                    <td>11,80 €</td>
+                    <td style="text-align: right;">377,60 €</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="totals">
+            <div class="total-row subtotal">
+                <span>Total HT</span>
+                <span>343,27 €</span>
+            </div>
+            <div class="total-row subtotal">
+                <span>TVA (10%)</span>
+                <span>34,33 €</span>
+            </div>
+            <div class="total-row final">
+                <span>Total TTC</span>
+                <span>377,60 €</span>
+            </div>
+        </div>
+        
+        <div class="tax-breakdown">
+            <h3>Récapitulatif TVA</h3>
+            <table class="tax-table">
+                <thead>
+                    <tr>
+                        <th>Taux</th>
+                        <th>Base HT</th>
+                        <th>TVA</th>
+                        <th>TTC</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>10%</td>
+                        <td>343,27 €</td>
+                        <td>34,33 €</td>
+                        <td>377,60 €</td>
+                    </tr>
+                    <tr>
+                        <td>20%</td>
+                        <td>0,00 €</td>
+                        <td>0,00 €</td>
+                        <td>0,00 €</td>
+                    </tr>
+                    <tr style="font-weight: bold;">
+                        <td>Total</td>
+                        <td>343,27 €</td>
+                        <td>34,33 €</td>
+                        <td>377,60 €</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="payment-info">
+            <strong>Mode de paiement :</strong> Carte Bleue - 377,60 € | Type : Credit | Rendu : 0,00 €
+        </div>
+        
+        <div class="footer">
+            Logiciel : 10.00.28.08.24 | Category B | Certificat (NF525)0410-6 | Signature : geWo<br>
+            Merci de votre visite, À bientôt !
+        </div>
+    </div>
+</body>
+</html>
