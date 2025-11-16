@@ -410,14 +410,30 @@
                     <input type="text" id="ticketNumber" value="T003218">
                 </div>
                 <div class="form-group">
-                    <label>数量</label>
+                    <label>Formule 1 数量</label>
                     <input type="number" id="quantity" value="1">
                 </div>
                 <div class="form-group">
-                    <label>单价含税 (€)</label>
+                    <label>Formule 1 单价含税 (€)</label>
                     <input type="number" step="0.01" id="pricePerUnit" value="11.80">
                 </div>
             </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>发票日期时间</label>
+                    <input type="datetime-local" id="invoiceDateInput">
+                </div>
+                <div class="form-group">
+                    <label>Formule 2 数量</label>
+                    <input type="number" id="quantity2" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Formule 2 单价含税 (€)</label>
+                    <input type="number" step="0.01" id="pricePerUnit2" value="0">
+                </div>
+            </div>
+
 
             <div class="form-group">
                 <label>支付方式</label>
@@ -512,13 +528,21 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
+                    <tr id="rowF1">
                         <td>Formule 1</td>
                         <td style="text-align: center;" id="displayQty">1</td>
                         <td id="displayPriceHT">10,73 €</td>
                         <td style="text-align: center;">10%</td>
                         <td id="displayPriceTTC">11,80 €</td>
                         <td style="text-align: right;" id="displayTotal">11,80 €</td>
+                    </tr>
+                    <tr id="rowF2" style="display: none;">
+                        <td>Formule 2</td>
+                        <td style="text-align: center;" id="displayQty2">0</td>
+                        <td id="displayPriceHT2">0,00 €</td>
+                        <td style="text-align: center;">10%</td>
+                        <td id="displayPriceTTC2">0,00 €</td>
+                        <td style="text-align: right;" id="displayTotal2">0,00 €</td>
                     </tr>
                 </tbody>
             </table>
@@ -584,199 +608,266 @@
     </div>
 
     <script>
-        // 默认密码，可以自己修改
-        const ADMIN_PASSWORD = '88888888';
-        
-        let clients = {};
-        let currentClient = null;
-        let isLoggedIn = false;
+    // 默认密码，可以自己修改
+    const ADMIN_PASSWORD = '88888888';
+    
+    let clients = {};
+    let currentClient = null;
+    let isLoggedIn = false;
 
-        function login() {
-            const password = document.getElementById('passwordInput').value;
-            if (password === ADMIN_PASSWORD) {
-                isLoggedIn = true;
-                document.getElementById('loginContainer').style.display = 'none';
-                document.getElementById('appContent').style.display = 'block';
-                document.getElementById('errorMsg').style.display = 'none';
-                initApp();
-            } else {
-                document.getElementById('errorMsg').style.display = 'block';
-            }
+    function login() {
+        const password = document.getElementById('passwordInput').value;
+        if (password === ADMIN_PASSWORD) {
+            isLoggedIn = true;
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('appContent').style.display = 'block';
+            document.getElementById('errorMsg').style.display = 'none';
+            initApp();
+        } else {
+            document.getElementById('errorMsg').style.display = 'block';
         }
+    }
 
-        function logout() {
-            if (confirm('确定退出登录吗？')) {
-                isLoggedIn = false;
-                document.getElementById('loginContainer').style.display = 'block';
-                document.getElementById('appContent').style.display = 'none';
-                document.getElementById('passwordInput').value = '';
-            }
+    function logout() {
+        if (confirm('确定退出登录吗？')) {
+            isLoggedIn = false;
+            document.getElementById('loginContainer').style.display = 'block';
+            document.getElementById('appContent').style.display = 'none';
+            document.getElementById('passwordInput').value = '';
         }
+    }
 
-        // 回车登录
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('passwordInput').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    login();
-                }
-            });
+    // 回车登录
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                login();
+            }
         });
+    });
 
-        function initApp() {
-            loadClients();
-            updateDate();
-            renderClientList();
-            updateInvoice();
-            
-            const clientKeys = Object.keys(clients);
-            if (clientKeys.length > 0) {
-                selectClient(clientKeys[0]);
+    function initApp() {
+        loadClients();
+        updateInvoiceDate();   // 初始化日期（会自动写当前时间到 input）
+        renderClientList();
+        updateInvoice();
+        
+        const clientKeys = Object.keys(clients);
+        if (clientKeys.length > 0) {
+            selectClient(clientKeys[0]);
+        }
+
+        const dateInput = document.getElementById('invoiceDateInput');
+        if (dateInput) {
+            dateInput.addEventListener('change', updateInvoiceDate);
+        }
+    }
+
+    // 根据输入框 / 当前时间更新发票日期显示
+    function updateInvoiceDate() {
+        const dateInput = document.getElementById('invoiceDateInput');
+        let dateObj;
+
+        if (!dateInput.value) {
+            // 如果没有填，就用当前时间，并写回 input
+            dateObj = new Date();
+            const year = dateObj.getFullYear();
+            const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const day = String(dateObj.getDate()).padStart(2, '0');
+            const hours = String(dateObj.getHours()).padStart(2, '0');
+            const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+            dateInput.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+        } else {
+            // 用户手动选择的日期时间
+            dateObj = new Date(dateInput.value);
+        }
+
+        const d = String(dateObj.getDate()).padStart(2, '0');
+        const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const y = dateObj.getFullYear();
+        const h = String(dateObj.getHours()).padStart(2, '0');
+        const min = String(dateObj.getMinutes()).padStart(2, '0');
+
+        document.getElementById('invoiceDate').textContent = `${d}.${m}.${y} ${h}:${min}`;
+    }
+
+    function loadClients() {
+        const saved = sessionStorage.getItem('cube_clients');
+        if (saved) {
+            clients = JSON.parse(saved);
+        } else {
+            clients = {};
+        }
+    }
+
+    function saveClientsToStorage() {
+        sessionStorage.setItem('cube_clients', JSON.stringify(clients));
+    }
+
+    function renderClientList() {
+        const list = document.getElementById('clientList');
+        list.innerHTML = '';
+        
+        if (Object.keys(clients).length === 0) {
+            list.innerHTML = '<div style="color: #999; font-size: 12px;">暂无客户，请添加客户信息</div>';
+            return;
+        }
+        
+        for (const [key, client] of Object.entries(clients)) {
+            const tag = document.createElement('div');
+            tag.className = 'client-tag' + (currentClient === key ? ' active' : '');
+            tag.innerHTML = `
+                <span onclick="selectClient('${key}')">${client.name}</span>
+                <span class="delete" onclick="deleteClient('${key}', event)">×</span>
+            `;
+            list.appendChild(tag);
+        }
+    }
+
+    function selectClient(key) {
+        currentClient = key;
+        const client = clients[key];
+        
+        document.getElementById('clientName').value = client.name;
+        document.getElementById('clientAddress').value = client.address;
+        document.getElementById('clientCity').value = client.city;
+        document.getElementById('clientTVA').value = client.tva;
+        
+        renderClientList();
+        updateInvoice();
+    }
+
+    function saveClient() {
+        const name = document.getElementById('clientName').value.trim();
+        const address = document.getElementById('clientAddress').value.trim();
+        const city = document.getElementById('clientCity').value.trim();
+        const tva = document.getElementById('clientTVA').value.trim();
+        
+        if (!name || !address || !city || !tva) {
+            alert('请填写所有客户信息！');
+            return;
+        }
+        
+        const key = name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+        clients[key] = { name, address, city, tva };
+        currentClient = key;
+        
+        saveClientsToStorage();
+        renderClientList();
+        updateInvoice();
+        
+        alert('客户保存成功！');
+    }
+
+    function deleteClient(key, event) {
+        event.stopPropagation();
+        if (confirm('确定删除这个客户吗？')) {
+            delete clients[key];
+            if (currentClient === key) {
+                currentClient = Object.keys(clients)[0] || null;
             }
-        }
-
-        function updateDate() {
-            const today = new Date();
-            const day = String(today.getDate()).padStart(2, '0');
-            const month = String(today.getMonth() + 1).padStart(2, '0');
-            const year = today.getFullYear();
-            const hours = String(today.getHours()).padStart(2, '0');
-            const minutes = String(today.getMinutes()).padStart(2, '0');
-            document.getElementById('invoiceDate').textContent = `${day}.${month}.${year} ${hours}:${minutes}`;
-        }
-
-        function loadClients() {
-            const saved = sessionStorage.getItem('cube_clients');
-            if (saved) {
-                clients = JSON.parse(saved);
-            } else {
-                clients = {};
-            }
-        }
-
-        function saveClientsToStorage() {
-            sessionStorage.setItem('cube_clients', JSON.stringify(clients));
-        }
-
-        function renderClientList() {
-            const list = document.getElementById('clientList');
-            list.innerHTML = '';
-            
-            if (Object.keys(clients).length === 0) {
-                list.innerHTML = '<div style="color: #999; font-size: 12px;">暂无客户，请添加客户信息</div>';
-                return;
-            }
-            
-            for (const [key, client] of Object.entries(clients)) {
-                const tag = document.createElement('div');
-                tag.className = 'client-tag' + (currentClient === key ? ' active' : '');
-                tag.innerHTML = `
-                    <span onclick="selectClient('${key}')">${client.name}</span>
-                    <span class="delete" onclick="deleteClient('${key}', event)">×</span>
-                `;
-                list.appendChild(tag);
-            }
-        }
-
-        function selectClient(key) {
-            currentClient = key;
-            const client = clients[key];
-            
-            document.getElementById('clientName').value = client.name;
-            document.getElementById('clientAddress').value = client.address;
-            document.getElementById('clientCity').value = client.city;
-            document.getElementById('clientTVA').value = client.tva;
-            
-            renderClientList();
-            updateInvoice();
-        }
-
-        function saveClient() {
-            const name = document.getElementById('clientName').value.trim();
-            const address = document.getElementById('clientAddress').value.trim();
-            const city = document.getElementById('clientCity').value.trim();
-            const tva = document.getElementById('clientTVA').value.trim();
-            
-            if (!name || !address || !city || !tva) {
-                alert('请填写所有客户信息！');
-                return;
-            }
-            
-            const key = name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
-            clients[key] = { name, address, city, tva };
-            currentClient = key;
-            
             saveClientsToStorage();
             renderClientList();
-            updateInvoice();
-            
-            alert('客户保存成功！');
-        }
-
-        function deleteClient(key, event) {
-            event.stopPropagation();
-            if (confirm('确定删除这个客户吗？')) {
-                delete clients[key];
-                if (currentClient === key) {
-                    currentClient = Object.keys(clients)[0] || null;
-                }
-                saveClientsToStorage();
-                renderClientList();
-                if (currentClient) {
-                    selectClient(currentClient);
-                } else {
-                    // 清空客户信息显示
-                    document.getElementById('clientInfo').innerHTML = `
-                        <strong>Client</strong><br>
-                        Adresse<br>
-                        Ville, Pays<br>
-                        TVA : -
-                    `;
-                }
-            }
-        }
-
-        function updateInvoice() {
-            const qty = parseInt(document.getElementById('quantity').value) || 0;
-            const priceTTC = parseFloat(document.getElementById('pricePerUnit').value) || 0;
-            const ticket = document.getElementById('ticketNumber').value;
-            const paymentMethod = document.getElementById('paymentMethod').value;
-            
-            const priceHT = priceTTC / 1.10;
-            const totalTTC = qty * priceTTC;
-            const totalHT = totalTTC / 1.10;
-            const totalTVA = totalTTC - totalHT;
-            
-            document.getElementById('displayTicket').textContent = ticket;
-            document.getElementById('displayQty').textContent = qty;
-            document.getElementById('displayPriceHT').textContent = priceHT.toFixed(2).replace('.', ',') + ' €';
-            document.getElementById('displayPriceTTC').textContent = priceTTC.toFixed(2).replace('.', ',') + ' €';
-            document.getElementById('displayTotal').textContent = totalTTC.toFixed(2).replace('.', ',') + ' €';
-            
-            document.getElementById('totalHT').textContent = totalHT.toFixed(2).replace('.', ',') + ' €';
-            document.getElementById('totalTVA').textContent = totalTVA.toFixed(2).replace('.', ',') + ' €';
-            document.getElementById('totalTTC').textContent = totalTTC.toFixed(2).replace('.', ',') + ' €';
-            
-            document.getElementById('taxHT').textContent = totalHT.toFixed(2).replace('.', ',') + ' €';
-            document.getElementById('taxAmount').textContent = totalTVA.toFixed(2).replace('.', ',') + ' €';
-            document.getElementById('taxTTC').textContent = totalTTC.toFixed(2).replace('.', ',') + ' €';
-            
-            document.getElementById('taxTotalHT').textContent = totalHT.toFixed(2).replace('.', ',') + ' €';
-            document.getElementById('taxTotalAmount').textContent = totalTVA.toFixed(2).replace('.', ',') + ' €';
-            document.getElementById('taxTotalTTC').textContent = totalTTC.toFixed(2).replace('.', ',') + ' €';
-            
-            document.getElementById('paymentAmount').textContent = totalTTC.toFixed(2).replace('.', ',') + ' €';
-            document.getElementById('paymentMethodDisplay').textContent = paymentMethod;
-            
-            if (currentClient && clients[currentClient]) {
-                const client = clients[currentClient];
+            if (currentClient) {
+                selectClient(currentClient);
+            } else {
+                // 清空客户信息显示
                 document.getElementById('clientInfo').innerHTML = `
-                    <strong>${client.name}</strong><br>
-                    ${client.address}<br>
-                    ${client.city}<br>
-                    TVA : ${client.tva}
+                    <strong>Client</strong><br>
+                    Adresse<br>
+                    Ville, Pays<br>
+                    TVA : -
                 `;
             }
         }
+    }
+
+    function updateInvoice() {
+        // 先更新日期（使用当前输入框内容）
+        updateInvoiceDate();
+
+        const qty1 = parseInt(document.getElementById('quantity').value) || 0;
+        const priceTTC1 = parseFloat(document.getElementById('pricePerUnit').value) || 0;
+        const qty2 = parseInt(document.getElementById('quantity2').value) || 0;
+        const priceTTC2 = parseFloat(document.getElementById('pricePerUnit2').value) || 0;
+        const ticket = document.getElementById('ticketNumber').value;
+        const paymentMethod = document.getElementById('paymentMethod').value;
+
+        // 这里默认都用 10% TVA
+        const TVA_RATE = 1.10;
+
+        // Formule 1
+        const totalTTC1 = qty1 * priceTTC1;
+        const totalHT1 = totalTTC1 / TVA_RATE;
+        const priceHT1 = priceTTC1 / TVA_RATE;
+
+        // Formule 2
+        const totalTTC2 = qty2 * priceTTC2;
+        const totalHT2 = totalTTC2 / TVA_RATE;
+        const priceHT2 = priceTTC2 / TVA_RATE;
+
+        // 总计
+        const totalTTC = totalTTC1 + totalTTC2;
+        const totalHT = totalHT1 + totalHT2;
+        const totalTVA = totalTTC - totalHT;
+
+        // 显示票号
+        document.getElementById('displayTicket').textContent = ticket;
+
+        // 控制 Formule 1 行显示/隐藏
+        const rowF1 = document.getElementById('rowF1');
+        if (qty1 > 0) {
+            rowF1.style.display = '';
+            document.getElementById('displayQty').textContent = qty1;
+            document.getElementById('displayPriceHT').textContent = priceHT1.toFixed(2).replace('.', ',') + ' €';
+            document.getElementById('displayPriceTTC').textContent = priceTTC1.toFixed(2).replace('.', ',') + ' €';
+            document.getElementById('displayTotal').textContent = totalTTC1.toFixed(2).replace('.', ',') + ' €';
+        } else {
+            rowF1.style.display = 'none';
+        }
+
+        // 控制 Formule 2 行显示/隐藏
+        const rowF2 = document.getElementById('rowF2');
+        if (qty2 > 0) {
+            rowF2.style.display = '';
+            document.getElementById('displayQty2').textContent = qty2;
+            document.getElementById('displayPriceHT2').textContent = priceHT2.toFixed(2).replace('.', ',') + ' €';
+            document.getElementById('displayPriceTTC2').textContent = priceTTC2.toFixed(2).replace('.', ',') + ' €';
+            document.getElementById('displayTotal2').textContent = totalTTC2.toFixed(2).replace('.', ',') + ' €';
+        } else {
+            rowF2.style.display = 'none';
+        }
+
+        // 总计显示
+        document.getElementById('totalHT').textContent = totalHT.toFixed(2).replace('.', ',') + ' €';
+        document.getElementById('totalTVA').textContent = totalTVA.toFixed(2).replace('.', ',') + ' €';
+        document.getElementById('totalTTC').textContent = totalTTC.toFixed(2).replace('.', ',') + ' €';
+
+        // TVA 汇总
+        document.getElementById('taxHT').textContent = totalHT.toFixed(2).replace('.', ',') + ' €';
+        document.getElementById('taxAmount').textContent = totalTVA.toFixed(2).replace('.', ',') + ' €';
+        document.getElementById('taxTTC').textContent = totalTTC.toFixed(2).replace('.', ',') + ' €';
+
+        document.getElementById('taxTotalHT').textContent = totalHT.toFixed(2).replace('.', ',') + ' €';
+        document.getElementById('taxTotalAmount').textContent = totalTVA.toFixed(2).replace('.', ',') + ' €';
+        document.getElementById('taxTotalTTC').textContent = totalTTC.toFixed(2).replace('.', ',') + ' €';
+
+        // 支付信息
+        document.getElementById('paymentAmount').textContent = totalTTC.toFixed(2).replace('.', ',') + ' €';
+        document.getElementById('paymentMethodDisplay').textContent = paymentMethod;
+
+        // 客户信息
+        if (currentClient && clients[currentClient]) {
+            const client = clients[currentClient];
+            document.getElementById('clientInfo').innerHTML = `
+                <strong>${client.name}</strong><br>
+                ${client.address}<br>
+                ${client.city}<br>
+                TVA : ${client.tva}
+            `;
+        }
+    }
     </script>
+
 </body>
 </html>
