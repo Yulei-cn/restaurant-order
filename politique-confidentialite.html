@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Politique de confidentialité / 隐私政策 - CUBE</title>
+  <link rel="stylesheet" href="stylebox.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="logo.png" alt="Logo CUBE" class="logo">
+      <h1 class="fr-only">Politique de confidentialité</h1>
+      <h1 class="zh-only">隐私政策</h1>
+    </div>
+
+    <div class="content">
+      <div class="section">
+        <h2 class="fr-only">Données collectées</h2>
+        <h2 class="zh-only">收集的数据</h2>
+        <div class="section-content">
+          <p class="fr-only">
+            Selon votre usage, le site peut traiter des informations nécessaires à la commande (ex. nom, téléphone, adresse, contenu de commande).
+          </p>
+          <p class="zh-only">
+            根据你的使用场景，网站可能处理与下单相关的信息（例如姓名、电话、地址、订单内容）。
+          </p>
+          <div class="info-box">
+            <p class="fr-only">
+              Le site mémorise aussi la langue via le stockage local (localStorage). Aucun usage publicitaire.
+            </p>
+            <p class="zh-only">
+              网站也会用 localStorage 记住语言偏好；不用于广告追踪。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2 class="fr-only">Finalité</h2>
+        <h2 class="zh-only">用途</h2>
+        <div class="section-content">
+          <p class="fr-only">
+            Ces données servent uniquement à traiter la commande, assurer la livraison/retrait et vous contacter en cas de besoin.
+          </p>
+          <p class="zh-only">
+            数据仅用于处理订单、完成配送/自提、以及必要时联系你确认信息。
+          </p>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2 class="fr-only">Vos droits</h2>
+        <h2 class="zh-only">你的权利</h2>
+        <div class="section-content">
+          <p class="fr-only">
+            Vous pouvez demander l’accès, la rectification ou la suppression de vos données en nous contactant : cube.paris9@gmail.com
+          </p>
+          <p class="zh-only">
+            你可以通过邮箱申请访问/更正/删除你的数据：cube.paris9@gmail.com
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function switchLanguage(lang) {
+      const frElems = document.querySelectorAll('.fr-only');
+      const zhElems = document.querySelectorAll('.zh-only');
+      if (lang === 'fr') {
+        frElems.forEach(el => el.style.display = 'block');
+        zhElems.forEach(el => el.style.display = 'none');
+      } else {
+        frElems.forEach(el => el.style.display = 'none');
+        zhElems.forEach(el => el.style.display = 'block');
+      }
+      localStorage.setItem('preferredLanguage', lang);
+    }
+    window.addEventListener('load', () => {
+      const savedLang = localStorage.getItem('preferredLanguage') || 'fr';
+      switchLanguage(savedLang);
+    });
+  </script>
+</body>
+</html>

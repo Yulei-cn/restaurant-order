@@ -539,3 +539,72 @@ table tr:hover td {
     display: none;
   }
 }
+
+/* Footer / 页脚 */
+.site-footer {
+  margin-top: 30px;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(220px, 1fr));
+  gap: 18px;
+}
+
+.footer-card {
+  background: white;
+  border-radius: 14px;
+  padding: 18px 18px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  border-left: 6px solid #4CAF50;
+}
+
+.footer-title {
+  font-weight: 800;
+  color: #1b5e20;
+  margin-bottom: 10px;
+  font-size: 1.05rem;
+}
+
+.footer-text {
+  color: #333;
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+
+.footer-links {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.footer-links a {
+  display: inline-block;
+  text-decoration: none;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #f1f8e9, #e8f5e8);
+  color: #1b5e20;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.footer-links a:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.10);
+}
+
+.footer-meta {
+  margin-top: 12px;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+/* Footer 响应式 */
+@media (max-width: 900px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+  }
+}
