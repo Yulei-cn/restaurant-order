@@ -24,7 +24,7 @@ body {
 }
 
 .header {
-  background: linear-gradient(135deg, #4CAF50, #45a049);
+  background: url("Background Spring Festival.png") center / cover no-repeat;
   color: white;
   padding: 40px 20px;
   text-align: center;
