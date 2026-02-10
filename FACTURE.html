@@ -53,6 +53,22 @@
                 </div>
             </div>
 
+            <!-- ✅ 自定义套餐（名称 + 数量 + 单价含税） -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label>自定义套餐名称</label>
+                    <input type="text" id="customName" value="Menu Nouvel An">
+                </div>
+                <div class="form-group">
+                    <label>自定义套餐 数量</label>
+                    <input type="number" id="customQty" value="0">
+                </div>
+                <div class="form-group">
+                    <label>自定义套餐 单价含税 (€)</label>
+                    <input type="number" step="0.01" id="customPriceTTC" value="0">
+                </div>
+            </div>
+
             <div class="form-group">
                 <label>支付方式</label>
                 <select id="paymentMethod">
@@ -161,6 +177,16 @@
                         <td style="text-align: center;">10%</td>
                         <td id="displayPriceTTC2">0,00 €</td>
                         <td style="text-align: right;" id="displayTotal2">0,00 €</td>
+                    </tr>
+
+                    <!-- ✅ 自定义套餐行（数量>0 才显示） -->
+                    <tr id="rowCustom" style="display: none;">
+                        <td id="displayCustomName">Menu Nouvel An</td>
+                        <td style="text-align: center;" id="displayCustomQty">0</td>
+                        <td id="displayCustomPriceHT">0,00 €</td>
+                        <td style="text-align: center;">10%</td>
+                        <td id="displayCustomPriceTTC">0,00 €</td>
+                        <td style="text-align: right;" id="displayCustomTotal">0,00 €</td>
                     </tr>
                 </tbody>
             </table>
@@ -376,7 +402,6 @@
         alert('客户保存成功！');
     }
 
-
     function deleteClient(key, event) {
         event.stopPropagation();
         if (confirm('确定删除这个客户吗？')) {
@@ -406,8 +431,15 @@
 
         const qty1 = parseInt(document.getElementById('quantity').value) || 0;
         const priceTTC1 = parseFloat(document.getElementById('pricePerUnit').value) || 0;
+
         const qty2 = parseInt(document.getElementById('quantity2').value) || 0;
         const priceTTC2 = parseFloat(document.getElementById('pricePerUnit2').value) || 0;
+
+        // ✅ 自定义套餐
+        const customName = (document.getElementById('customName').value || '').trim() || 'Custom';
+        const customQty = parseInt(document.getElementById('customQty').value) || 0;
+        const customPriceTTC = parseFloat(document.getElementById('customPriceTTC').value) || 0;
+
         const ticket = document.getElementById('ticketNumber').value;
         const paymentMethod = document.getElementById('paymentMethod').value;
 
@@ -424,9 +456,14 @@
         const totalHT2 = totalTTC2 / TVA_RATE;
         const priceHT2 = priceTTC2 / TVA_RATE;
 
+        // ✅ Custom
+        const customTotalTTC = customQty * customPriceTTC;
+        const customTotalHT = customTotalTTC / TVA_RATE;
+        const customPriceHT = customPriceTTC / TVA_RATE;
+
         // 总计
-        const totalTTC = totalTTC1 + totalTTC2;
-        const totalHT = totalHT1 + totalHT2;
+        const totalTTC = totalTTC1 + totalTTC2 + customTotalTTC;
+        const totalHT = totalHT1 + totalHT2 + customTotalHT;
         const totalTVA = totalTTC - totalHT;
 
         // 显示票号
@@ -456,12 +493,25 @@
             rowF2.style.display = 'none';
         }
 
+        // ✅ 控制 Custom 行显示/隐藏
+        const rowCustom = document.getElementById('rowCustom');
+        if (customQty > 0) {
+            rowCustom.style.display = '';
+            document.getElementById('displayCustomName').textContent = customName;
+            document.getElementById('displayCustomQty').textContent = customQty;
+            document.getElementById('displayCustomPriceHT').textContent = customPriceHT.toFixed(2).replace('.', ',') + ' €';
+            document.getElementById('displayCustomPriceTTC').textContent = customPriceTTC.toFixed(2).replace('.', ',') + ' €';
+            document.getElementById('displayCustomTotal').textContent = customTotalTTC.toFixed(2).replace('.', ',') + ' €';
+        } else {
+            rowCustom.style.display = 'none';
+        }
+
         // 总计显示
         document.getElementById('totalHT').textContent = totalHT.toFixed(2).replace('.', ',') + ' €';
         document.getElementById('totalTVA').textContent = totalTVA.toFixed(2).replace('.', ',') + ' €';
         document.getElementById('totalTTC').textContent = totalTTC.toFixed(2).replace('.', ',') + ' €';
 
-        // TVA 汇总
+        // TVA 汇总（10%）
         document.getElementById('taxHT').textContent = totalHT.toFixed(2).replace('.', ',') + ' €';
         document.getElementById('taxAmount').textContent = totalTVA.toFixed(2).replace('.', ',') + ' €';
         document.getElementById('taxTTC').textContent = totalTTC.toFixed(2).replace('.', ',') + ' €';
