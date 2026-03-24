@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CUBE Admin</title>
+  <link rel="icon" href="logo.png" type="image/png">
+  <style>
+    :root {
+      --bg: #f4f6fb;
+      --card: #ffffff;
+      --text: #172033;
+      --muted: #667085;
+      --line: #d8dfeb;
+      --blue: #1d4ed8;
+      --blue-dark: #173ea6;
+      --green: #0f766e;
+      --amber: #b45309;
+      --shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(29, 78, 216, 0.08), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(15, 118, 110, 0.08), transparent 24%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .shell {
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #0f172a, #1d4ed8);
+      color: #fff;
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+      margin-bottom: 22px;
+    }
+
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
+    }
+
+    .hero p {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.84);
+      line-height: 1.6;
+      max-width: 760px;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      padding: 24px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .login-card {
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    .login-card h2,
+    .workspace-head h2 {
+      margin: 0 0 8px;
+      font-size: 24px;
+    }
+
+    .subtitle {
+      margin: 0 0 20px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    input {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 13px 14px;
+      font-size: 16px;
+      margin-bottom: 14px;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--blue);
+      box-shadow: 0 0 0 4px rgba(29, 78, 216, 0.12);
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    button,
+    .card-link {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .primary {
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .primary:hover {
+      background: var(--blue-dark);
+    }
+
+    .secondary {
+      background: #e8eefc;
+      color: var(--blue);
+    }
+
+    .danger {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .message {
+      min-height: 22px;
+      margin-top: 12px;
+      color: #b91c1c;
+      font-size: 14px;
+    }
+
+    .workspace-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .tool-card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      background: linear-gradient(180deg, #ffffff, #f8fbff);
+    }
+
+    .tool-card h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
+    .tool-card p {
+      margin: 0 0 14px;
+      color: var(--muted);
+      line-height: 1.6;
+      min-height: 66px;
+    }
+
+    .badge {
+      display: inline-flex;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .badge-live {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .badge-soon {
+      background: #fef3c7;
+      color: var(--amber);
+    }
+
+    @media (max-width: 720px) {
+      body {
+        padding: 14px;
+      }
+
+      .hero,
+      .panel {
+        padding: 18px;
+        border-radius: 18px;
+      }
+
+      .hero h1 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section class="hero">
+      <h1>CUBE Admin</h1>
+      <p>统一后台入口。当前主目标是稳定店内订单闭环：店员录单，收银台看单，后厨接单。发票和后续内部工具都从这里进入。</p>
+    </section>
+
+    <section id="loginPanel" class="panel login-card hidden">
+      <h2>后台登录</h2>
+      <p class="subtitle">使用管理员密码进入后台。登录成功后会建立同站点 session，用于订单面板和发票页。</p>
+      <form id="loginForm">
+        <label for="passwordInput">管理员密码</label>
+        <input id="passwordInput" type="password" autocomplete="current-password" required>
+        <div class="actions">
+          <button type="submit" class="primary">登录后台</button>
+        </div>
+        <div id="loginMessage" class="message"></div>
+      </form>
+    </section>
+
+    <section id="workspacePanel" class="panel hidden">
+      <div class="workspace-head">
+        <div>
+          <h2>后台工作区</h2>
+          <p class="subtitle">统一入口只负责导航和登录态。具体业务页面仍然独立维护。</p>
+        </div>
+        <div class="actions">
+          <button id="refreshSessionBtn" class="secondary" type="button">刷新状态</button>
+          <button id="logoutBtn" class="danger" type="button">退出登录</button>
+        </div>
+      </div>
+
+      <div class="grid">
+        <article class="tool-card">
+          <span class="badge badge-live">当前使用</span>
+          <h3>订单面板</h3>
+          <p>收银台查看新订单，刷新状态，处理店内订单闭环。</p>
+          <a class="card-link primary" href="mes-commandes.html">进入 mes-commandes</a>
+        </article>
+
+        <article class="tool-card">
+          <span class="badge badge-live">当前使用</span>
+          <h3>发票页</h3>
+          <p>处理票据、打印和企业客户信息。后续会继续接数据库。</p>
+          <a class="card-link primary" href="FACTURE.html">进入 FACTURE</a>
+        </article>
+
+        <article class="tool-card">
+          <span class="badge badge-soon">后续阶段</span>
+          <h3>内部点单入口</h3>
+          <p>预留给店员录单页面。等后台骨架稳定后再接入，不在当前改动范围内。</p>
+          <span class="card-link secondary">待接入</span>
+        </article>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const loginPanel = document.getElementById('loginPanel');
+    const workspacePanel = document.getElementById('workspacePanel');
+    const loginForm = document.getElementById('loginForm');
+    const passwordInput = document.getElementById('passwordInput');
+    const loginMessage = document.getElementById('loginMessage');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const refreshSessionBtn = document.getElementById('refreshSessionBtn');
+    const rawNextTarget = new URLSearchParams(window.location.search).get('next');
+    const allowedTargets = new Set([
+      'mes-commandes.html',
+      'FACTURE.html',
+      'admin.html'
+    ]);
+    const nextTarget = allowedTargets.has(rawNextTarget) ? rawNextTarget : '';
+
+    function showWorkspace() {
+      loginPanel.classList.add('hidden');
+      workspacePanel.classList.remove('hidden');
+      loginMessage.textContent = '';
+    }
+
+    function showLogin(message = '') {
+      workspacePanel.classList.add('hidden');
+      loginPanel.classList.remove('hidden');
+      loginMessage.textContent = message;
+      passwordInput.focus();
+    }
+
+    async function fetchSession() {
+      const res = await fetch('/api/admin-session', {
+        credentials: 'same-origin'
+      });
+
+      return {
+        ok: res.ok,
+        data: await res.json()
+      };
+    }
+
+    async function boot() {
+      try {
+        const { ok, data } = await fetchSession();
+        if (ok && data?.authenticated) {
+          if (nextTarget) {
+            window.location.replace(nextTarget);
+            return;
+          }
+          showWorkspace();
+          return;
+        }
+        showLogin();
+      } catch (error) {
+        console.error('Admin session boot failed', error);
+        showLogin('后台会话检查失败，请重试。');
+      }
+    }
+
+    loginForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      loginMessage.textContent = '';
+
+      const res = await fetch('/api/admin-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ password: passwordInput.value })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        loginMessage.textContent = data?.error || '登录失败';
+        return;
+      }
+
+      passwordInput.value = '';
+      if (nextTarget) {
+        window.location.replace(nextTarget);
+        return;
+      }
+      showWorkspace();
+    });
+
+    logoutBtn.addEventListener('click', async () => {
+      await fetch('/api/admin-logout', {
+        method: 'POST',
+        credentials: 'same-origin'
+      });
+      showLogin('已退出登录。');
+    });
+
+    refreshSessionBtn.addEventListener('click', boot);
+
+    boot();
+  </script>
+</body>
+</html>

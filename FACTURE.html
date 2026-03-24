@@ -10,18 +10,20 @@
     <!-- 登录界面 -->
     <div class="login-container" id="loginContainer">
         <h2>🔐 CUBE 发票系统</h2>
-        <div class="form-group">
-            <label>管理员密码</label>
-            <input type="password" id="passwordInput" placeholder="请输入管理员密码">
-        </div>
-        <button class="btn" onclick="login()">登录</button>
+        <form onsubmit="event.preventDefault(); login();">
+            <div class="form-group">
+                <label>管理员密码</label>
+                <input type="password" id="passwordInput" placeholder="请输入管理员密码">
+            </div>
+            <button class="btn" type="submit">登录</button>
+        </form>
         <div class="error-msg" id="errorMsg">密码错误！</div>
     </div>
 
     <!-- 主应用内容 -->
     <div id="appContent">
         <div class="controls">
-            <h2>📝 控制面板 <button class="logout-btn" onclick="logout()">退出登录</button></h2>
+            <h2>📝 控制面板 <button class="logout-btn" type="button" onclick="window.location.href='admin.html'">后台入口</button> <button class="logout-btn" onclick="logout()">退出登录</button></h2>
             
             <div class="form-row">
                 <div class="form-group">
@@ -257,6 +259,8 @@
     let isLoggedIn = false;
 
     async function login() {
+        window.location.href = 'admin.html?next=FACTURE.html';
+        return;
         const password = document.getElementById('passwordInput').value;
         const res = await fetch('/api/admin-login', {
             method: 'POST',
@@ -271,7 +275,11 @@
             document.getElementById('appContent').style.display = 'block';
             document.getElementById('errorMsg').style.display = 'none';
             initApp();
+        } else if (res.status >= 500) {
+            document.getElementById('errorMsg').textContent = '后台登录配置缺失，请检查 Vercel 环境变量';
+            document.getElementById('errorMsg').style.display = 'block';
         } else {
+            document.getElementById('errorMsg').textContent = '密码错误！';
             document.getElementById('errorMsg').style.display = 'block';
         }
     }
@@ -286,6 +294,7 @@
             document.getElementById('loginContainer').style.display = 'block';
             document.getElementById('appContent').style.display = 'none';
             document.getElementById('passwordInput').value = '';
+            window.location.href = 'admin.html';
         }
     }
 
@@ -309,6 +318,8 @@
                 document.getElementById('appContent').style.display = 'block';
                 document.getElementById('errorMsg').style.display = 'none';
                 initApp();
+            } else if (sessionRes.status < 500) {
+                window.location.href = 'admin.html?next=FACTURE.html';
             }
         } catch (error) {
             console.error('Admin session check failed', error);

@@ -7,8 +7,8 @@ export default async function handler(req, res) {
 
   try {
     requireAdminConfig();
-  } catch {
-    return res.status(500).json({ error: 'Missing admin configuration' });
+  } catch (error) {
+    return res.status(500).json({ error: error.message || 'Missing admin configuration' });
   }
 
   const isAuthenticated = verifyAdminSessionValue(getAdminSession(req));

@@ -53,6 +53,16 @@
       flex-wrap: wrap;
     }
 
+    .nav-btn {
+      background: #0f172a;
+      color: #fff;
+    }
+
+    .danger-btn {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
     .status-badge {
       padding: 8px 12px;
       border-radius: 999px;
@@ -247,8 +257,10 @@
       <p id="pageSubtitle">店内和线上到店付款订单统一显示在这里。</p>
     </div>
     <div class="topbar-right">
+      <button class="nav-btn" onclick="window.location.href='admin.html'">后台入口</button>
       <button id="langZhBtn" class="secondary-btn lang-btn active" onclick="setLanguage('zh')">中文</button>
       <button id="langFrBtn" class="secondary-btn lang-btn" onclick="setLanguage('fr')">FR</button>
+      <button class="danger-btn" onclick="logoutAdmin()">退出</button>
       <div id="connectionStatus" class="status-badge connected">手动模式</div>
     </div>
   </div>
@@ -295,7 +307,8 @@
         toggleAutoBtn: "开启自动刷新",
         stopAutoBtn: "停止自动刷新",
         pollNote: "轮询每 60 秒一次，5 分钟无操作时暂停。",
-        wrongPassword: "密码错误",
+        wrongPassword: "密码错误，请重试",
+        adminConfigError: "后台登录配置缺失，请检查 Vercel 环境变量",
         enterPassword: "请输入管理员密码",
         newOrderTitle: "收到新订单",
         newOrderBody: "请查看订单面板",
@@ -350,7 +363,8 @@
         toggleAutoBtn: "Activer auto-refresh",
         stopAutoBtn: "Arreter auto-refresh",
         pollNote: "Sondage toutes les 60 secondes, pause apres 5 minutes d'inactivite.",
-        wrongPassword: "Mot de passe incorrect",
+        wrongPassword: "Mot de passe incorrect, reessayez",
+        adminConfigError: "Configuration admin manquante, verifiez les variables Vercel",
         enterPassword: "Entrez le mot de passe admin",
         newOrderTitle: "Nouvelle commande",
         newOrderBody: "Verifiez le panneau",
@@ -544,15 +558,28 @@
       return t(`payment_${status}`);
     }
 
+    async function logoutAdmin() {
+      await fetch("/api/admin-logout", {
+        method: "POST",
+        credentials: "same-origin"
+      });
+      window.location.href = "admin.html";
+    }
+
     async function updateOrderStatus(id, orderStatus) {
       try {
         const res = await fetch("/api/mark-printed", {
           method: "PATCH",
+          credentials: "same-origin",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ id, order_status: orderStatus })
         });
 
         if (!res.ok) {
+          if (res.status === 401) {
+            window.location.href = "admin.html?next=mes-commandes.html";
+            return;
+          }
           const data = await res.json();
           throw new Error(data.error || t("statusUpdateFailed"));
         }
@@ -621,7 +648,11 @@
 
     async function loadOrdersIfChanged() {
       try {
-        const res = await fetch("/api/list-orders");
+        const res = await fetch("/api/list-orders", { credentials: "same-origin" });
+        if (res.status === 401) {
+          window.location.href = "admin.html?next=mes-commandes.html";
+          return;
+        }
         const orders = await res.json();
         if (!Array.isArray(orders)) {
           throw new Error(orders?.error || "Invalid response");
@@ -649,7 +680,11 @@
 
     async function loadOrders() {
       try {
-        const res = await fetch("/api/list-orders");
+        const res = await fetch("/api/list-orders", { credentials: "same-origin" });
+        if (res.status === 401) {
+          window.location.href = "admin.html?next=mes-commandes.html";
+          return;
+        }
         const orders = await res.json();
         if (!Array.isArray(orders)) {
           throw new Error(orders?.error || "Invalid response");
@@ -708,26 +743,12 @@
         return true;
       }
 
-      const input = prompt(translations.zh.enterPassword);
-      if (!input) {
-        window.location.href = "https://cube-paris.vercel.app/";
+      if (sessionRes.status >= 500) {
+        alert(sessionData?.error || t("adminConfigError"));
         return false;
       }
-
-      const loginRes = await fetch("/api/admin-login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "same-origin",
-        body: JSON.stringify({ password: input })
-      });
-
-      if (!loginRes.ok) {
-        alert(t("wrongPassword"));
-        window.location.href = "https://cube-paris.vercel.app/";
-        return false;
-      }
-
-      return true;
+      window.location.href = "admin.html?next=mes-commandes.html";
+      return false;
     }
 
     ["mousemove", "mousedown", "keydown", "touchstart", "scroll"].forEach((eventName) => {

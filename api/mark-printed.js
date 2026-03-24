@@ -1,4 +1,5 @@
 import { getServiceHeaders, getSupabaseUrl, requireSupabaseConfig } from './_supabase.js';
+import { requireAdminConfig, requireAdminSession } from './_adminAuth.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'PATCH') {
@@ -6,9 +7,14 @@ export default async function handler(req, res) {
   }
 
   try {
+    requireAdminConfig();
     requireSupabaseConfig();
   } catch {
-    return res.status(500).json({ error: 'Configuration Supabase manquante' });
+    return res.status(500).json({ error: 'Configuration serveur manquante' });
+  }
+
+  if (!requireAdminSession(req, res)) {
+    return;
   }
 
   const { id, order_status = 'completed' } = req.body || {};

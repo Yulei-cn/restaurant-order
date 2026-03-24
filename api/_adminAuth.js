@@ -69,6 +69,23 @@ export function getAdminSession(req) {
   return cookies[COOKIE_NAME] || '';
 }
 
+export function isAdminAuthenticated(req) {
+  try {
+    return verifyAdminSessionValue(getAdminSession(req));
+  } catch {
+    return false;
+  }
+}
+
+export function requireAdminSession(req, res) {
+  if (!isAdminAuthenticated(req)) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return false;
+  }
+
+  return true;
+}
+
 export function validateAdminPassword(password) {
   const expected = getRequiredEnv('ADMIN_PASSWORD');
   return typeof password === 'string' && password === expected;
