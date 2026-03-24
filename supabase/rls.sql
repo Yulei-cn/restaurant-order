@@ -1,8 +1,8 @@
 -- CUBE security baseline for Supabase
 -- Goal:
--- 1. Block all direct browser access to operational tables
--- 2. Keep access available through server-side API routes using the secret key
--- 3. Prepare for future authenticated admin access without exposing data now
+-- 1. Keep browser users blocked from direct access to operational tables
+-- 2. Allow server-side API routes that use the service role / secret server key
+-- 3. Avoid breaking inserts/updates from Vercel API routes
 
 alter table public.orders enable row level security;
 alter table public.order_items enable row level security;
@@ -10,13 +10,18 @@ alter table public.invoice_clients enable row level security;
 alter table public.invoices enable row level security;
 alter table public.invoice_items enable row level security;
 
-alter table public.orders force row level security;
-alter table public.order_items force row level security;
-alter table public.invoice_clients force row level security;
-alter table public.invoices force row level security;
-alter table public.invoice_items force row level security;
+alter table public.orders no force row level security;
+alter table public.order_items no force row level security;
+alter table public.invoice_clients no force row level security;
+alter table public.invoices no force row level security;
+alter table public.invoice_items no force row level security;
 
--- Remove any previously created broad policies if they exist.
+drop policy if exists "service_orders_all" on public.orders;
+drop policy if exists "service_order_items_all" on public.order_items;
+drop policy if exists "service_invoice_clients_all" on public.invoice_clients;
+drop policy if exists "service_invoices_all" on public.invoices;
+drop policy if exists "service_invoice_items_all" on public.invoice_items;
+
 drop policy if exists "orders_anon_read" on public.orders;
 drop policy if exists "orders_anon_write" on public.orders;
 drop policy if exists "order_items_anon_read" on public.order_items;
@@ -28,14 +33,41 @@ drop policy if exists "invoices_anon_write" on public.invoices;
 drop policy if exists "invoice_items_anon_read" on public.invoice_items;
 drop policy if exists "invoice_items_anon_write" on public.invoice_items;
 
--- No SELECT/INSERT/UPDATE/DELETE policies are created on purpose.
--- Result:
--- - anon/authenticated browser clients cannot read or write these tables
--- - service-role / secret-key requests from your backend continue to work
+create policy "service_orders_all"
+on public.orders
+for all
+to service_role
+using (true)
+with check (true);
 
--- Lock down the summary view as well.
+create policy "service_order_items_all"
+on public.order_items
+for all
+to service_role
+using (true)
+with check (true);
+
+create policy "service_invoice_clients_all"
+on public.invoice_clients
+for all
+to service_role
+using (true)
+with check (true);
+
+create policy "service_invoices_all"
+on public.invoices
+for all
+to service_role
+using (true)
+with check (true);
+
+create policy "service_invoice_items_all"
+on public.invoice_items
+for all
+to service_role
+using (true)
+with check (true);
+
 revoke all on public.order_summary from anon;
 revoke all on public.order_summary from authenticated;
-
--- Optional explicit grants for backend roles usually remain managed by Supabase.
--- If you later add admin login with Supabase Auth, create narrow policies then.
+grant select on public.order_summary to service_role;
