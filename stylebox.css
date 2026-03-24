@@ -446,56 +446,369 @@ table tr:hover td {
     border-radius: 15px;
   }
 
+  .header {
+    padding: 26px 16px;
+  }
+
+  .logo {
+    width: 86px;
+    margin-bottom: 12px;
+  }
+
+  .header h1 {
+    font-size: 1.35rem;
+    margin-bottom: 0;
+  }
+
+  .vip-notice {
+    margin: 14px 14px 10px;
+    padding: 16px;
+    border-width: 2px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+  }
+
+  .vip-notice img {
+    margin-top: 10px;
+    border-radius: 12px;
+  }
+
   .lang-switch {
-    flex-direction: column;
-    align-items: center;
+    gap: 10px;
+    margin: 16px 14px;
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .lang-switch button {
+    flex: 1 1 0;
+    min-height: 42px;
+    padding: 10px 12px;
+    font-size: 15px;
+  }
+
+  .offers-container {
+    margin: 14px;
+    border-radius: 14px;
+  }
+
+  .offer-card {
+    flex-direction: row;
+    text-align: left;
+    align-items: flex-start;
+    padding: 16px 14px 28px;
+    gap: 12px;
+    min-height: 0;
+  }
+
+  .offer-image {
+    width: 88px;
+    height: 88px;
+    border-radius: 14px;
+  }
+
+  .offer-badge {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+    margin-bottom: 8px;
+  }
+
+  .offer-content h3 {
+    font-size: 1rem;
+    margin-bottom: 8px;
+  }
+
+  .offer-content p {
+    font-size: 0.88rem;
+    line-height: 1.45;
+  }
+
+  .slider-dots {
+    bottom: 10px;
+  }
+
+  .lang-switch {
+    flex-direction: row;
+    align-items: stretch;
   }
 
   .drinks-list {
     grid-template-columns: 1fr;
+    gap: 8px;
   }
 
   table {
-    font-size: 14px;
+    font-size: 13px;
   }
 
   table th, table td {
-    padding: 10px 8px;
+    padding: 9px 8px;
   }
 
-  .offer-card {
-    flex-direction: column;
-    text-align: center;
-    padding: 25px 20px;
+  .content {
+    padding: 14px;
   }
 
-  .offer-image {
-    width: 120px;
-    height: 120px;
+  .section {
+    margin: 16px 0;
+    border-radius: 12px;
+  }
+
+  .section h2 {
+    padding: 12px 14px;
+    font-size: 1rem;
+    border-bottom-width: 2px;
+  }
+
+  .section-content {
+    padding: 14px;
+  }
+
+  .info-box {
+    padding: 14px;
+    margin: 14px 0;
+    border-left-width: 4px;
+  }
+
+  .menu-table {
+    margin: 12px 0;
+    border-radius: 10px;
+  }
+
+  .drinks-list li {
+    padding: 12px;
+    border-radius: 8px;
+  }
+
+  .formula-card {
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  .formula-title {
+    font-size: 1rem;
+    margin-bottom: 6px;
+  }
+
+  .formula-price {
+    font-size: 1.15rem;
+    margin-bottom: 10px;
+  }
+
+  .contact-item {
+    padding: 14px;
+    gap: 10px;
+    border-radius: 10px;
+  }
+
+  .contact-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+
+  .download-section {
+    margin: 22px 14px;
+  }
+
+  .download-btn {
+    width: 100%;
+    padding: 14px 16px;
+    min-height: 48px;
+    font-size: 0.98rem;
+    border-radius: 16px;
+  }
+
+  .footer-card {
+    padding: 14px;
+    border-left-width: 4px;
+    border-radius: 12px;
+  }
+
+  .footer-title {
+    font-size: 0.98rem;
+  }
+
+  .footer-text {
+    font-size: 0.9rem;
+    line-height: 1.55;
   }
 }
 
 @media (max-width: 480px) {
-  .vip-notice, .offers-container {
+  .container {
+    margin: 6px;
+    border-radius: 12px;
+  }
+
+  .header {
+    padding: 20px 12px;
+  }
+
+  .logo {
+    width: 72px;
+    margin-bottom: 10px;
+  }
+
+  .header h1 {
+    font-size: 1.15rem;
+  }
+
+  .vip-notice,
+  .offers-container {
     margin: 10px;
-    padding: 15px;
   }
 
-  .section {
-    margin: 20px 10px;
+  .vip-notice {
+    padding: 12px;
+    font-size: 0.88rem;
   }
 
-  .section-content {
-    padding: 15px;
+  .lang-switch {
+    margin: 12px 10px;
+    gap: 8px;
+  }
+
+  .lang-switch button {
+    min-height: 38px;
+    padding: 8px 10px;
+    font-size: 14px;
   }
 
   .offer-card {
-    padding: 20px 15px;
+    padding: 12px 10px 24px;
+    gap: 10px;
   }
 
   .offer-image {
-    width: 100px;
-    height: 100px;
+    width: 72px;
+    height: 72px;
+    border-radius: 12px;
+  }
+
+  .offer-badge {
+    font-size: 0.7rem;
+    padding: 5px 8px;
+    margin-bottom: 6px;
+  }
+
+  .offer-content h3 {
+    font-size: 0.92rem;
+    margin-bottom: 6px;
+  }
+
+  .offer-content p {
+    font-size: 0.82rem;
+    line-height: 1.35;
+  }
+
+  .slider-dots {
+    bottom: 8px;
+    gap: 8px;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+  }
+
+  .content {
+    padding: 10px;
+  }
+
+  .section {
+    margin: 12px 0;
+    border-radius: 10px;
+  }
+
+  .section h2 {
+    padding: 10px 12px;
+    font-size: 0.92rem;
+  }
+
+  .section-content {
+    padding: 12px;
+  }
+
+  .info-box {
+    padding: 12px;
+    margin: 12px 0;
+    font-size: 0.86rem;
+  }
+
+  table {
+    font-size: 12px;
+  }
+
+  table th,
+  table td {
+    padding: 8px 6px;
+  }
+
+  .drinks-list {
+    gap: 6px;
+    margin: 12px 0;
+  }
+
+  .drinks-list li {
+    padding: 10px;
+    font-size: 0.88rem;
+  }
+
+  .formula-card {
+    padding: 12px;
+  }
+
+  .formula-title {
+    font-size: 0.95rem;
+  }
+
+  .formula-price {
+    font-size: 1.05rem;
+    margin-bottom: 8px;
+  }
+
+  .contact-item {
+    padding: 12px;
+    gap: 8px;
+  }
+
+  .contact-icon {
+    width: 34px;
+    height: 34px;
+    font-size: 16px;
+  }
+
+  .download-section {
+    margin: 18px 10px;
+  }
+
+  .download-btn {
+    padding: 12px 14px;
+    font-size: 0.92rem;
+    min-height: 44px;
+    border-radius: 14px;
+  }
+
+  .footer-grid {
+    gap: 12px;
+  }
+
+  .footer-card {
+    padding: 12px;
+  }
+
+  .footer-title {
+    font-size: 0.92rem;
+  }
+
+  .footer-text {
+    font-size: 0.86rem;
+  }
+
+  .footer-links a {
+    padding: 8px 12px;
+    font-size: 0.85rem;
   }
 }
 
