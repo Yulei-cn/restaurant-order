@@ -257,7 +257,7 @@
       window.location.href = "https://cube-paris.vercel.app/";
     }
 
-    let supabase = null;
+    let supabaseClient = null;
     let realtimeChannel = null;
     let isRealtimeMode = false;
     let isAudioEnabled = false;
@@ -273,7 +273,7 @@
 
     function initRealtime() {
       try {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
         isRealtimeMode = true;
         updateConnectionStatus("connected", "Realtime");
       } catch (error) {
@@ -492,9 +492,9 @@
     }
 
     function setupRealtimeSubscription() {
-      if (!supabase) return;
+      if (!supabaseClient) return;
 
-      realtimeChannel = supabase
+      realtimeChannel = supabaseClient
         .channel("orders-channel")
         .on("postgres_changes", { event: "INSERT", schema: "public", table: "orders" }, () => {
           showNewOrderAlert();
@@ -532,7 +532,7 @@
         realtimeChannel = null;
         isRealtimeMode = false;
         startPolling();
-      } else if (supabase) {
+      } else if (supabaseClient) {
         stopPolling();
         isRealtimeMode = true;
         setupRealtimeSubscription();
