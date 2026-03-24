@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CUBE - Commande</title>
   <link rel="icon" href="logo.png" type="image/png">
@@ -12,8 +12,8 @@
       box-sizing: border-box;
     }
 
-    body { 
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
       color: #333;
@@ -22,57 +22,54 @@
 
     .container {
       max-width: 1200px;
-      margin: 0 auto;
-      background: white;
+      margin: 20px auto;
+      background: #fff;
       border-radius: 20px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
       overflow: hidden;
-      margin-top: 20px;
-      margin-bottom: 20px;
     }
 
     .header {
-      background: linear-gradient(135deg, #4CAF50, #45a049);
-      color: white;
+      background: linear-gradient(135deg, #4caf50, #45a049);
+      color: #fff;
       padding: 30px 20px;
       text-align: center;
       position: relative;
     }
 
     .header::before {
-      content: '';
+      content: "";
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="1" fill="white" opacity="0.1"/><circle cx="80" cy="40" r="1" fill="white" opacity="0.1"/><circle cx="40" cy="80" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+      inset: 0;
+      background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><pattern id='grain' width='100' height='100' patternUnits='userSpaceOnUse'><circle cx='20' cy='20' r='1' fill='white' opacity='0.1'/><circle cx='80' cy='40' r='1' fill='white' opacity='0.1'/><circle cx='40' cy='80' r='1' fill='white' opacity='0.1'/></pattern></defs><rect width='100' height='100' fill='url(%23grain)'/></svg>");
       opacity: 0.3;
+    }
+
+    .header h1,
+    .info-box {
+      position: relative;
+      z-index: 1;
     }
 
     .header h1 {
       font-size: clamp(1.8rem, 5vw, 2.5rem);
       margin-bottom: 10px;
-      position: relative;
-      z-index: 1;
     }
 
     .info-box {
-      background: rgba(255,255,255,0.2);
+      background: rgba(255, 255, 255, 0.2);
       backdrop-filter: blur(10px);
       padding: 15px;
       border-radius: 15px;
       margin-top: 20px;
       font-size: clamp(0.9rem, 2.5vw, 1.1rem);
-      position: relative;
-      z-index: 1;
     }
 
     .lang-switch {
       display: flex;
       justify-content: center;
       gap: 15px;
-      margin: 30px 20px;
+      margin: 24px 20px;
     }
 
     .lang-switch button {
@@ -80,22 +77,17 @@
       border: none;
       border-radius: 25px;
       padding: 12px 20px;
-      color: white;
+      color: #fff;
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      min-height: 48px; /* 移动端触控友好 */
+      min-height: 48px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     }
 
-    .lang-switch button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-    }
-
-    .lang-switch button:active {
-      transform: translateY(0);
+    .lang-switch button.active {
+      background: linear-gradient(135deg, #2e7d32, #1b5e20);
     }
 
     .content {
@@ -103,22 +95,20 @@
     }
 
     .category {
-      margin-bottom: 40px;
+      margin-bottom: 28px;
       background: #fafafa;
       border-radius: 15px;
       overflow: hidden;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     }
 
     .category h2 {
       background: linear-gradient(135deg, #f1f8e9, #e8f5e8);
-      padding: 20px;
-      margin: 0;
-      font-size: clamp(1.2rem, 4vw, 1.5rem);
-      border-bottom: 3px solid #4CAF50;
+      padding: 18px 20px;
+      font-size: clamp(1.1rem, 4vw, 1.5rem);
+      border-bottom: 3px solid #4caf50;
     }
 
-    /* 移动端优化：卡片式布局替代表格 */
     .menu-grid {
       display: grid;
       gap: 15px;
@@ -126,35 +116,29 @@
     }
 
     .menu-item {
-      background: white;
+      background: #fff;
       border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      padding: 18px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .menu-item:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+      gap: 12px;
     }
 
     .item-info {
       flex: 1;
-      margin-right: 15px;
+      min-width: 0;
     }
 
     .item-name {
       font-weight: 600;
-      font-size: clamp(0.9rem, 2.5vw, 1.1rem);
-      color: #333;
-      margin-bottom: 5px;
+      font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+      margin-bottom: 4px;
     }
 
     .item-price {
-      color: #4CAF50;
+      color: #4caf50;
       font-weight: 700;
       font-size: clamp(1rem, 3vw, 1.2rem);
     }
@@ -162,62 +146,51 @@
     .item-controls {
       display: flex;
       align-items: center;
-      gap: 15px;
+      gap: 12px;
       flex-shrink: 0;
     }
 
     .qty-button {
-      background: linear-gradient(135deg, #4CAF50, #45a049);
+      background: linear-gradient(135deg, #4caf50, #45a049);
       border: none;
       border-radius: 50%;
       width: 40px;
       height: 40px;
-      color: white;
+      color: #fff;
       font-size: 18px;
-      font-weight: bold;
+      font-weight: 700;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.2s ease;
-      min-height: 44px; /* 移动端触控标准 */
-      min-width: 44px;
-    }
-
-    .qty-button:hover {
-      transform: scale(1.05);
-      box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
-    }
-
-    .qty-button:active {
-      transform: scale(0.95);
+      min-width: 40px;
+      min-height: 40px;
     }
 
     .qty-display {
       background: #f5f5f5;
       border-radius: 8px;
-      padding: 8px 16px;
-      min-width: 50px;
+      padding: 8px 14px;
+      min-width: 46px;
       text-align: center;
-      font-weight: bold;
-      font-size: 16px;
+      font-weight: 700;
     }
 
     .cart-summary {
       position: sticky;
       bottom: 0;
-      background: linear-gradient(135deg, #4CAF50, #45a049);
-      color: white;
+      background: linear-gradient(135deg, #4caf50, #45a049);
+      color: #fff;
       padding: 20px;
       margin: 30px -20px -20px -20px;
       text-align: center;
-      box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
     }
 
     .total-price {
       font-size: clamp(1.5rem, 5vw, 2rem);
-      font-weight: bold;
-      margin-bottom: 20px;
+      font-weight: 700;
+      margin-bottom: 16px;
     }
 
     .form-section {
@@ -229,13 +202,12 @@
     .form-section h2 {
       text-align: center;
       margin-bottom: 25px;
-      color: #333;
-      font-size: clamp(1.3rem, 4vw, 1.6rem);
+      font-size: clamp(1.2rem, 4vw, 1.6rem);
     }
 
     .form-grid {
       display: grid;
-      gap: 20px;
+      gap: 18px;
       max-width: 600px;
       margin: 0 auto;
     }
@@ -252,61 +224,34 @@
     }
 
     .form-field input {
-      padding: 15px;
+      padding: 14px;
       border: 2px solid #e0e0e0;
       border-radius: 10px;
       font-size: 16px;
-      transition: border-color 0.3s ease;
-      background: white;
+      background: #fff;
     }
 
     .form-field input:focus {
       outline: none;
-      border-color: #4CAF50;
+      border-color: #4caf50;
       box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
     }
 
     .submit-btn {
-      background: linear-gradient(135deg, #4CAF50, #45a049);
+      background: linear-gradient(135deg, #4caf50, #45a049);
       border: none;
       border-radius: 25px;
       padding: 18px 40px;
-      color: white;
+      color: #fff;
       font-size: 18px;
-      font-weight: bold;
+      font-weight: 700;
       cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
-      min-height: 56px; /* 移动端标准 */
-      margin-top: 20px;
-    }
-
-    .submit-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 25px rgba(76, 175, 80, 0.4);
+      min-height: 56px;
     }
 
     .submit-btn:disabled {
       opacity: 0.6;
       cursor: not-allowed;
-      transform: none;
-    }
-
-    .map-section {
-      margin-top: 40px;
-      padding: 30px 20px;
-      text-align: center;
-    }
-
-    .map-section h2 {
-      margin-bottom: 25px;
-      font-size: clamp(1.3rem, 4vw, 1.6rem);
-    }
-
-    .map-container {
-      border-radius: 15px;
-      overflow: hidden;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
     }
 
     .result-message {
@@ -317,19 +262,101 @@
       font-weight: 600;
     }
 
-    .result-message.success {
-      background: #d4edda;
-      color: #155724;
-      border: 1px solid #c3e6cb;
-    }
-
     .result-message.error {
       background: #f8d7da;
       color: #721c24;
       border: 1px solid #f5c6cb;
     }
 
-    /* 响应式设计 */
+    .pickup-card {
+      margin-top: 20px;
+      padding: 22px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #ecfdf5, #f0fdf4);
+      border: 1px solid #86efac;
+      box-shadow: 0 12px 30px rgba(34, 197, 94, 0.12);
+    }
+
+    .pickup-card h3 {
+      margin-bottom: 10px;
+      font-size: clamp(1.3rem, 4vw, 1.7rem);
+      color: #166534;
+      text-align: center;
+    }
+
+    .pickup-number {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      margin: 18px 0;
+      padding: 18px;
+      border-radius: 14px;
+      background: #fff;
+      border: 2px dashed #22c55e;
+    }
+
+    .pickup-number-label {
+      font-size: 0.95rem;
+      color: #166534;
+      font-weight: 600;
+    }
+
+    .pickup-number-value {
+      font-size: clamp(2rem, 8vw, 3rem);
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      color: #15803d;
+    }
+
+    .pickup-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .pickup-item {
+      background: rgba(255, 255, 255, 0.92);
+      border-radius: 12px;
+      padding: 12px 14px;
+    }
+
+    .pickup-item strong {
+      display: block;
+      margin-bottom: 6px;
+      color: #166534;
+      font-size: 0.9rem;
+    }
+
+    .pickup-note {
+      margin-top: 18px;
+      padding: 14px 16px;
+      background: rgba(255, 255, 255, 0.92);
+      border-radius: 12px;
+      color: #166534;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .map-section {
+      margin-top: 40px;
+      padding: 30px 20px;
+      text-align: center;
+    }
+
+    .map-section h2 {
+      margin-bottom: 25px;
+      font-size: clamp(1.2rem, 4vw, 1.6rem);
+    }
+
+    .map-container {
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    }
+
     @media (max-width: 768px) {
       .container {
         margin: 10px;
@@ -338,12 +365,6 @@
 
       .header {
         padding: 22px 16px;
-      }
-
-      .info-box {
-        margin-top: 14px;
-        padding: 12px;
-        font-size: 0.95rem;
       }
 
       .lang-switch {
@@ -364,13 +385,10 @@
 
       .category {
         margin-bottom: 18px;
-        border-radius: 12px;
       }
 
       .category h2 {
         padding: 12px 14px;
-        font-size: 1rem;
-        border-bottom-width: 2px;
       }
 
       .menu-grid {
@@ -379,34 +397,7 @@
       }
 
       .menu-item {
-        flex-direction: row;
-        text-align: left;
-        gap: 10px;
         padding: 10px 12px;
-        border-radius: 10px;
-      }
-
-      .item-info {
-        margin-right: 8px;
-        min-width: 0;
-      }
-
-      .item-name {
-        font-size: 0.9rem;
-        line-height: 1.25;
-        margin-bottom: 2px;
-      }
-
-      .item-price {
-        font-size: 0.95rem;
-      }
-
-      .item-controls {
-        gap: 6px;
-      }
-
-      .form-grid {
-        padding: 0;
       }
 
       .cart-summary {
@@ -414,27 +405,9 @@
         margin: 20px -14px -14px -14px;
       }
 
-      .total-price {
-        font-size: 1.2rem;
-        margin-bottom: 12px;
-      }
-
       .form-section {
         padding: 20px 14px;
         margin: 0 -14px;
-      }
-
-      .form-section h2 {
-        margin-bottom: 18px;
-        font-size: 1.15rem;
-      }
-
-      .form-grid {
-        gap: 14px;
-      }
-
-      .form-field input {
-        padding: 12px;
       }
 
       .submit-btn {
@@ -442,11 +415,6 @@
         padding: 14px 20px;
         min-height: 50px;
         font-size: 16px;
-      }
-
-      .map-section {
-        margin-top: 24px;
-        padding: 20px 8px 8px;
       }
     }
 
@@ -460,22 +428,8 @@
         padding: 18px 12px;
       }
 
-      .info-box {
-        padding: 10px;
-        font-size: 0.88rem;
-      }
-
-      .lang-switch {
-        margin: 14px 12px;
-      }
-
       .content {
         padding: 10px;
-      }
-
-      .category h2 {
-        padding: 10px 12px;
-        font-size: 0.95rem;
       }
 
       .menu-grid {
@@ -485,7 +439,6 @@
 
       .menu-item {
         padding: 8px 10px;
-        gap: 8px;
       }
 
       .qty-button {
@@ -496,22 +449,10 @@
         font-size: 15px;
       }
 
-      .item-controls {
-        gap: 4px;
-      }
-
       .qty-display {
         min-width: 28px;
         padding: 4px 6px;
         font-size: 13px;
-      }
-
-      .item-name {
-        font-size: 0.82rem;
-      }
-
-      .item-price {
-        font-size: 0.88rem;
       }
 
       .cart-summary {
@@ -519,386 +460,436 @@
         margin: 16px -10px -10px -10px;
       }
 
-      .total-price {
-        font-size: 1.05rem;
-        margin-bottom: 10px;
-      }
-
       .form-section {
         padding: 16px 10px;
         margin: 0 -10px;
       }
-
-      .form-field input {
-        padding: 10px 12px;
-        font-size: 15px;
-      }
-
-      .submit-btn {
-        padding: 12px 18px;
-        font-size: 15px;
-      }
-    }
-
-    /* 暗色模式适配 */
-    @media (prefers-color-scheme: dark) {
-      .menu-item {
-        background: #f9f9f9;
-      }
-      
-      .category {
-        background: #f5f5f5;
-      }
-    }
-
-    /* 动画效果 */
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .category {
-      animation: slideIn 0.6s ease forwards;
-    }
-
-    .category:nth-child(odd) {
-      animation-delay: 0.1s;
-    }
-
-    .category:nth-child(even) {
-      animation-delay: 0.2s;
     }
   </style>
 </head>
 <body>
+  <div class="container">
+    <div class="header">
+      <h1 id="title">CUBE - Commande</h1>
+      <div class="info-box" id="infoBox"></div>
+    </div>
 
-<div class="container">
-  <div class="header">
-    <h1 id="title">🥡 CUBE - Commande</h1>
-    <div class="info-box" id="infoBox">📍 7 Rue Blanche, 75009 Paris — ⏰ 11:30–20:30</div>
-  </div>
+    <div class="lang-switch">
+      <button id="lang-fr" type="button" onclick="setLang('fr')">Français</button>
+      <button id="lang-zh" type="button" onclick="setLang('zh')">中文</button>
+    </div>
 
-  <div class="lang-switch">
-    <button onclick="setLang('fr')" aria-label="Français">🇫🇷 Français</button>
-    <button onclick="setLang('zh')" aria-label="中文">🇨🇳 中文</button>
-  </div>
+    <div class="content">
+      <form id="orderForm">
+        <div id="menuCategories"></div>
 
-  <div class="content">
-    <form id="orderForm">
-      <div id="menuCategories"></div>
-
-      <div class="cart-summary">
-        <div class="total-price">💰 Total : <span id="total">0.00</span> €</div>
-      </div>
-
-      <div class="form-section">
-        <h2 data-fr="Informations de retrait" data-zh="订单信息">Informations de retrait</h2>
-        
-        <div class="form-grid">
-          <div class="form-field">
-            <label data-fr="Nom du client (obligatoire)" data-zh="姓名（必填）">Nom du client (obligatoire)</label>
-            <input type="text" name="customer_name" id="customer_name" required />
-          </div>
-
-          <div class="form-field">
-            <label data-fr="Adresse (optionnel)" data-zh="地址（可选）">Adresse (optionnel)</label>
-            <input type="text" name="address" id="address" />
-          </div>
-
-          <div class="form-field">
-            <label data-fr="Téléphone (optionnel)" data-zh="电话（可选）">Téléphone (optionnel)</label>
-            <input type="tel" name="phone" id="phone" />
-          </div>
-
-          <div class="form-field">
-            <label data-fr="Remarques (optionnel)" data-zh="备注（可选）">Remarques (optionnel)</label>
-            <input type="text" name="notes" id="notes" />
-          </div>
-
-          <button type="submit" class="submit-btn" id="submitBtn">✅ Commander</button>
+        <div class="cart-summary">
+          <div class="total-price"><span id="totalLabel"></span> <span id="total">0.00</span> EUR</div>
         </div>
-      </div>
-    </form>
 
-    <div id="result"></div>
+        <div class="form-section">
+          <h2 id="pickupInfoTitle"></h2>
 
-    <div class="map-section">
-      <h2>📍 Nous trouver</h2>
-      <div class="map-container">
-        <iframe
-          src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d8826.566768564202!2d2.327968040327757!3d48.87434070843596!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e66f9eb79f4ec3%3A0x8afbe2aac1fe8dd8!2sCUBE!5e0!3m2!1szh-CN!2sfr!4v1749454247270!5m2!1szh-CN!2sfr"
-          width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy">
-        </iframe>
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="customer_name" id="labelName"></label>
+              <input type="text" name="customer_name" id="customer_name" required>
+            </div>
+
+            <div class="form-field">
+              <label for="address" id="labelAddress"></label>
+              <input type="text" name="address" id="address">
+            </div>
+
+            <div class="form-field">
+              <label for="phone" id="labelPhone"></label>
+              <input type="tel" name="phone" id="phone">
+            </div>
+
+            <div class="form-field">
+              <label for="notes" id="labelNotes"></label>
+              <input type="text" name="notes" id="notes">
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn"></button>
+          </div>
+        </div>
+      </form>
+
+      <div id="result"></div>
+
+      <div class="map-section">
+        <h2 id="mapTitle"></h2>
+        <div class="map-container">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d8826.566768564202!2d2.327968040327757!3d48.87434070843596!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e66f9eb79f4ec3%3A0x8afbe2aac1fe8dd8!2sCUBE!5e0!3m2!1szh-CN!2sfr!4v1749454247270!5m2!1szh-CN!2sfr"
+            width="100%"
+            height="300"
+            style="border:0;"
+            allowfullscreen=""
+            loading="lazy">
+          </iframe>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<script>
-let cart = {};
-const categories = [
-  {
-    title: "🥗 Entrées / 前菜",
-    items: [
-      ["Concombre mariné / 拍黄瓜", 5.80],
-      ["Radis aigre-doux / 酸甜萝卜", 5.80],
-      ["Pommes de terre râpées / 凉拌土豆丝", 5.80],
-      ["Algues marinées / 海带丝", 5.80],
-    ]
-  },
-  {
-    title: "🍛 Plats chauds / 热菜",
-    items: [
-      ["Bœuf mijoté / 烧牛肉", 8.80],
-      ["Porc braisé / 红烧肉", 8.80],
-      ["Poulet aigre-doux / 糖醋鸡", 8.80],
-      ["Porc sauté croustillant / 溜肉段", 8.80],
-      ["Poulet frit / 炸鸡块", 8.80],
-      ["Porc frit croustillant / 小酥肉", 8.80],
-      ["Poulet Kung Pao / 宫保鸡丁", 8.80],
-      ["Aubergines braisées / 烧茄子", 6.80],
-      ["Haricots verts sautés / 干煸豆角", 6.80],
-      ["Œufs aux tomates / 番茄炒鸡蛋", 6.80],
-    ]
-  },
-  {
-    title: "🍚 Accompagnements / 主食",
-    items: [
-      ["Riz nature / 米饭", 2.50],
-      ["Riz sauté / 炒饭", 5.80],
-      ["Nouilles sautées / 炒面", 6.80],
-    ]
-  },
-  {
-    title: "🥯 Snacks / 小吃",
-    items: [
-      ["Roujiamo porc / 猪肉肉夹馍", 5.80],
-      ["Roujiamo bœuf / 牛肉肉夹馍", 6.80],
-    ]
-  },
-  {
-    title: "🥤 Boissons / 饮品",
-    items: [
-      ["Coca-Cola / 可乐", 2.00],
-      ["Sprite / 雪碧", 2.00],
-      ["Fanta / 芬达", 2.00],
-      ["Thé à la pêche / 桃茶", 2.00],
-      ["Jus d'orange / 橙汁", 2.00],
-      ["Eau minérale / 矿泉水", 2.00],
-    ]
-  },
-  {
-    title: "🍱 Formules / 套餐",
-    items: [
-      ["Formule 1 — 米饭/炒面 + 前菜1 + 热菜2 + 饮品", 11.80],
-      ["Formule 2 — 米饭/炒面 + 前菜1 + 热菜3 + 饮品", 13.80],
-    ]
-  }
-];
+  <script>
+    const i18n = {
+      fr: {
+        pageTitle: "🍱 CUBE - Commande",
+        infoBox: "📍 7 Rue Blanche, 75009 Paris | 🕒 11:30-20:30",
+        totalPrefix: "💵 Total :",
+        pickupInfoTitle: "Informations de retrait",
+        nameLabel: "Nom du client (obligatoire)",
+        addressLabel: "Adresse (optionnel)",
+        phoneLabel: "Telephone (optionnel)",
+        notesLabel: "Remarques (optionnel)",
+        mapTitle: "📍 Nous trouver",
+        submitReady: "✅ Commander",
+        submitDisabled: "Selectionnez des articles",
+        submitLoading: "Envoi en cours...",
+        decAria: "Diminuer",
+        incAria: "Augmenter",
+        emptyCart: "⚠️ Veuillez selectionner des articles",
+        missingName: "⚠️ Veuillez remplir le nom",
+        priceError: "❌ Erreur de validation du prix",
+        networkError: "❌ Erreur reseau, veuillez reessayer",
+        pickupTitle: "Commande enregistree, conservez votre numero",
+        pickupLabel: "Votre numero de retrait",
+        customerLabel: "Client",
+        timeLabel: "Heure",
+        totalLabel: "Total",
+        paymentLabel: "Paiement",
+        paymentValue: "Paiement sur place",
+        pickupNote: "Presentez cette page ou indiquez ce numero au comptoir pour retirer votre commande."
+      },
+      zh: {
+        pageTitle: "🍱 CUBE 盒饭点餐",
+        infoBox: "📍 巴黎9区 Rue Blanche 7号 | 🕒 营业时间 11:30-20:30",
+        totalPrefix: "💵 总计：",
+        pickupInfoTitle: "订单信息",
+        nameLabel: "姓名（必填）",
+        addressLabel: "地址（可选）",
+        phoneLabel: "电话（可选）",
+        notesLabel: "备注（可选）",
+        mapTitle: "📍 我们的位置",
+        submitReady: "✅ 提交订单",
+        submitDisabled: "选择商品后提交",
+        submitLoading: "提交中...",
+        decAria: "减少",
+        incAria: "增加",
+        emptyCart: "⚠️ 请选择商品",
+        missingName: "⚠️ 请填写姓名",
+        priceError: "❌ 价格验证失败，请刷新重试",
+        networkError: "❌ 网络错误，请重试",
+        pickupTitle: "下单成功，请保存取餐号",
+        pickupLabel: "您的取餐号",
+        customerLabel: "姓名",
+        timeLabel: "下单时间",
+        totalLabel: "总金额",
+        paymentLabel: "支付状态",
+        paymentValue: "到店付款",
+        pickupNote: "到店取餐时请向柜台出示此页面或报出取餐号。"
+      }
+    };
 
-function renderCategories() {
-  const container = document.getElementById("menuCategories");
-  container.innerHTML = '';
-  
-  categories.forEach((cat, index) => {
-    const section = document.createElement("div");
-    section.className = "category";
-    section.style.animationDelay = `${index * 0.1}s`;
-    
-    section.innerHTML = `
-      <h2>${cat.title}</h2>
-      <div class="menu-grid">
-        ${cat.items.map(([label, price]) => {
-          const key = `${label} - ${price.toFixed(2)}€`;
-          const sanitizedKey = key.replace(/['"]/g, '&quot;');
-          return `
-            <div class="menu-item">
-              <div class="item-info">
-                <div class="item-name">${label}</div>
-                <div class="item-price">${price.toFixed(2)} €</div>
+    const menuData = [
+      {
+        title: { fr: "🥗 Entrees", zh: "🥗 前菜" },
+        items: [
+          { id: "concombre", fr: "Concombre marine", zh: "拍黄瓜", server: "Concombre marine", price: 5.8 },
+          { id: "radis", fr: "Radis aigre-doux", zh: "酸甜萝卜", server: "Radis aigre-doux", price: 5.8 },
+          { id: "pommes", fr: "Pommes de terre rapees", zh: "凉拌土豆丝", server: "Pommes de terre rapees", price: 5.8 },
+          { id: "algues", fr: "Algues marinees", zh: "海带丝", server: "Algues marinees", price: 5.8 }
+        ]
+      },
+      {
+        title: { fr: "🍲 Plats chauds", zh: "🍲 热菜" },
+        items: [
+          { id: "boeuf", fr: "Boeuf mijote", zh: "炖牛肉", server: "Boeuf mijote", price: 8.8 },
+          { id: "porc_braise", fr: "Porc braise", zh: "红烧肉", server: "Porc braise", price: 8.8 },
+          { id: "poulet_aigre_doux", fr: "Poulet aigre-doux", zh: "糖醋鸡", server: "Poulet aigre-doux", price: 8.8 },
+          { id: "porc_croustillant", fr: "Porc saute croustillant", zh: "溜肉段", server: "Porc saute croustillant", price: 8.8 },
+          { id: "poulet_frit", fr: "Poulet frit", zh: "炸鸡块", server: "Poulet frit", price: 8.8 },
+          { id: "porc_frit", fr: "Porc frit croustillant", zh: "小酥肉", server: "Porc frit croustillant", price: 8.8 },
+          { id: "kung_pao", fr: "Poulet Kung Pao", zh: "宫保鸡丁", server: "Poulet Kung Pao", price: 8.8 },
+          { id: "aubergines", fr: "Aubergines braisees", zh: "烧茄子", server: "Aubergines braisees", price: 6.8 },
+          { id: "haricots", fr: "Haricots verts sautes", zh: "干煸豆角", server: "Haricots verts sautes", price: 6.8 },
+          { id: "oeufs_tomates", fr: "Oeufs aux tomates", zh: "番茄炒蛋", server: "Oeufs aux tomates", price: 6.8 }
+        ]
+      },
+      {
+        title: { fr: "🍚 Accompagnements", zh: "🍚 主食" },
+        items: [
+          { id: "riz_nature", fr: "Riz nature", zh: "米饭", server: "Riz nature", price: 2.5 },
+          { id: "riz_saute", fr: "Riz saute", zh: "炒饭", server: "Riz saute", price: 5.8 },
+          { id: "nouilles", fr: "Nouilles sautees", zh: "炒面", server: "Nouilles sautees", price: 6.8 }
+        ]
+      },
+      {
+        title: { fr: "🥙 Snacks", zh: "🥙 小吃" },
+        items: [
+          { id: "roujiamo_porc", fr: "Roujiamo porc", zh: "猪肉夹馍", server: "Roujiamo porc", price: 5.8 },
+          { id: "roujiamo_boeuf", fr: "Roujiamo boeuf", zh: "牛肉夹馍", server: "Roujiamo boeuf", price: 6.8 }
+        ]
+      },
+      {
+        title: { fr: "🥤 Boissons", zh: "🥤 饮品" },
+        items: [
+          { id: "coca", fr: "Coca-Cola", zh: "可乐", server: "Coca-Cola", price: 2.0 },
+          { id: "sprite", fr: "Sprite", zh: "雪碧", server: "Sprite", price: 2.0 },
+          { id: "fanta", fr: "Fanta", zh: "芬达", server: "Fanta", price: 2.0 },
+          { id: "peach_tea", fr: "The a la peche", zh: "桃茶", server: "The a la peche", price: 2.0 },
+          { id: "orange_juice", fr: "Jus d'orange", zh: "橙汁", server: "Jus d'orange", price: 2.0 },
+          { id: "water", fr: "Eau minerale", zh: "矿泉水", server: "Eau minerale", price: 2.0 }
+        ]
+      },
+      {
+        title: { fr: "🍱 Formules", zh: "🍱 套餐" },
+        items: [
+          { id: "formule1", fr: "Formule 1", zh: "套餐 1", server: "Formule 1", price: 11.8 },
+          { id: "formule2", fr: "Formule 2", zh: "套餐 2", server: "Formule 2", price: 13.8 }
+        ]
+      }
+    ];
+
+    const itemIndex = Object.fromEntries(
+      menuData.flatMap((category) => category.items.map((item) => [item.id, item]))
+    );
+
+    let currentLang = "fr";
+    let cart = {};
+    let lastPickupData = null;
+
+    function t(key) {
+      return i18n[currentLang][key];
+    }
+
+    function calculateTotal() {
+      return Object.entries(cart).reduce((sum, [itemId, qty]) => {
+        const item = itemIndex[itemId];
+        return item ? sum + item.price * qty : sum;
+      }, 0);
+    }
+
+    function updateTotal() {
+      document.getElementById("total").textContent = calculateTotal().toFixed(2);
+    }
+
+    function updateCartSummary() {
+      const totalItems = Object.values(cart).reduce((sum, qty) => sum + qty, 0);
+      const submitBtn = document.getElementById("submitBtn");
+
+      if (totalItems === 0) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = t("submitDisabled");
+      } else {
+        submitBtn.disabled = false;
+        submitBtn.textContent = t("submitReady");
+      }
+    }
+
+    function renderCategories() {
+      const container = document.getElementById("menuCategories");
+      container.innerHTML = "";
+
+      menuData.forEach((category) => {
+        const section = document.createElement("div");
+        section.className = "category";
+        section.innerHTML = `
+          <h2>${category.title[currentLang]}</h2>
+          <div class="menu-grid">
+            ${category.items.map((item) => `
+              <div class="menu-item">
+                <div class="item-info">
+                  <div class="item-name">${item[currentLang]}</div>
+                  <div class="item-price">${item.price.toFixed(2)} EUR</div>
+                </div>
+                <div class="item-controls">
+                  <button type="button" class="qty-button" onclick="changeQty('${item.id}', -1)" aria-label="${t("decAria")}">-</button>
+                  <div class="qty-display" id="qty-${item.id}">${cart[item.id] || 0}</div>
+                  <button type="button" class="qty-button" onclick="changeQty('${item.id}', 1)" aria-label="${t("incAria")}">+</button>
+                </div>
               </div>
-              <div class="item-controls">
-                <button type="button" class="qty-button" onclick="changeQty('${sanitizedKey}', -1)" aria-label="Diminuer">−</button>
-                <div class="qty-display" id="qty-${sanitizedKey}">0</div>
-                <button type="button" class="qty-button" onclick="changeQty('${sanitizedKey}', 1)" aria-label="Augmenter">+</button>
-              </div>
-            </div>
-          `;
-        }).join("")}
-      </div>
-    `;
-    container.appendChild(section);
-  });
-}
-
-function changeQty(name, delta) {
-  cart[name] = Math.max(0, (cart[name] || 0) + delta);
-  const sanitizedName = name.replace(/['"]/g, '&quot;');
-  const qtyElement = document.getElementById(`qty-${sanitizedName}`);
-  if (qtyElement) {
-    qtyElement.textContent = cart[name];
-  }
-  updateTotal();
-  updateCartSummary();
-}
-
-function updateTotal() {
-  let total = 0;
-  for (const [name, qty] of Object.entries(cart)) {
-    const price = parseFloat(name.match(/- ([\d.]+)€/)[1]);
-    total += price * qty;
-  }
-  document.getElementById("total").textContent = total.toFixed(2);
-}
-
-function updateCartSummary() {
-  const totalItems = Object.values(cart).reduce((sum, qty) => sum + qty, 0);
-  const submitBtn = document.getElementById("submitBtn");
-  
-  if (totalItems === 0) {
-    submitBtn.disabled = true;
-    submitBtn.textContent = document.documentElement.lang === 'zh' ? '选择商品后提交' : 'Sélectionnez des articles';
-  } else {
-    submitBtn.disabled = false;
-    submitBtn.textContent = document.documentElement.lang === 'zh' ? '✅ 提交订单' : '✅ Commander';
-  }
-}
-
-function setLang(lang) {
-  document.documentElement.lang = lang;
-  document.getElementById("title").textContent = lang === "zh" ? "🥡 CUBE盒饭点餐" : "🥡 CUBE - Commande";
-  document.getElementById("infoBox").textContent = lang === "zh"
-    ? "📍 巴黎9区 Rue Blanche 7号 — ⏰ 营业时间 11:30–20:30"
-    : "📍 7 Rue Blanche, 75009 Paris — ⏰ 11:30–20:30";
-
-  document.querySelectorAll("[data-fr]").forEach(element => {
-    const text = lang === "zh" ? element.dataset.zh : element.dataset.fr;
-    if (element.tagName === 'LABEL') {
-      // For labels, replace only the text content, preserve the input
-      element.childNodes.forEach(node => {
-        if (node.nodeType === 3) { // Text node
-          node.nodeValue = text;
-        }
+            `).join("")}
+          </div>
+        `;
+        container.appendChild(section);
       });
-    } else {
-      element.textContent = text;
     }
-  });
-  
-  updateCartSummary();
-}
 
-document.getElementById("orderForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  
-  const items = [];
-  let clientTotal = 0;
-  
-  for (const [name, qty] of Object.entries(cart)) {
-    if (qty > 0) {
-      const price = parseFloat(name.match(/- ([\d.]+)€/)[1]);
-      items.push({ name, qty, price });
-      clientTotal += price * qty;
+    function updateStaticTexts() {
+      document.documentElement.lang = currentLang;
+      document.title = currentLang === "zh" ? "CUBE 盒饭点餐" : "CUBE - Commande";
+      document.getElementById("title").textContent = t("pageTitle");
+      document.getElementById("infoBox").textContent = t("infoBox");
+      document.getElementById("totalLabel").textContent = t("totalPrefix");
+      document.getElementById("pickupInfoTitle").textContent = t("pickupInfoTitle");
+      document.getElementById("labelName").textContent = t("nameLabel");
+      document.getElementById("labelAddress").textContent = t("addressLabel");
+      document.getElementById("labelPhone").textContent = t("phoneLabel");
+      document.getElementById("labelNotes").textContent = t("notesLabel");
+      document.getElementById("mapTitle").textContent = t("mapTitle");
+      document.getElementById("lang-fr").classList.toggle("active", currentLang === "fr");
+      document.getElementById("lang-zh").classList.toggle("active", currentLang === "zh");
     }
-  }
-  
-  if (items.length === 0) {
-    showResult("⚠️ " + (document.documentElement.lang === 'zh' ? '请选择商品' : 'Veuillez sélectionner des articles'), 'error');
-    return;
-  }
 
-  const customer_name = document.getElementById("customer_name").value;
-  
-  if (!customer_name.trim()) {
-    showResult("⚠️ " + (document.documentElement.lang === 'zh' ? '请填写姓名' : 'Veuillez remplir le nom'), 'error');
-    return;
-  }
+    function changeQty(itemId, delta) {
+      cart[itemId] = Math.max(0, (cart[itemId] || 0) + delta);
+      const qtyElement = document.getElementById(`qty-${itemId}`);
+      if (qtyElement) {
+        qtyElement.textContent = cart[itemId];
+      }
+      updateTotal();
+      updateCartSummary();
+    }
 
-  // Disable submit button during submission
-  const submitBtn = document.getElementById("submitBtn");
-  submitBtn.disabled = true;
-  submitBtn.textContent = document.documentElement.lang === 'zh' ? '提交中...' : 'Envoi en cours...';
+    function getPickupContent(data, clientTotal, customerName) {
+      return {
+        title: t("pickupTitle"),
+        pickupLabel: t("pickupLabel"),
+        customerLabel: t("customerLabel"),
+        timeLabel: t("timeLabel"),
+        totalLabel: t("totalLabel"),
+        paymentLabel: t("paymentLabel"),
+        paymentValue: t("paymentValue"),
+        note: t("pickupNote"),
+        customerName: customerName || "-",
+        orderTime: new Date().toLocaleString(currentLang === "zh" ? "zh-CN" : "fr-FR"),
+        serverTotal: Number(data.serverTotal || clientTotal || 0).toFixed(2)
+      };
+    }
 
-  try {
-    const res = await fetch("/api/submit-order", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        customer_name: customer_name.trim(),
-        items,
-        address: document.getElementById("address").value.trim(),
-        phone: document.getElementById("phone").value.trim(),
-        notes: document.getElementById("notes").value.trim(),
-        source: "online_pickup",
-        channel: "web",
-        fulfillment_type: "pickup",
-        payment_status: "pay_on_pickup"
-      })
-    });
+    function showPickupResult(data, clientTotal, customerName) {
+      const resultDiv = document.getElementById("result");
+      const content = getPickupContent(data, clientTotal, customerName);
 
-    const data = await res.json();
+      resultDiv.className = "pickup-card";
+      resultDiv.innerHTML = `
+        <h3>✅ ${content.title}</h3>
+        <div class="pickup-number">
+          <div class="pickup-number-label">${content.pickupLabel}</div>
+          <div class="pickup-number-value">${data.orderNumber || "---"}</div>
+        </div>
+        <div class="pickup-grid">
+          <div class="pickup-item">
+            <strong>${content.customerLabel}</strong>
+            <span>${content.customerName}</span>
+          </div>
+          <div class="pickup-item">
+            <strong>${content.timeLabel}</strong>
+            <span>${content.orderTime}</span>
+          </div>
+          <div class="pickup-item">
+            <strong>${content.totalLabel}</strong>
+            <span>EUR ${content.serverTotal}</span>
+          </div>
+          <div class="pickup-item">
+            <strong>${content.paymentLabel}</strong>
+            <span>${content.paymentValue}</span>
+          </div>
+        </div>
+        <div class="pickup-note">${content.note}</div>
+      `;
 
-    if (res.ok) {
-      if (data.serverTotal && Math.abs(data.serverTotal - clientTotal) > 0.01) {
-        showResult("❌ " + (document.documentElement.lang === 'zh' ? '价格验证失败，请刷新重试' : 'Erreur de validation du prix'), 'error');
+      lastPickupData = { data, clientTotal, customerName };
+      resultDiv.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    function showResult(message, type) {
+      lastPickupData = null;
+      const resultDiv = document.getElementById("result");
+      resultDiv.textContent = message;
+      resultDiv.className = `result-message ${type}`;
+      resultDiv.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    function setLang(lang) {
+      currentLang = lang;
+      updateStaticTexts();
+      renderCategories();
+      updateTotal();
+      updateCartSummary();
+
+      if (lastPickupData) {
+        showPickupResult(lastPickupData.data, lastPickupData.clientTotal, lastPickupData.customerName);
+      }
+    }
+
+    document.getElementById("orderForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const items = [];
+      let clientTotal = 0;
+
+      for (const [itemId, qty] of Object.entries(cart)) {
+        if (qty > 0) {
+          const item = itemIndex[itemId];
+          if (!item) continue;
+          items.push({ name: item.server, qty, price: item.price });
+          clientTotal += item.price * qty;
+        }
+      }
+
+      if (items.length === 0) {
+        showResult(t("emptyCart"), "error");
         return;
       }
 
-      // Clear cart
-      const allKeys = Object.keys(cart);
-      cart = {};
-      document.getElementById("orderForm").reset();
-      allKeys.forEach(key => {
-        const sanitizedKey = key.replace(/['"]/g, '&quot;');
-        const qtyElement = document.getElementById(`qty-${sanitizedKey}`);
-        if (qtyElement) {
-          qtyElement.textContent = "0";
+      const customerName = document.getElementById("customer_name").value.trim();
+      if (!customerName) {
+        showResult(t("missingName"), "error");
+        return;
+      }
+
+      const submitBtn = document.getElementById("submitBtn");
+      submitBtn.disabled = true;
+      submitBtn.textContent = t("submitLoading");
+
+      try {
+        const res = await fetch("/api/submit-order", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customer_name: customerName,
+            items,
+            address: document.getElementById("address").value.trim(),
+            phone: document.getElementById("phone").value.trim(),
+            notes: document.getElementById("notes").value.trim(),
+            source: "online_pickup",
+            channel: "web",
+            fulfillment_type: "pickup",
+            payment_status: "pay_on_pickup"
+          })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          if (data.serverTotal && Math.abs(data.serverTotal - clientTotal) > 0.01) {
+            showResult(t("priceError"), "error");
+            return;
+          }
+
+          cart = {};
+          document.getElementById("orderForm").reset();
+          renderCategories();
+          updateTotal();
+          updateCartSummary();
+          showPickupResult(data, clientTotal, customerName);
+        } else {
+          showResult(`❌ ${data.error}`, "error");
         }
-      });
-      updateTotal();
-      updateCartSummary();
-      
-      const successMessage = document.documentElement.lang === 'zh'
-        ? `订单提交成功${data.orderNumber ? `，订单号：${data.orderNumber}` : ''}！`
-        : `Commande envoyée avec succès${data.orderNumber ? `, numéro : ${data.orderNumber}` : ''} !`;
-      showResult("✅ " + successMessage, 'success');
-    } else {
-      showResult(`❌ ${data.error}`, 'error');
-    }
-  } catch (error) {
-    showResult("❌ " + (document.documentElement.lang === 'zh' ? '网络错误，请重试' : 'Erreur réseau, veuillez réessayer'), 'error');
-  } finally {
-    updateCartSummary();
-  }
-});
+      } catch (error) {
+        showResult(t("networkError"), "error");
+      } finally {
+        updateCartSummary();
+      }
+    });
 
-function showResult(message, type) {
-  const resultDiv = document.getElementById("result");
-  resultDiv.textContent = message;
-  resultDiv.className = `result-message ${type}`;
-  
-  // Auto-hide success messages after 5 seconds
-  if (type === 'success') {
-    setTimeout(() => {
-      resultDiv.textContent = '';
-      resultDiv.className = '';
-    }, 5000);
-  }
-}
-
-// Initialize
-renderCategories();
-updateCartSummary();
-
-// Add touch feedback for mobile
-document.addEventListener('touchstart', function() {}, { passive: true });
-</script>
-
+    setLang("fr");
+    document.addEventListener("touchstart", function () {}, { passive: true });
+  </script>
 </body>
 </html>

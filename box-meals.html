@@ -1,556 +1,499 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Restaurant CUBE - Boîtes Repas & Menu</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Restaurant CUBE - Boites Repas & Menu</title>
   <link rel="stylesheet" href="stylebox.css">
+  <style>
+    .lang-switch button.active {
+      background: linear-gradient(135deg, #2e7d32, #1b5e20);
+    }
+  </style>
 </head>
-
 <body>
-
-<div class="container">
-  <div class="header">
-    <img src="logo.png" alt="Logo CUBE" class="logo">
-    <h1 class="fr-only">🍱 Livraison de Boîtes Repas Chinoises</h1>
-    <h1 class="zh-only">🍱 中式风味便当配送服务</h1>
-  </div>
-
-  <!-- VIP 积分提示（双语） -->
-  <div class="fr-only vip-notice">
-    🎁 Chaque commande = 1 tampon ! Cumulez-en 9 et la 10<sup>e</sup> boîte est offerte !
-    <div>
-      <img src="vip.jpg" alt="Carte VIP">
+  <div class="container">
+    <div class="header">
+      <img src="logo.png" alt="Logo CUBE" class="logo">
+      <h1 id="heroTitle"></h1>
     </div>
-  </div>
 
-  <div class="zh-only vip-notice">
-    🎁 每次点菜记得领取会员卡片，每次可累计一次，累计9次，第十次免费盒饭！
-    <div>
-      <img src="vip.jpg" alt="VIP卡">
+    <div id="vipNotice" class="vip-notice"></div>
+
+    <div class="lang-switch">
+      <button id="lang-fr" type="button" onclick="setLang('fr')">Français</button>
+      <button id="lang-zh" type="button" onclick="setLang('zh')">中文</button>
     </div>
-  </div>
 
-  <div class="lang-switch">
-    <button onclick="switchLanguage('fr')">🇫🇷 Français</button>
-    <button onclick="switchLanguage('zh')">🇨🇳 中文</button>
-  </div>
-
-  <!-- 今日优惠横向滑动区域 -->
-  <div class="offers-container">
-    <div class="offers-slider">
-      <!-- 小菜优惠 -->
-      <div class="offer-card">
-        <div class="offer-image">
-          <img src="Photo/xiaocai.jpg" alt="免费小菜" />
-        </div>
-        <div class="offer-content">
-          <div class="offer-badge">🎁 今日优惠</div>
-          <h3 class="fr-only">Accompagnement Offert !</h3>
-          <h3 class="zh-only">免费赠送小菜！</h3>
-          <p class="fr-only">
-            Avec toute commande, choisissez un accompagnement gratuit :<br>
-            <strong>• Concombre mariné</strong><br>
-            <strong>• Pommes de terre sucrées-aigres</strong><br>
-            <strong>• Radis aigre-doux</strong><br>
-            <strong>• Algues marinées</strong>
-          </p>
-          <p class="zh-only">
-            每份订单免费赠送小菜一份，任选其一：<br>
-            <strong>• 拍黄瓜</strong><br>
-            <strong>• 糖醋土豆丝</strong><br>
-            <strong>• 糖醋萝卜</strong><br>
-            <strong>• 海带丝</strong>
-          </p>
-        </div>
-      </div>
-
-      <!-- 水果优惠 -->
-      <div class="offer-card">
-        <div class="offer-image">
-          <img src="Photo/shuiguo.jpg" alt="免费水果" />
-        </div>
-        <div class="offer-content">
-          <div class="offer-badge">🍎 今日特惠</div>
-          <h3 class="fr-only">Fruits Frais Offerts !</h3>
-          <h3 class="zh-only">新鲜水果免费送！</h3>
-          <p class="fr-only">
-            Fruits de saison offerts avec votre commande.<br>
-            <strong>Fraîcheur et vitamines garanties !</strong>
-          </p>
-          <p class="zh-only">
-            订单满额即送当季新鲜水果<br>
-            <strong>新鲜维生素，健康加倍！</strong>
-          </p>
-        </div>
+    <div class="offers-container">
+      <div class="offers-slider" id="offersSlider"></div>
+      <div class="slider-dots">
+        <span class="dot active" onclick="showSlide(0)"></span>
+        <span class="dot" onclick="showSlide(1)"></span>
       </div>
     </div>
-    
-    <!-- 滑动指示器 -->
-    <div class="slider-dots">
-      <span class="dot active" onclick="showSlide(0)"></span>
-      <span class="dot" onclick="showSlide(1)"></span>
+
+    <div class="content">
+      <div id="storySections"></div>
+
+      <div class="download-section">
+        <a href="meun.pdf" download class="download-btn" id="downloadBtn"></a>
+      </div>
+
+      <div id="menuSections"></div>
+
+      <footer class="section site-footer">
+        <h2 id="footerTitle"></h2>
+        <div class="section-content">
+          <div class="footer-grid" id="footerGrid"></div>
+        </div>
+      </footer>
     </div>
   </div>
 
-  <div class="content">
-    <!-- 法语内容 -->
-    <div class="fr-only">
-      <div class="section">
-        <h2>🇨🇳 Un Voyage de Saveurs à Chaque Repas</h2>
-        <div class="section-content">
-          <p>
-            Chez CUBE, nos boîtes repas sont un hommage aux saveurs authentiques de la Chine.
-            Du riz parfumé aux nouilles sautées, chaque plat est préparé à la commande, avec soin et générosité.
-          </p>
-        </div>
-      </div>
-
-      <div class="section">
-        <h2>⏱️ Commande Simple, Livraison Express</h2>
-        <div class="section-content">
-          <p>
-            Commandez en ligne en quelques clics. Nous cuisinons à la minute et livrons chaud à votre porte.
-            Livraison en 30 minutes dans Paris.
-          </p>
-        </div>
-      </div>
-
-      <div class="section">
-        <h2>🌿 Sain, Léger et Savoureux</h2>
-        <div class="section-content">
-          <p>
-            Nos recettes sont conçues pour vous offrir un repas complet, équilibré et léger.
-          </p>
-          
-          <div class="info-box">
-            📢 <strong>Bonne nouvelle !</strong> Bientôt sur <strong>Uber Eats</strong> et <strong>PandaGo</strong> (熊猫外卖) !<br>
-            Précommande & retrait sur place disponibles dès maintenant.
-          </div>
-        </div>
-      </div>
-
-      <div class="section">
-        <h2>📍 Infos Pratiques</h2>
-        <div class="section-content">
-          <div class="contact-info">
-            <div class="contact-item">
-              <div class="contact-icon">📍</div>
-              <div>
-                <strong>Adresse :</strong><br>
-                7 Rue Blanche, 75009 Paris
-              </div>
-            </div>
-            <div class="contact-item">
-              <div class="contact-icon">📞</div>
-              <div>
-                <strong>Téléphone :</strong><br>
-                01 88 61 44 96
-              </div>
-            </div>
-            <div class="contact-item">
-              <div class="contact-icon">⏰</div>
-              <div>
-                <strong>Horaires :</strong><br>
-                Lundi à samedi, de 11h00 à 20h30<br>
-                <em>(fermé le dimanche)</em>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 中文内容 -->
-    <div class="zh-only">
-      <div class="section">
-        <h2>🇨🇳 每一口都是亚洲风情</h2>
-        <div class="section-content">
-          <p>在 CUBE，我们的便当融合了正宗中式风味。米饭、炒面、热菜，现做现送。</p>
-        </div>
-      </div>
-
-      <div class="section">
-        <h2>⏱️ 预定简便，配送快捷</h2>
-        <div class="section-content">
-          <p>在线下单，厨房现做。巴黎 30 分钟送达。</p>
-        </div>
-      </div>
-
-      <div class="section">
-        <h2>🌿 健康、清爽、美味</h2>
-        <div class="section-content">
-          <p>低脂肪，多蔬菜，健康不失美味。</p>
-          
-          <div class="info-box">
-            📢 <strong>好消息！</strong> 即将上线 <strong>Uber Eats</strong> 和 <strong>PandaGo 熊猫外卖</strong><br>
-            现在可预定并前往门口自提窗口领取。
-          </div>
-        </div>
-      </div>
-
-      <div class="section">
-        <h2>📍 实用信息</h2>
-        <div class="section-content">
-          <div class="contact-info">
-            <div class="contact-item">
-              <div class="contact-icon">📍</div>
-              <div>
-                <strong>地址：</strong><br>
-                巴黎 9区 Rue Blanche 7号
-              </div>
-            </div>
-            <div class="contact-item">
-              <div class="contact-icon">📞</div>
-              <div>
-                <strong>电话：</strong><br>
-                01 88 61 44 96
-              </div>
-            </div>
-            <div class="contact-item">
-              <div class="contact-icon">⏰</div>
-              <div>
-                <strong>营业时间：</strong><br>
-                周一至周六 11:00 – 20:30<br>
-                <em>(周日休息)</em>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="download-section">
-      <a href="meun.pdf" download class="download-btn">📄 Télécharger le menu PDF / 下载菜单 PDF</a>
-    </div>
-
-    <!-- 菜单部分 -->
-    <div class="section">
-      <h2>🥗 Entrées / 前菜</h2>
-      <div class="section-content">
-        <div class="menu-table">
-          <div class="table-container">
-            <table>
-              <tr><th>Nom</th><th>Prix</th></tr>
-              <tr><td>Concombre mariné / 拍黄瓜</td><td>5,80 €</td></tr>
-              <tr><td>Radis aigre-doux / 酸甜萝卜</td><td>5,80 €</td></tr>
-              <tr><td>Pommes de terre râpées / 凉拌土豆丝</td><td>5,80 €</td></tr>
-              <tr><td>Algues marinées / 海带丝</td><td>5,80 €</td></tr>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="section">
-      <h2>🍛 Plats chauds / 热菜</h2>
-      <div class="section-content">
-        <div class="menu-table">
-          <div class="table-container">
-            <table>
-              <tr><th>Nom</th><th>Prix</th></tr>
-              <tr><td>Bœuf mijoté / 烧牛肉</td><td>8,80 €</td></tr>
-              <tr><td>Porc braisé / 红烧肉</td><td>8,80 €</td></tr>
-              <tr><td>Poulet aigre-doux / 糖醋鸡</td><td>8,80 €</td></tr>
-              <tr><td>Porc sauté croustillant / 溜肉段</td><td>8,80 €</td></tr>
-              <tr><td>Poulet frit / 炸鸡块</td><td>8,80 €</td></tr>
-              <tr><td>Porc frit croustillant / 小酥肉</td><td>8,80 €</td></tr>
-              <tr><td>Poulet Kung Pao / 宫保鸡丁</td><td>8,80 €</td></tr>
-              <tr><td>Aubergines braisées / 烧茄子</td><td>6,80 €</td></tr>
-              <tr><td>Haricots verts sautés / 干煸豆角</td><td>6,80 €</td></tr>
-              <tr><td>Œufs à la tomate / 番茄炒鸡蛋</td><td>6,80 €</td></tr>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="section">
-      <h2>🍚 Accompagnements / 主食</h2>
-      <div class="section-content">
-        <div class="menu-table">
-          <div class="table-container">
-            <table>
-              <tr><th>Nom</th><th>Prix</th></tr>
-              <tr><td>Riz nature / 米饭</td><td>2,50 €</td></tr>
-              <tr><td>Riz sauté / 炒饭</td><td>5,80 €</td></tr>
-              <tr><td>Nouilles sautées / 炒面</td><td>6,80 €</td></tr>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="section">
-      <h2>🥯 Snacks / 小吃</h2>
-      <div class="section-content">
-        <div class="menu-table">
-          <div class="table-container">
-            <table>
-              <tr><th>Nom</th><th>Prix</th></tr>
-              <tr>
-                <td>
-                  Roujiamo porc / 猪肉肉夹馍<br>
-                  <span class="note">Pain chinois croustillant garni</span>
-                </td>
-                <td>5,80 €</td>
-              </tr>
-              <tr>
-                <td>
-                  Roujiamo bœuf / 牛肉肉夹馍<br>
-                  <span class="note">Pain chinois croustillant garni</span>
-                </td>
-                <td>6,80 €</td>
-              </tr>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="section">
-      <h2>🥤 Boissons / 饮品</h2>
-      <div class="section-content">
-        <p style="text-align: center; font-size: 1.2rem; font-weight: bold; color: #4CAF50; margin-bottom: 20px;">
-          Toutes les boissons : <strong>2,00 €</strong>
-        </p>
-        <ul class="drinks-list">
-          <li>🥤 Coca-Cola / 可乐</li>
-          <li>🥤 Sprite / 雪碧</li>
-          <li>🥤 Fanta / 芬达</li>
-          <li>🍑 Thé à la pêche / 桃茶</li>
-          <li>🍊 Jus d'orange / 橙汁</li>
-          <li>💧 Eau minérale / 矿泉水</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="section">
-      <h2>🍱 Formules / 套餐</h2>
-      <div class="section-content">
-        <div class="formulas">
-          <div class="formula-card">
-            <div class="formula-title">Formule 1</div>
-            <div class="formula-price">11,80 €</div>
-            <div>
-              <strong>Français :</strong> Riz ou nouilles sautées (+1,00 €) + 1 entrée + 2 plats chauds<br>
-              <strong>中文 :</strong> 米饭 或 炒面（加1欧）+ 一个前菜 + 两个热菜<br>
-              <em style="color: #666;">Boisson en supplément : +1,00 € / 饮料另加1欧</em>
-            </div>
-          </div>
-          
-          <div class="formula-card">
-            <div class="formula-title">Formule 2</div>
-            <div class="formula-price">13,80 €</div>
-            <div>
-              <strong>Français :</strong> Riz ou nouilles sautées (+1,00 €) + 1 entrée + 3 plats chauds<br>
-              <strong>中文 :</strong> 米饭 或 炒面（加1欧）+ 一个前菜 + 三个热菜<br>
-              <em style="color: #666;">Boisson en supplément : +1,00 € / 饮料另加1欧</em>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- Footer / 页脚（双语） -->
-    <footer class="section site-footer">
-      <h2 class="fr-only">ℹ️ Informations & Mentions</h2>
-      <h2 class="zh-only">ℹ️ 网站信息与声明</h2>
-
-      <div class="section-content">
-        <div class="footer-grid">
-          <!-- 作者 / 更新 -->
-          <div class="footer-card">
-            <div class="footer-title fr-only">Auteur / Réalisation</div>
-            <div class="footer-title zh-only">作者 / 制作</div>
-
-            <div class="footer-text">
-              <span class="fr-only">ZHU Yulei</span>
-              <span class="zh-only">朱宇雷</span>
-            </div>
-
-            <div class="footer-meta">
-              <span class="fr-only">Dernière mise à jour : <strong>2026-01-26</strong></span>
-              <span class="zh-only">最近更新日期：<strong>2026-01-26</strong></span>
-            </div>
-          </div>
-
-          <!-- 团体订餐 -->
-          <div class="footer-card">
-            <div class="footer-title fr-only">Commande de groupe</div>
-            <div class="footer-title zh-only">团体订餐</div>
-
-            <div class="footer-text">
-              <span class="fr-only">
-                Téléphone : <strong>01 88 61 44 96</strong><br>
-                Email : <strong>cube.paris9@gmail.com</strong><br>
-                Merci de commander <strong>24h à l’avance</strong> (entreprises/événements).<br>
-                Facture : <strong>sur demande</strong>.
-              </span>
-
-              <span class="zh-only">
-                电话：<strong>01 88 61 44 96</strong><br>
-                邮箱：<strong>cube.paris9@gmail.com</strong><br>
-                团体/公司订餐建议<strong>提前24小时</strong>沟通确认。<br>
-                发票：<strong>如需可开</strong>（按要求提供信息）。
-              </span>
-            </div>
-          </div>
-
-          <!-- 过敏原 & 法律信息 -->
-          <div class="footer-card">
-            <div class="footer-title fr-only">Allergènes & informations légales</div>
-            <div class="footer-title zh-only">过敏原与法律信息</div>
-
-            <div class="footer-text">
-              <span class="fr-only">
-                Allergènes possibles : arachides, fruits à coque, sésame, soja, œufs, gluten, crustacés/poisson.<br>
-                En cas d’allergie sévère, appelez avant de commander.
-              </span>
-
-              <span class="zh-only">
-                可能含有过敏原：花生、坚果、芝麻、大豆、鸡蛋、麸质（面筋）、鱼类/甲壳类。<br>
-                严重过敏请下单前先电话确认。
-              </span>
-            </div>
-
-            <div class="footer-links">
-              <a href="politique-confidentialite.html" target="_blank" rel="noopener">
-                <span class="fr-only">Politique de confidentialité</span>
-                <span class="zh-only">隐私政策</span>
-              </a>
-            </div>
-
-            <div class="footer-meta">
-              <span class="fr-only">Ce site utilise uniquement le stockage local pour mémoriser la langue.</span>
-              <span class="zh-only">本网站仅使用本地存储（localStorage）记录语言偏好。</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </footer>
-  </div>
-</div>
-
-<script>
-  let currentSlide = 0;
-  let slideInterval;
-
-  function showSlide(index) {
-    const slider = document.querySelector('.offers-slider');
-    const dots = document.querySelectorAll('.dot');
-    
-    if (!slider) return;
-    
-    currentSlide = index;
-    
-    // 更新滑动位置
-    slider.style.transform = `translateX(-${currentSlide * 50}%)`;
-    
-    // 更新指示器
-    dots.forEach((dot, i) => {
-      dot.classList.toggle('active', i === currentSlide);
-    });
-  }
-
-  function nextSlide() {
-    currentSlide = (currentSlide + 1) % 2;
-    showSlide(currentSlide);
-  }
-
-  function startAutoSlide() {
-    slideInterval = setInterval(nextSlide, 4000); // 4秒自动切换
-  }
-
-  function stopAutoSlide() {
-    if (slideInterval) {
-      clearInterval(slideInterval);
-    }
-  }
-
-  function switchLanguage(lang) {
-    const frElems = document.querySelectorAll('.fr-only');
-    const zhElems = document.querySelectorAll('.zh-only');
-    
-    if (lang === 'fr') {
-      frElems.forEach(el => el.style.display = 'block');
-      zhElems.forEach(el => el.style.display = 'none');
-    } else {
-      frElems.forEach(el => el.style.display = 'none');
-      zhElems.forEach(el => el.style.display = 'block');
-    }
-    
-    // 保存语言偏好
-    localStorage.setItem('preferredLanguage', lang);
-  }
-
-  // 页面加载时恢复语言偏好
-  window.addEventListener('load', () => {
-    const savedLang = localStorage.getItem('preferredLanguage') || 'fr';
-    switchLanguage(savedLang);
-    
-    // 启动自动滑动
-    startAutoSlide();
-    
-    // 添加触摸/鼠标交互
-    const offersContainer = document.querySelector('.offers-container');
-    if (offersContainer) {
-      offersContainer.addEventListener('mouseenter', stopAutoSlide);
-      offersContainer.addEventListener('mouseleave', startAutoSlide);
-      
-      // 触摸滑动支持
-      let startX = 0;
-      let isDragging = false;
-      
-      offersContainer.addEventListener('touchstart', (e) => {
-        startX = e.touches[0].clientX;
-        isDragging = true;
-        stopAutoSlide();
-      });
-      
-      offersContainer.addEventListener('touchmove', (e) => {
-        if (!isDragging) return;
-        e.preventDefault();
-      });
-      
-      offersContainer.addEventListener('touchend', (e) => {
-        if (!isDragging) return;
-        
-        const endX = e.changedTouches[0].clientX;
-        const diff = startX - endX;
-        
-        if (Math.abs(diff) > 50) { // 滑动距离阈值
-          if (diff > 0) {
-            // 左滑，下一张
-            showSlide(1);
-          } else {
-            // 右滑，上一张
-            showSlide(0);
+  <script>
+    const pageData = {
+      fr: {
+        title: "🍱 Livraison de Boites Repas Chinoises",
+        vip: "🏵️ Chaque commande = 1 tampon ! Cumulez-en 9 et la 10e boite est offerte !",
+        offers: [
+          {
+            image: "Photo/xiaocai.jpg",
+            alt: "Accompagnement offert",
+            badge: "🏵️ Promotion du jour",
+            title: "Accompagnement offert !",
+            text: "Avec toute commande, choisissez un accompagnement gratuit : concombre marine, pommes de terre rapees, radis aigre-doux ou algues marinees."
+          },
+          {
+            image: "Photo/shuiguo.jpg",
+            alt: "Fruits offerts",
+            badge: "🍓 Offre speciale",
+            title: "Fruits frais offerts !",
+            text: "Fruits de saison offerts avec votre commande. Fraicheur et vitamines garanties."
           }
-        }
-        
-        isDragging = false;
-        setTimeout(startAutoSlide, 2000); // 2秒后恢复自动播放
-      });
-    }
-  });
+        ],
+        sections: [
+          {
+            title: "🇨🇳 Un voyage de saveurs a chaque repas",
+            body: "Chez CUBE, nos boites repas rendent hommage aux saveurs authentiques de la Chine. Riz, nouilles et plats chauds sont prepares avec soin, sur commande."
+          },
+          {
+            title: "⏱️ Commande simple, retrait rapide",
+            body: "Consultez le menu, choisissez vos plats et passez commande facilement. Le retrait sur place est deja disponible."
+          },
+          {
+            title: "🌶️ Sain, leger et savoureux",
+            body: "Nos recettes sont pensees pour offrir un repas complet, equilibre et gourmand.",
+            info: "Bonne nouvelle : Uber Eats et PandaGo arrivent bientot. La precommande et le retrait sur place sont deja possibles."
+          },
+          {
+            title: "📍 Infos pratiques",
+            contacts: [
+              { icon: "📍", title: "Adresse", text: "7 Rue Blanche, 75009 Paris" },
+              { icon: "📞", title: "Telephone", text: "01 88 61 44 96" },
+              { icon: "🕒", title: "Horaires", text: "Lundi a samedi, 11h00-20h30\nFerme le dimanche" }
+            ]
+          }
+        ],
+        download: "📥 Telecharger le menu PDF",
+        menu: {
+          tableHeadName: "Nom",
+          tableHeadPrice: "Prix",
+          drinksIntro: "Toutes les boissons : 2,00 EUR",
+          sections: [
+            {
+              title: "🥗 Entrees",
+              rows: [
+                ["Concombre marine", "5,80 EUR"],
+                ["Radis aigre-doux", "5,80 EUR"],
+                ["Pommes de terre rapees", "5,80 EUR"],
+                ["Algues marinees", "5,80 EUR"]
+              ]
+            },
+            {
+              title: "🍲 Plats chauds",
+              rows: [
+                ["Boeuf mijote", "8,80 EUR"],
+                ["Porc braise", "8,80 EUR"],
+                ["Poulet aigre-doux", "8,80 EUR"],
+                ["Porc saute croustillant", "8,80 EUR"],
+                ["Poulet frit", "8,80 EUR"],
+                ["Porc frit croustillant", "8,80 EUR"],
+                ["Poulet Kung Pao", "8,80 EUR"],
+                ["Aubergines braisees", "6,80 EUR"],
+                ["Haricots verts sautes", "6,80 EUR"],
+                ["Oeufs aux tomates", "6,80 EUR"]
+              ]
+            },
+            {
+              title: "🍚 Accompagnements",
+              rows: [
+                ["Riz nature", "2,50 EUR"],
+                ["Riz saute", "5,80 EUR"],
+                ["Nouilles sautees", "6,80 EUR"]
+              ]
+            },
+            {
+              title: "🥙 Snacks",
+              rows: [
+                ["Roujiamo porc", "5,80 EUR"],
+                ["Roujiamo boeuf", "6,80 EUR"]
+              ]
+            }
+          ],
+          drinksTitle: "🥤 Boissons",
+          drinks: ["Coca-Cola", "Sprite", "Fanta", "The a la peche", "Jus d'orange", "Eau minerale"],
+          formulasTitle: "🍱 Formules",
+          formulas: [
+            {
+              title: "Formule 1",
+              price: "11,80 EUR",
+              desc: "Riz ou nouilles sautees (+1,00 EUR), 1 entree, 2 plats chauds. Boisson en supplement : +1,00 EUR."
+            },
+            {
+              title: "Formule 2",
+              price: "13,80 EUR",
+              desc: "Riz ou nouilles sautees (+1,00 EUR), 1 entree, 3 plats chauds. Boisson en supplement : +1,00 EUR."
+            }
+          ]
+        },
+        footerTitle: "ℹ️ Informations & mentions",
+        footerCards: [
+          {
+            title: "Auteur / Realisation",
+            body: "ZHU Yulei",
+            meta: "Derniere mise a jour : 2026-01-26"
+          },
+          {
+            title: "Commande de groupe",
+            body: "Telephone : 01 88 61 44 96\nEmail : cube.paris9@gmail.com\nMerci de commander 24h a l'avance.\nFacture sur demande.",
+            meta: ""
+          },
+          {
+            title: "Allergenes & informations legales",
+            body: "Allergenes possibles : arachides, fruits a coque, sesame, soja, oeufs, gluten, crustaces et poisson.\nEn cas d'allergie severe, appelez avant de commander.",
+            meta: "Ce site utilise uniquement le stockage local pour memoriser la langue.",
+            linkLabel: "Politique de confidentialite"
+          }
+        ]
+      },
+      zh: {
+        title: "🍱 中式风味盒饭配送服务",
+        vip: "🏵️ 每次下单积 1 枚印章，集满 9 枚，第 10 份盒饭免费！",
+        offers: [
+          {
+            image: "Photo/xiaocai.jpg",
+            alt: "免费小菜",
+            badge: "🏵️ 今日优惠",
+            title: "免费赠送小菜！",
+            text: "每份订单可免费选 1 份小菜：拍黄瓜、凉拌土豆丝、酸甜萝卜或海带丝。"
+          },
+          {
+            image: "Photo/shuiguo.jpg",
+            alt: "免费水果",
+            badge: "🍓 今日特惠",
+            title: "新鲜水果免费送！",
+            text: "随订单赠送当季水果，清爽解腻，补充维生素。"
+          }
+        ],
+        sections: [
+          {
+            title: "🇨🇳 每一口都是中式风味",
+            body: "在 CUBE，我们的盒饭融合了地道中式风味。米饭、炒面和热菜都现点现做。"
+          },
+          {
+            title: "⏱️ 点餐简单，取餐方便",
+            body: "先浏览菜单，再轻松下单，到店后即可快速领取。"
+          },
+          {
+            title: "🌶️ 健康、清爽、好吃",
+            body: "搭配注重均衡，适合工作日午餐和日常简餐。",
+            info: "好消息：Uber Eats 和 PandaGo 即将上线。目前已经支持预订和到店自取。"
+          },
+          {
+            title: "📍 实用信息",
+            contacts: [
+              { icon: "📍", title: "地址", text: "巴黎 9 区 Rue Blanche 7 号" },
+              { icon: "📞", title: "电话", text: "01 88 61 44 96" },
+              { icon: "🕒", title: "营业时间", text: "周一到周六 11:00-20:30\n周日休息" }
+            ]
+          }
+        ],
+        download: "📥 下载菜单 PDF",
+        menu: {
+          tableHeadName: "名称",
+          tableHeadPrice: "价格",
+          drinksIntro: "全部饮品统一价格：2,00 EUR",
+          sections: [
+            {
+              title: "🥗 前菜",
+              rows: [
+                ["拍黄瓜", "5,80 EUR"],
+                ["酸甜萝卜", "5,80 EUR"],
+                ["凉拌土豆丝", "5,80 EUR"],
+                ["海带丝", "5,80 EUR"]
+              ]
+            },
+            {
+              title: "🍲 热菜",
+              rows: [
+                ["炖牛肉", "8,80 EUR"],
+                ["红烧肉", "8,80 EUR"],
+                ["糖醋鸡", "8,80 EUR"],
+                ["溜肉段", "8,80 EUR"],
+                ["炸鸡块", "8,80 EUR"],
+                ["小酥肉", "8,80 EUR"],
+                ["宫保鸡丁", "8,80 EUR"],
+                ["烧茄子", "6,80 EUR"],
+                ["干煸豆角", "6,80 EUR"],
+                ["番茄炒蛋", "6,80 EUR"]
+              ]
+            },
+            {
+              title: "🍚 主食",
+              rows: [
+                ["米饭", "2,50 EUR"],
+                ["炒饭", "5,80 EUR"],
+                ["炒面", "6,80 EUR"]
+              ]
+            },
+            {
+              title: "🥙 小吃",
+              rows: [
+                ["猪肉夹馍", "5,80 EUR"],
+                ["牛肉夹馍", "6,80 EUR"]
+              ]
+            }
+          ],
+          drinksTitle: "🥤 饮品",
+          drinks: ["可乐", "雪碧", "芬达", "桃茶", "橙汁", "矿泉水"],
+          formulasTitle: "🍱 套餐",
+          formulas: [
+            {
+              title: "套餐 1",
+              price: "11,80 EUR",
+              desc: "米饭或炒面（加 1,00 EUR），1 份前菜，2 份热菜。饮品另加 1,00 EUR。"
+            },
+            {
+              title: "套餐 2",
+              price: "13,80 EUR",
+              desc: "米饭或炒面（加 1,00 EUR），1 份前菜，3 份热菜。饮品另加 1,00 EUR。"
+            }
+          ]
+        },
+        footerTitle: "ℹ️ 网站信息与说明",
+        footerCards: [
+          {
+            title: "作者 / 制作",
+            body: "朱宇雷",
+            meta: "最近更新日期：2026-01-26"
+          },
+          {
+            title: "团体订餐",
+            body: "电话：01 88 61 44 96\n邮箱：cube.paris9@gmail.com\n团体或公司订餐建议提前 24 小时沟通。\n如需发票可提前说明。",
+            meta: ""
+          },
+          {
+            title: "过敏原与法律信息",
+            body: "可能含有花生、坚果、芝麻、大豆、鸡蛋、麸质、鱼类与甲壳类。\n如有严重过敏，请务必下单前电话确认。",
+            meta: "本网站仅使用 localStorage 记录语言偏好。",
+            linkLabel: "隐私政策"
+          }
+        ]
+      }
+    };
 
-  // 添加平滑滚动
-  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-      e.preventDefault();
-      const target = document.querySelector(this.getAttribute('href'));
-      if (target) {
-        target.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start'
+    let currentLang = "fr";
+    let currentSlide = 0;
+    let slideInterval;
+
+    function renderOffers() {
+      const slider = document.getElementById("offersSlider");
+      const offers = pageData[currentLang].offers;
+      slider.innerHTML = offers.map((offer) => `
+        <div class="offer-card">
+          <div class="offer-image">
+            <img src="${offer.image}" alt="${offer.alt}">
+          </div>
+          <div class="offer-content">
+            <div class="offer-badge">${offer.badge}</div>
+            <h3>${offer.title}</h3>
+            <p>${offer.text}</p>
+          </div>
+        </div>
+      `).join("");
+      showSlide(currentSlide);
+    }
+
+    function renderStorySections() {
+      const container = document.getElementById("storySections");
+      container.innerHTML = pageData[currentLang].sections.map((section) => `
+        <div class="section">
+          <h2>${section.title}</h2>
+          <div class="section-content">
+            ${section.body ? `<p>${section.body}</p>` : ""}
+            ${section.info ? `<div class="info-box">📙 <strong>${section.info}</strong></div>` : ""}
+            ${section.contacts ? `
+              <div class="contact-info">
+                ${section.contacts.map((contact) => `
+                  <div class="contact-item">
+                    <div class="contact-icon">${contact.icon}</div>
+                    <div><strong>${contact.title}</strong><br>${contact.text.replace(/\n/g, "<br>")}</div>
+                  </div>
+                `).join("")}
+              </div>
+            ` : ""}
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderMenu() {
+      const menu = pageData[currentLang].menu;
+      const container = document.getElementById("menuSections");
+
+      const standardSections = menu.sections.map((section) => `
+        <div class="section">
+          <h2>${section.title}</h2>
+          <div class="section-content">
+            <div class="menu-table">
+              <div class="table-container">
+                <table>
+                  <tr><th>${menu.tableHeadName}</th><th>${menu.tableHeadPrice}</th></tr>
+                  ${section.rows.map((row) => `<tr><td>${row[0]}</td><td>${row[1]}</td></tr>`).join("")}
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join("");
+
+      const drinksSection = `
+        <div class="section">
+          <h2>${menu.drinksTitle}</h2>
+          <div class="section-content">
+            <p style="text-align:center;font-size:1.2rem;font-weight:bold;color:#4CAF50;margin-bottom:20px;">
+              ${menu.drinksIntro}
+            </p>
+            <ul class="drinks-list">
+              ${menu.drinks.map((drink) => `<li>🥤 ${drink}</li>`).join("")}
+            </ul>
+          </div>
+        </div>
+      `;
+
+      const formulasSection = `
+        <div class="section">
+          <h2>${menu.formulasTitle}</h2>
+          <div class="section-content">
+            <div class="formulas">
+              ${menu.formulas.map((formula) => `
+                <div class="formula-card">
+                  <div class="formula-title">${formula.title}</div>
+                  <div class="formula-price">${formula.price}</div>
+                  <div>${formula.desc}</div>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        </div>
+      `;
+
+      container.innerHTML = standardSections + drinksSection + formulasSection;
+    }
+
+    function renderFooter() {
+      const data = pageData[currentLang];
+      document.getElementById("footerTitle").textContent = data.footerTitle;
+      document.getElementById("footerGrid").innerHTML = data.footerCards.map((card, index) => `
+        <div class="footer-card">
+          <div class="footer-title">${card.title}</div>
+          <div class="footer-text">${card.body.replace(/\n/g, "<br>")}</div>
+          ${card.linkLabel ? `
+            <div class="footer-links">
+              <a href="politique-confidentialite.html" target="_blank" rel="noopener">${card.linkLabel}</a>
+            </div>
+          ` : ""}
+          ${card.meta ? `<div class="footer-meta">${card.meta}</div>` : ""}
+        </div>
+      `).join("");
+    }
+
+    function showSlide(index) {
+      currentSlide = index;
+      const slider = document.getElementById("offersSlider");
+      const dots = document.querySelectorAll(".dot");
+      slider.style.transform = `translateX(-${currentSlide * 50}%)`;
+      dots.forEach((dot, i) => dot.classList.toggle("active", i === currentSlide));
+    }
+
+    function nextSlide() {
+      currentSlide = (currentSlide + 1) % 2;
+      showSlide(currentSlide);
+    }
+
+    function startAutoSlide() {
+      stopAutoSlide();
+      slideInterval = setInterval(nextSlide, 4000);
+    }
+
+    function stopAutoSlide() {
+      if (slideInterval) {
+        clearInterval(slideInterval);
+      }
+    }
+
+    function setLang(lang) {
+      currentLang = lang;
+      const data = pageData[lang];
+      document.documentElement.lang = lang;
+      document.title = lang === "zh" ? "CUBE 盒饭宣传页" : "Restaurant CUBE - Boites Repas & Menu";
+      document.getElementById("heroTitle").textContent = data.title;
+      document.getElementById("vipNotice").innerHTML = `${data.vip}<div><img src="vip.jpg" alt="VIP"></div>`;
+      document.getElementById("downloadBtn").textContent = data.download;
+      document.getElementById("lang-fr").classList.toggle("active", lang === "fr");
+      document.getElementById("lang-zh").classList.toggle("active", lang === "zh");
+
+      renderOffers();
+      renderStorySections();
+      renderMenu();
+      renderFooter();
+
+      localStorage.setItem("preferredLanguage", lang);
+    }
+
+    window.addEventListener("load", () => {
+      const savedLang = localStorage.getItem("preferredLanguage") || "fr";
+      setLang(savedLang);
+      startAutoSlide();
+
+      const offersContainer = document.querySelector(".offers-container");
+      if (offersContainer) {
+        offersContainer.addEventListener("mouseenter", stopAutoSlide);
+        offersContainer.addEventListener("mouseleave", startAutoSlide);
+
+        let startX = 0;
+        let dragging = false;
+
+        offersContainer.addEventListener("touchstart", (event) => {
+          startX = event.touches[0].clientX;
+          dragging = true;
+          stopAutoSlide();
+        });
+
+        offersContainer.addEventListener("touchend", (event) => {
+          if (!dragging) return;
+          const diff = startX - event.changedTouches[0].clientX;
+          if (Math.abs(diff) > 50) {
+            showSlide(diff > 0 ? 1 : 0);
+          }
+          dragging = false;
+          setTimeout(startAutoSlide, 2000);
         });
       }
     });
-  });
 
-  // 添加触摸反馈
-  document.addEventListener('touchstart', function() {}, { passive: true });
-</script>
-
+    document.addEventListener("touchstart", function () {}, { passive: true });
+  </script>
 </body>
 </html>
