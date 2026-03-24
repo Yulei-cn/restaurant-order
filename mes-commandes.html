@@ -249,7 +249,7 @@
     <div class="topbar-right">
       <button id="langZhBtn" class="secondary-btn lang-btn active" onclick="setLanguage('zh')">中文</button>
       <button id="langFrBtn" class="secondary-btn lang-btn" onclick="setLanguage('fr')">FR</button>
-      <div id="connectionStatus" class="status-badge disconnected">未连接</div>
+      <div id="connectionStatus" class="status-badge connected">手动模式</div>
     </div>
   </div>
 
@@ -274,7 +274,6 @@
   </div>
 
   <script>
-    const adminPassword = "88888888";
     const POLLING_MS = 60000;
     const INACTIVITY_MS = 5 * 60 * 1000;
 
@@ -283,7 +282,7 @@
         pageTitle: "订单面板",
         pageSubtitle: "店内和线上到店付款订单统一显示在这里。",
         connected: "自动刷新",
-        disconnected: "未连接",
+        disconnected: "手动模式",
         polling: "轮询模式",
         error: "连接错误",
         audioLabel: "声音提醒",
@@ -338,7 +337,7 @@
         pageTitle: "Panneau de commandes",
         pageSubtitle: "Les commandes internes et en retrait sont affichees ici.",
         connected: "Rafraichissement auto",
-        disconnected: "Deconnecte",
+        disconnected: "Mode manuel",
         polling: "Mode sondage",
         error: "Erreur reseau",
         audioLabel: "Alerte sonore",
@@ -400,6 +399,7 @@
     let isPollingPaused = false;
     let isAutoRefreshEnabled = false;
     let inactivityTimer = null;
+    let hasLoadedOrders = false;
 
     function t(key) {
       return translations[currentLang][key] || key;
@@ -424,7 +424,9 @@
     }
 
     function refreshConnectionBadge() {
-      if (isPollingPaused && isAutoRefreshEnabled) {
+      if (!isAutoRefreshEnabled) {
+        updateConnectionStatus("connected", t("disconnected"));
+      } else if (isPollingPaused && isAutoRefreshEnabled) {
         updateConnectionStatus("disconnected", t("polling"));
       } else if (isAutoRefreshEnabled && pollingInterval) {
         updateConnectionStatus("connected", t("polling"));
@@ -652,7 +654,15 @@
         if (!Array.isArray(orders)) {
           throw new Error(orders?.error || "Invalid response");
         }
+        const previousIds = new Set(lastOrderIds);
         lastOrderIds = new Set(orders.map((order) => order.id));
+        const newOrders = hasLoadedOrders
+          ? orders.filter((order) => !previousIds.has(order.id))
+          : [];
+        if (newOrders.length > 0) {
+          showNewOrderAlert();
+        }
+        hasLoadedOrders = true;
         renderOrders(orders);
       } catch (error) {
         console.error(t("orderLoadFailedLog"), error);
@@ -690,10 +700,34 @@
       }
     }
 
-    const input = prompt(translations.zh.enterPassword);
-    if (input !== adminPassword) {
-      alert(t("wrongPassword"));
-      window.location.href = "https://cube-paris.vercel.app/";
+    async function requireAdminAccess() {
+      const sessionRes = await fetch("/api/admin-session", { credentials: "same-origin" });
+      const sessionData = await sessionRes.json();
+
+      if (sessionData?.authenticated) {
+        return true;
+      }
+
+      const input = prompt(translations.zh.enterPassword);
+      if (!input) {
+        window.location.href = "https://cube-paris.vercel.app/";
+        return false;
+      }
+
+      const loginRes = await fetch("/api/admin-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({ password: input })
+      });
+
+      if (!loginRes.ok) {
+        alert(t("wrongPassword"));
+        window.location.href = "https://cube-paris.vercel.app/";
+        return false;
+      }
+
+      return true;
     }
 
     ["mousemove", "mousedown", "keydown", "touchstart", "scroll"].forEach((eventName) => {
@@ -711,10 +745,14 @@
       Notification.requestPermission();
     }
 
-    setLanguage("zh");
-    loadOrders();
-    resetInactivityTimer();
-    refreshConnectionBadge();
+    (async () => {
+      const allowed = await requireAdminAccess();
+      if (!allowed) return;
+      setLanguage("zh");
+      loadOrders();
+      resetInactivityTimer();
+      refreshConnectionBadge();
+    })();
   </script>
 </body>
 </html>

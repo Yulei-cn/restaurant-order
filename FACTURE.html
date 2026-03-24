@@ -252,15 +252,20 @@
 
     <script>
     // 默认密码，可以自己修改
-    const ADMIN_PASSWORD = '88888888';
-    
     let clients = {};
     let currentClient = null;
     let isLoggedIn = false;
 
-    function login() {
+    async function login() {
         const password = document.getElementById('passwordInput').value;
-        if (password === ADMIN_PASSWORD) {
+        const res = await fetch('/api/admin-login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ password })
+        });
+
+        if (res.ok) {
             isLoggedIn = true;
             document.getElementById('loginContainer').style.display = 'none';
             document.getElementById('appContent').style.display = 'block';
@@ -271,8 +276,12 @@
         }
     }
 
-    function logout() {
+    async function logout() {
         if (confirm('确定退出登录吗？')) {
+            await fetch('/api/admin-logout', {
+                method: 'POST',
+                credentials: 'same-origin'
+            });
             isLoggedIn = false;
             document.getElementById('loginContainer').style.display = 'block';
             document.getElementById('appContent').style.display = 'none';
@@ -281,12 +290,29 @@
     }
 
     // 回车登录
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', async function() {
         document.getElementById('passwordInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 login();
             }
         });
+
+        try {
+            const sessionRes = await fetch('/api/admin-session', {
+                credentials: 'same-origin'
+            });
+            const sessionData = await sessionRes.json();
+
+            if (sessionData?.authenticated) {
+                isLoggedIn = true;
+                document.getElementById('loginContainer').style.display = 'none';
+                document.getElementById('appContent').style.display = 'block';
+                document.getElementById('errorMsg').style.display = 'none';
+                initApp();
+            }
+        } catch (error) {
+            console.error('Admin session check failed', error);
+        }
     });
 
     function initApp() {
