@@ -162,7 +162,7 @@
           {
             title: "Auteur / Realisation",
             body: "ZHU Yulei",
-            meta: "Derniere mise a jour : 2026-01-26"
+            meta: "Derniere mise a jour : 2026-03-25"
           },
           {
             title: "Commande de groupe",
@@ -286,7 +286,7 @@
           {
             title: "作者 / 制作",
             body: "朱宇雷",
-            meta: "最近更新日期：2026-01-26"
+            meta: "最近更新日期：2026-03-25"
           },
           {
             title: "团体订餐",
@@ -352,6 +352,23 @@
       const menu = pageData[currentLang].menu;
       const container = document.getElementById("menuSections");
 
+      const formulasSection = `
+        <div class="section">
+          <h2>${menu.formulasTitle}</h2>
+          <div class="section-content">
+            <div class="formulas">
+              ${menu.formulas.map((formula) => `
+                <div class="formula-card">
+                  <div class="formula-title">${formula.title}</div>
+                  <div class="formula-price">${formula.price}</div>
+                  <div>${formula.desc}</div>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        </div>
+      `;
+
       const standardSections = menu.sections.map((section) => `
         <div class="section">
           <h2>${section.title}</h2>
@@ -382,24 +399,7 @@
         </div>
       `;
 
-      const formulasSection = `
-        <div class="section">
-          <h2>${menu.formulasTitle}</h2>
-          <div class="section-content">
-            <div class="formulas">
-              ${menu.formulas.map((formula) => `
-                <div class="formula-card">
-                  <div class="formula-title">${formula.title}</div>
-                  <div class="formula-price">${formula.price}</div>
-                  <div>${formula.desc}</div>
-                </div>
-              `).join("")}
-            </div>
-          </div>
-        </div>
-      `;
-
-      container.innerHTML = standardSections + drinksSection + formulasSection;
+      container.innerHTML = formulasSection + standardSections + drinksSection;
     }
 
     function renderFooter() {
