@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CUBE 订单面板</title>
+  <title>CUBE Order Panel</title>
   <link rel="icon" href="logo.png" type="image/png">
   <style>
     :root {
@@ -12,10 +12,7 @@
       --line: #d9e0ea;
       --text: #1e293b;
       --muted: #64748b;
-      --green: #0f9d58;
       --blue: #2563eb;
-      --orange: #ea580c;
-      --red: #dc2626;
     }
 
     * {
@@ -24,7 +21,7 @@
 
     body {
       margin: 0;
-      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      font-family: "Segoe UI", Tahoma, sans-serif;
       background: var(--bg);
       color: var(--text);
       padding: 24px;
@@ -223,29 +220,29 @@
 <body>
   <div class="topbar">
     <div class="title-block">
-      <h1>订单接收面板</h1>
-      <p>店内点单和外部点单将统一显示在这里</p>
+      <h1>Order Panel</h1>
+      <p>Internal and online pickup orders appear here.</p>
     </div>
-    <div id="connectionStatus" class="status-badge disconnected">未连接</div>
+    <div id="connectionStatus" class="status-badge disconnected">Disconnected</div>
   </div>
 
   <div class="audio-controls">
-    <strong>声音提醒</strong>
-    <button id="enableAudioBtn" class="primary-btn" onclick="enableAudio()">启用声音提醒</button>
-    <button id="testSoundBtn" class="secondary-btn" onclick="testSound()" disabled>测试提示音</button>
-    <span id="audioStatus" class="audio-status">尚未启用</span>
+    <strong>Audio</strong>
+    <button id="enableAudioBtn" class="primary-btn" onclick="enableAudio()">Enable alert sound</button>
+    <button id="testSoundBtn" class="secondary-btn" onclick="testSound()" disabled>Test sound</button>
+    <span id="audioStatus" class="audio-status">Disabled</span>
     <audio id="alertSound" preload="auto">
       <source src="新订单.mp3" type="audio/mpeg">
     </audio>
   </div>
 
   <div class="controls">
-    <button class="primary-btn" onclick="loadOrders()">刷新订单</button>
-    <button class="secondary-btn" onclick="toggleRealtime()">切换实时模式</button>
+    <button class="primary-btn" onclick="loadOrders()">Refresh orders</button>
+    <button class="secondary-btn" onclick="toggleRealtime()">Toggle realtime</button>
   </div>
 
   <div id="orders" class="orders-grid">
-    <div class="empty-state">加载中...</div>
+    <div class="empty-state">Loading...</div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -254,9 +251,9 @@
     const SUPABASE_URL = "https://jjkyltquurcuznukxakv.supabase.co";
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_KZezonRMvncSjXTgiSz-Kg_Ra2O4HhH";
 
-    const input = prompt("请输入管理员密码");
+    const input = prompt("Enter admin password");
     if (input !== adminPassword) {
-      alert("密码错误，即将离开页面");
+      alert("Wrong password");
       window.location.href = "https://cube-paris.vercel.app/";
     }
 
@@ -278,10 +275,10 @@
       try {
         supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
         isRealtimeMode = true;
-        updateConnectionStatus("connected", "实时连接中");
+        updateConnectionStatus("connected", "Realtime");
       } catch (error) {
-        console.warn("Supabase 初始化失败，改用轮询模式", error);
-        updateConnectionStatus("disconnected", "轮询模式");
+        console.warn("Supabase init failed, fallback to polling", error);
+        updateConnectionStatus("disconnected", "Polling");
       }
     }
 
@@ -307,11 +304,11 @@
           isAudioEnabled = true;
           document.getElementById("enableAudioBtn").style.display = "none";
           testBtn.disabled = false;
-          statusEl.textContent = "已启用";
+          statusEl.textContent = "Enabled";
         }).catch(() => {
           isAudioEnabled = true;
           testBtn.disabled = false;
-          statusEl.textContent = "已启用（Web Audio）";
+          statusEl.textContent = "Enabled (Web Audio)";
         });
       }
     }
@@ -334,7 +331,6 @@
 
     function playAlertSound() {
       if (!isAudioEnabled) return;
-
       const audio = document.getElementById("alertSound");
       audio.currentTime = 0;
       audio.play().catch(() => playWebAudioAlert());
@@ -348,38 +344,38 @@
       playAlertSound();
 
       if (document.visibilityState === "hidden" && "Notification" in window && Notification.permission === "granted") {
-        new Notification("收到新订单", {
-          body: "请查看订单面板",
+        new Notification("New order", {
+          body: "Check the order panel",
           icon: "logo.png"
         });
       }
     }
 
     function getSourceLabel(source) {
-      if (source === "internal") return "店内";
-      if (source === "online_paid") return "线上已支付";
-      return "线上到店付款";
+      if (source === "internal") return "Internal";
+      if (source === "online_paid") return "Online paid";
+      return "Pickup payment";
     }
 
     function getStatusLabel(status) {
       const labels = {
-        new: "新订单",
-        confirmed: "已确认",
-        preparing: "制作中",
-        ready: "可取餐",
-        completed: "已完成",
-        cancelled: "已取消"
+        new: "New",
+        confirmed: "Confirmed",
+        preparing: "Preparing",
+        ready: "Ready",
+        completed: "Completed",
+        cancelled: "Cancelled"
       };
       return labels[status] || status;
     }
 
     function getPaymentLabel(status) {
       const labels = {
-        unpaid: "未支付",
-        pay_on_pickup: "到店付款",
-        paid: "已支付",
-        failed: "支付失败",
-        refunded: "已退款"
+        unpaid: "Unpaid",
+        pay_on_pickup: "Pay on pickup",
+        paid: "Paid",
+        failed: "Failed",
+        refunded: "Refunded"
       };
       return labels[status] || status;
     }
@@ -394,13 +390,13 @@
 
         if (!res.ok) {
           const data = await res.json();
-          throw new Error(data.error || "状态更新失败");
+          throw new Error(data.error || "Status update failed");
         }
 
         loadOrders();
       } catch (error) {
-        console.error("订单状态更新失败", error);
-        alert("订单状态更新失败，请重试");
+        console.error("Order status update failed", error);
+        alert("Order status update failed");
       }
     }
 
@@ -409,7 +405,7 @@
       container.innerHTML = "";
 
       if (!orders.length) {
-        container.innerHTML = '<div class="empty-state">当前没有待处理订单</div>';
+        container.innerHTML = '<div class="empty-state">No active orders</div>';
         return;
       }
 
@@ -425,32 +421,32 @@
 
         const items = Array.isArray(order.items) ? order.items : [];
         const itemHtml = items.length
-          ? items.map((item) => `<li>${item.name} x${item.qty} - €${Number(item.total ?? item.price * item.qty).toFixed(2)}</li>`).join("")
-          : "<li>无商品</li>";
+          ? items.map((item) => `<li>${item.name} x${item.qty} - EUR ${Number(item.total ?? item.price * item.qty).toFixed(2)}</li>`).join("")
+          : "<li>No items</li>";
 
         div.innerHTML = `
           <div class="order-head">
             <div>
-              <div class="order-number">${order.order_number || "未生成订单号"}</div>
-              <div class="order-meta">${new Date(order.created_at).toLocaleString("zh-CN")}</div>
+              <div class="order-number">${order.order_number || "No number"}</div>
+              <div class="order-meta">${new Date(order.created_at).toLocaleString("fr-FR")}</div>
             </div>
-            <div class="order-extra">总价 €${Number(order.total_amount || 0).toFixed(2)}</div>
+            <div class="order-extra">Total EUR ${Number(order.total_amount || 0).toFixed(2)}</div>
           </div>
           <div class="pill-row">
             <span class="pill pill-source">${getSourceLabel(order.source)}</span>
             <span class="pill pill-payment">${getPaymentLabel(order.payment_status)}</span>
             <span class="pill pill-status">${getStatusLabel(order.order_status)}</span>
           </div>
-          <div class="order-extra">姓名：${order.customer_name || "未填写"}</div>
-          <div class="order-extra">电话：${order.customer_phone || "无"}</div>
-          <div class="order-extra">地址：${order.customer_address || "无"}</div>
-          <div class="order-extra">备注：${order.customer_notes || "无"}</div>
+          <div class="order-extra">Customer: ${order.customer_name || "-"}</div>
+          <div class="order-extra">Phone: ${order.customer_phone || "-"}</div>
+          <div class="order-extra">Address: ${order.customer_address || "-"}</div>
+          <div class="order-extra">Notes: ${order.customer_notes || "-"}</div>
           <ul class="item-list">${itemHtml}</ul>
           <div class="actions">
-            <button class="btn-confirm" onclick="updateOrderStatus('${order.id}', 'confirmed')">确认</button>
-            <button class="btn-preparing" onclick="updateOrderStatus('${order.id}', 'preparing')">制作中</button>
-            <button class="btn-ready" onclick="updateOrderStatus('${order.id}', 'ready')">可取餐</button>
-            <button class="btn-completed" onclick="updateOrderStatus('${order.id}', 'completed')">完成</button>
+            <button class="btn-confirm" onclick="updateOrderStatus('${order.id}', 'confirmed')">Confirm</button>
+            <button class="btn-preparing" onclick="updateOrderStatus('${order.id}', 'preparing')">Preparing</button>
+            <button class="btn-ready" onclick="updateOrderStatus('${order.id}', 'ready')">Ready</button>
+            <button class="btn-completed" onclick="updateOrderStatus('${order.id}', 'completed')">Complete</button>
           </div>
         `;
 
@@ -478,8 +474,8 @@
           renderOrders(orders);
         }
       } catch (error) {
-        console.error("检查订单变化失败", error);
-        updateConnectionStatus("disconnected", "连接错误");
+        console.error("Order polling failed", error);
+        updateConnectionStatus("disconnected", "Error");
       }
     }
 
@@ -490,8 +486,8 @@
         lastOrderIds = new Set(orders.map((order) => order.id));
         renderOrders(orders);
       } catch (error) {
-        console.error("加载订单失败", error);
-        document.getElementById("orders").innerHTML = '<div class="empty-state">加载订单失败，请检查网络或 API 配置</div>';
+        console.error("Order load failed", error);
+        document.getElementById("orders").innerHTML = '<div class="empty-state">Order loading failed</div>';
       }
     }
 
@@ -509,9 +505,9 @@
         })
         .subscribe((status) => {
           if (status === "SUBSCRIBED") {
-            updateConnectionStatus("connected", "实时模式");
+            updateConnectionStatus("connected", "Realtime");
           } else if (status === "CHANNEL_ERROR") {
-            updateConnectionStatus("disconnected", "轮询模式");
+            updateConnectionStatus("disconnected", "Polling");
             startPolling();
           }
         });
@@ -519,7 +515,7 @@
 
     function startPolling() {
       stopPolling();
-      updateConnectionStatus("connected", "轮询模式");
+      updateConnectionStatus("connected", "Polling");
       pollingInterval = setInterval(loadOrdersIfChanged, 3000);
     }
 
@@ -541,7 +537,7 @@
         isRealtimeMode = true;
         setupRealtimeSubscription();
       } else {
-        alert("Supabase 未初始化，无法启用实时模式");
+        alert("Supabase is not available");
       }
     }
 
