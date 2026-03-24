@@ -265,7 +265,7 @@
 
   <div class="controls">
     <button id="refreshBtn" class="primary-btn" onclick="loadOrders()">手动刷新</button>
-    <button id="toggleRealtimeBtn" class="secondary-btn" onclick="toggleRealtime()">切换实时</button>
+    <button id="toggleAutoBtn" class="secondary-btn" onclick="toggleAutoRefresh()">开启自动刷新</button>
     <span id="pollNote" class="poll-note">轮询每 60 秒一次，5 分钟无操作时暂停。</span>
   </div>
 
@@ -273,11 +273,8 @@
     <div id="loadingText" class="empty-state">加载中...</div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const adminPassword = "88888888";
-    const SUPABASE_URL = "https://jjkyltquurcuznukxakv.supabase.co";
-    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_KZezonRMvncSjXTgiSz-Kg_Ra2O4HhH";
     const POLLING_MS = 60000;
     const INACTIVITY_MS = 5 * 60 * 1000;
 
@@ -285,7 +282,7 @@
       zh: {
         pageTitle: "订单面板",
         pageSubtitle: "店内和线上到店付款订单统一显示在这里。",
-        connected: "实时连接",
+        connected: "自动刷新",
         disconnected: "未连接",
         polling: "轮询模式",
         error: "连接错误",
@@ -296,7 +293,8 @@
         audioEnabled: "已启用",
         audioEnabledWeb: "已启用（网页音频）",
         refreshBtn: "手动刷新",
-        toggleRealtimeBtn: "切换实时",
+        toggleAutoBtn: "开启自动刷新",
+        stopAutoBtn: "停止自动刷新",
         pollNote: "轮询每 60 秒一次，5 分钟无操作时暂停。",
         wrongPassword: "密码错误",
         enterPassword: "请输入管理员密码",
@@ -332,7 +330,6 @@
         ready: "可取餐",
         completed: "完成",
         statusUpdateFailed: "订单状态更新失败",
-        supabaseUnavailable: "Supabase 不可用",
         orderLoadFailedLog: "加载订单失败",
         orderPollingFailedLog: "轮询订单失败",
         orderStatusFailedLog: "更新订单状态失败"
@@ -340,7 +337,7 @@
       fr: {
         pageTitle: "Panneau de commandes",
         pageSubtitle: "Les commandes internes et en retrait sont affichees ici.",
-        connected: "Temps reel",
+        connected: "Rafraichissement auto",
         disconnected: "Deconnecte",
         polling: "Mode sondage",
         error: "Erreur reseau",
@@ -351,7 +348,8 @@
         audioEnabled: "Active",
         audioEnabledWeb: "Active (audio web)",
         refreshBtn: "Rafraichir",
-        toggleRealtimeBtn: "Basculer temps reel",
+        toggleAutoBtn: "Activer auto-refresh",
+        stopAutoBtn: "Arreter auto-refresh",
         pollNote: "Sondage toutes les 60 secondes, pause apres 5 minutes d'inactivite.",
         wrongPassword: "Mot de passe incorrect",
         enterPassword: "Entrez le mot de passe admin",
@@ -387,7 +385,6 @@
         ready: "Pret",
         completed: "Terminer",
         statusUpdateFailed: "Echec de mise a jour",
-        supabaseUnavailable: "Supabase indisponible",
         orderLoadFailedLog: "Echec du chargement",
         orderPollingFailedLog: "Echec du sondage",
         orderStatusFailedLog: "Echec de mise a jour"
@@ -395,15 +392,13 @@
     };
 
     let currentLang = "zh";
-    let supabaseClient = null;
-    let realtimeChannel = null;
-    let isRealtimeMode = false;
     let isAudioEnabled = false;
     let audioContext = null;
     let pollingInterval = null;
     let lastOrderIds = new Set();
     let lastOrders = [];
     let isPollingPaused = false;
+    let isAutoRefreshEnabled = false;
     let inactivityTimer = null;
 
     function t(key) {
@@ -419,7 +414,7 @@
       document.getElementById("enableAudioBtn").textContent = t("enableAudioBtn");
       document.getElementById("testSoundBtn").textContent = t("testSoundBtn");
       document.getElementById("refreshBtn").textContent = t("refreshBtn");
-      document.getElementById("toggleRealtimeBtn").textContent = t("toggleRealtimeBtn");
+      document.getElementById("toggleAutoBtn").textContent = isAutoRefreshEnabled ? t("stopAutoBtn") : t("toggleAutoBtn");
       document.getElementById("pollNote").textContent = t("pollNote");
       document.getElementById("langZhBtn").classList.toggle("active", lang === "zh");
       document.getElementById("langFrBtn").classList.toggle("active", lang === "fr");
@@ -429,11 +424,9 @@
     }
 
     function refreshConnectionBadge() {
-      if (isRealtimeMode && realtimeChannel) {
-        updateConnectionStatus("connected", t("connected"));
-      } else if (isPollingPaused) {
+      if (isPollingPaused && isAutoRefreshEnabled) {
         updateConnectionStatus("disconnected", t("polling"));
-      } else if (pollingInterval) {
+      } else if (isAutoRefreshEnabled && pollingInterval) {
         updateConnectionStatus("connected", t("polling"));
       } else {
         updateConnectionStatus("disconnected", t("disconnected"));
@@ -448,7 +441,7 @@
 
     function handleActivity() {
       isPollingPaused = false;
-      if (!isRealtimeMode && !pollingInterval) {
+      if (isAutoRefreshEnabled && !pollingInterval) {
         startPolling();
       }
       refreshConnectionBadge();
@@ -460,24 +453,12 @@
         clearTimeout(inactivityTimer);
       }
       inactivityTimer = setTimeout(() => {
-        if (!isRealtimeMode) {
+        if (isAutoRefreshEnabled) {
           isPollingPaused = true;
           stopPolling();
           refreshConnectionBadge();
         }
       }, INACTIVITY_MS);
-    }
-
-    function initRealtime() {
-      try {
-        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-        isRealtimeMode = true;
-        refreshConnectionBadge();
-      } catch (error) {
-        console.warn("Supabase init failed, fallback to polling", error);
-        isRealtimeMode = false;
-        refreshConnectionBadge();
-      }
     }
 
     function enableAudio() {
@@ -673,32 +654,9 @@
       }
     }
 
-    function setupRealtimeSubscription() {
-      if (!supabaseClient) return;
-
-      realtimeChannel = supabaseClient
-        .channel("orders-channel")
-        .on("postgres_changes", { event: "INSERT", schema: "public", table: "orders" }, () => {
-          showNewOrderAlert();
-          loadOrders();
-        })
-        .on("postgres_changes", { event: "UPDATE", schema: "public", table: "orders" }, () => {
-          loadOrders();
-        })
-        .subscribe((status) => {
-          if (status === "SUBSCRIBED") {
-            isRealtimeMode = true;
-            refreshConnectionBadge();
-          } else if (status === "CHANNEL_ERROR") {
-            isRealtimeMode = false;
-            startPolling();
-          }
-        });
-    }
-
     function startPolling() {
       stopPolling();
-      if (isPollingPaused) {
+      if (!isAutoRefreshEnabled || isPollingPaused) {
         refreshConnectionBadge();
         return;
       }
@@ -713,18 +671,16 @@
       }
     }
 
-    function toggleRealtime() {
-      if (isRealtimeMode && realtimeChannel) {
-        realtimeChannel.unsubscribe();
-        realtimeChannel = null;
-        isRealtimeMode = false;
-        startPolling();
-      } else if (supabaseClient) {
-        stopPolling();
+    function toggleAutoRefresh() {
+      isAutoRefreshEnabled = !isAutoRefreshEnabled;
+      document.getElementById("toggleAutoBtn").textContent = isAutoRefreshEnabled ? t("stopAutoBtn") : t("toggleAutoBtn");
+      if (isAutoRefreshEnabled) {
         isPollingPaused = false;
-        setupRealtimeSubscription();
+        resetInactivityTimer();
+        startPolling();
       } else {
-        alert(t("supabaseUnavailable"));
+        stopPolling();
+        refreshConnectionBadge();
       }
     }
 
@@ -749,16 +705,10 @@
       Notification.requestPermission();
     }
 
-    initRealtime();
     setLanguage("zh");
     loadOrders();
     resetInactivityTimer();
-
-    if (isRealtimeMode) {
-      setupRealtimeSubscription();
-    } else {
-      startPolling();
-    }
+    refreshConnectionBadge();
   </script>
 </body>
 </html>
