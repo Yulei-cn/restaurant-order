@@ -1,9 +1,13 @@
-// 速率限制：15分钟内最多5次下单
+import { getServiceHeaders, getSupabaseUrl, requireSupabaseConfig, roundMoney } from './_supabase.js';
+
 const rateLimitMap = new Map();
+const TAX_RATE = 0.1;
+
+const allowedPrices = new Set([2.0, 2.5, 5.8, 6.8, 8.8, 11.8, 13.8]);
 
 function checkRateLimit(ip) {
   const now = Date.now();
-  const windowMs = 15 * 60 * 1000; // 15分钟
+  const windowMs = 15 * 60 * 1000;
   const maxRequests = 5;
 
   if (!rateLimitMap.has(ip)) {
@@ -12,9 +16,7 @@ function checkRateLimit(ip) {
   }
 
   const record = rateLimitMap.get(ip);
-  
   if (now > record.resetTime) {
-    // 重置计数器
     record.count = 1;
     record.resetTime = now + windowMs;
     return true;
@@ -24,158 +26,179 @@ function checkRateLimit(ip) {
     return false;
   }
 
-  record.count++;
+  record.count += 1;
   return true;
 }
 
-// 安全日志记录
 function logSuspiciousActivity(ip, reason, data) {
-  const timestamp = new Date().toISOString();
-  console.error(`[SECURITY] ${timestamp} - IP: ${ip} - ${reason}`, data);
+  console.error(`[SECURITY] ${new Date().toISOString()} - IP: ${ip} - ${reason}`, data);
 }
 
-// 根据您的菜单创建价格表
-const menuPrices = {
-  "Concombre mariné / 拍黄瓜 - 5.80€": 5.80,
-  "Radis aigre-doux / 酸甜萝卜 - 5.80€": 5.80,
-  "Pommes de terre râpées / 凉拌土豆丝 - 5.80€": 5.80,
-  "Algues marinées / 海带丝 - 5.80€": 5.80,
-  "Bœuf mijoté / 烧牛肉 - 8.80€": 8.80,
-  "Porc braisé / 红烧肉 - 8.80€": 8.80,
-  "Poulet aigre-doux / 糖醋鸡 - 8.80€": 8.80,
-  "Porc sauté croustillant / 溜肉段 - 8.80€": 8.80,
-  "Poulet frit / 炸鸡块 - 8.80€": 8.80,
-  "Porc frit croustillant / 小酥肉 - 8.80€": 8.80,
-  "Poulet Kung Pao / 宫保鸡丁 - 8.80€": 8.80,
-  "Aubergines braisées / 烧茄子 - 6.80€": 6.80,
-  "Haricots verts sautés / 干煸豆角 - 6.80€": 6.80,
-  "Œufs aux tomates / 番茄炒鸡蛋 - 6.80€": 6.80,
-  "Riz nature / 米饭 - 2.50€": 2.50,
-  "Riz sauté / 炒饭 - 5.80€": 5.80,
-  "Nouilles sautées / 炒面 - 6.80€": 6.80,
-  "Roujiamo porc / 猪肉肉夹馍 - 5.80€": 5.80,
-  "Roujiamo bœuf / 牛肉肉夹馍 - 6.80€": 6.80,
-  "Coca-Cola / 可乐 - 2.00€": 2.00,
-  "Sprite / 雪碧 - 2.00€": 2.00,
-  "Fanta / 芬达 - 2.00€": 2.00,
-  "Thé à la pêche / 桃茶 - 2.00€": 2.00,
-  "Jus d'orange / 橙汁 - 2.00€": 2.00,
-  "Eau minérale / 矿泉水 - 2.00€": 2.00,
-  "Formule 1 — 米饭/炒面 + 前菜1 + 热菜2 + 饮品 - 11.80€": 11.80,
-  "Formule 2 — 米饭/炒面 + 前菜1 + 热菜3 + 饮品 - 13.80€": 13.80
-};
+function getClientIp(req) {
+  return req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || req.connection?.remoteAddress || 'unknown';
+}
+
+function getCategoryFromName(name) {
+  const lowerName = name.toLowerCase();
+  if (lowerName.includes('formule')) return 'formula';
+  if (lowerName.includes('coca') || lowerName.includes('sprite') || lowerName.includes('fanta') || lowerName.includes('jus') || lowerName.includes('eau') || lowerName.includes('thé')) return 'drink';
+  if (lowerName.includes('roujiamo')) return 'snack';
+  if (lowerName.includes('riz') || lowerName.includes('nouilles')) return 'side';
+  return 'dish';
+}
 
 export default async function handler(req, res) {
-  // 获取客户端IP
-  const clientIP = req.headers['x-forwarded-for'] || 
-                   req.headers['x-real-ip'] || 
-                   req.connection.remoteAddress || 
-                   'unknown';
-  
-  // 检查速率限制
-  if (!checkRateLimit(clientIP)) {
-    logSuspiciousActivity(clientIP, 'Rate limit exceeded', { 
-      attempts: rateLimitMap.get(clientIP)?.count 
-    });
-    return res.status(429).json({ 
-      error: "Trop de commandes. Veuillez patienter 15 minutes." 
-    });
-  }
-
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Méthode non autorisée" });
-  }
-
-  const { items, address, phone, notes, customer_name } = req.body;
-
-  // 验证客户姓名
-  if (!customer_name || customer_name.trim().length === 0) {
-    logSuspiciousActivity(clientIP, 'Empty customer name', { customer_name });
-    return res.status(400).json({ error: "Nom du client requis" });
-  }
-
-  if (customer_name.length > 50) {
-    logSuspiciousActivity(clientIP, 'Customer name too long', { 
-      length: customer_name.length 
-    });
-    return res.status(400).json({ error: "Nom trop long" });
-  }
-
-  // 验证订单
-  if (!Array.isArray(items) || items.length === 0) {
-    logSuspiciousActivity(clientIP, 'Empty order attempt', { items });
-    return res.status(400).json({ error: "Commande vide" });
-  }
-
-  // 重新计算价格防止篡改
-  let serverTotal = 0;
-  const validatedItems = [];
-
-  for (const item of items) {
-    const correctPrice = menuPrices[item.name];
-    
-    if (!correctPrice) {
-      logSuspiciousActivity(clientIP, 'Invalid product attempted', { 
-        productName: item.name 
-      });
-      return res.status(400).json({ error: `Produit invalide: ${item.name}` });
-    }
-
-    if (item.qty <= 0 || item.qty > 10) {
-      logSuspiciousActivity(clientIP, 'Invalid quantity attempted', { 
-        product: item.name, 
-        quantity: item.qty 
-      });
-      return res.status(400).json({ error: `Quantité invalide: ${item.qty}` });
-    }
-
-    // 使用服务端正确价格
-    validatedItems.push({
-      name: item.name,
-      qty: item.qty,
-      price: correctPrice
-    });
-
-    serverTotal += correctPrice * item.qty;
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Méthode non autorisée' });
   }
 
   try {
-    const supabaseRes = await fetch("https://fdbcypvxuikhmxvyyvmb.supabase.co/rest/v1/orders", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        apikey: process.env.SUPABASE_KEY,
-        Authorization: `Bearer ${process.env.SUPABASE_KEY}`,
-        Prefer: "return=minimal"
-      },
+    requireSupabaseConfig();
+  } catch {
+    return res.status(500).json({ error: 'Configuration Supabase manquante' });
+  }
+
+  const clientIP = getClientIp(req);
+  if (!checkRateLimit(clientIP)) {
+    logSuspiciousActivity(clientIP, 'Rate limit exceeded', { attempts: rateLimitMap.get(clientIP)?.count });
+    return res.status(429).json({ error: 'Trop de commandes. Veuillez patienter 15 minutes.' });
+  }
+
+  const {
+    items,
+    address,
+    phone,
+    notes,
+    customer_name,
+    source = 'online_pickup',
+    channel = 'web',
+    fulfillment_type = 'pickup',
+    payment_status
+  } = req.body || {};
+
+  if (!customer_name || !customer_name.trim()) {
+    logSuspiciousActivity(clientIP, 'Empty customer name', { customer_name });
+    return res.status(400).json({ error: 'Nom du client requis' });
+  }
+
+  if (customer_name.trim().length > 50) {
+    logSuspiciousActivity(clientIP, 'Customer name too long', { length: customer_name.trim().length });
+    return res.status(400).json({ error: 'Nom trop long' });
+  }
+
+  if (!Array.isArray(items) || items.length === 0) {
+    logSuspiciousActivity(clientIP, 'Empty order attempt', { items });
+    return res.status(400).json({ error: 'Commande vide' });
+  }
+
+  let totalAmount = 0;
+  const validatedItems = [];
+
+  for (const [index, item] of items.entries()) {
+    const itemName = String(item?.name || '').trim();
+    const quantity = Number(item?.qty);
+    const submittedPrice = roundMoney(Number(item?.price));
+
+    if (!itemName || itemName.length > 160) {
+      logSuspiciousActivity(clientIP, 'Invalid product attempted', { productName: itemName });
+      return res.status(400).json({ error: `Produit invalide: ${itemName}` });
+    }
+
+    if (!Number.isInteger(quantity) || quantity <= 0 || quantity > 10) {
+      logSuspiciousActivity(clientIP, 'Invalid quantity attempted', { product: itemName, quantity });
+      return res.status(400).json({ error: `Quantité invalide: ${quantity}` });
+    }
+
+    if (!allowedPrices.has(submittedPrice)) {
+      logSuspiciousActivity(clientIP, 'Invalid price attempted', { product: itemName, price: submittedPrice });
+      return res.status(400).json({ error: `Prix invalide: ${submittedPrice}` });
+    }
+
+    validatedItems.push({
+      sort_order: index,
+      item_name: itemName,
+      item_category: getCategoryFromName(itemName),
+      quantity,
+      unit_price: submittedPrice,
+      tax_rate: 10.0,
+      notes: item?.notes ? String(item.notes).trim() : null
+    });
+
+    totalAmount = roundMoney(totalAmount + submittedPrice * quantity);
+  }
+
+  const subtotalAmount = roundMoney(totalAmount / (1 + TAX_RATE));
+  const taxAmount = roundMoney(totalAmount - subtotalAmount);
+  const normalizedSource = ['internal', 'online_pickup', 'online_paid'].includes(source) ? source : 'online_pickup';
+  const normalizedChannel = ['staff', 'web', 'phone', 'walk_in'].includes(channel) ? channel : 'web';
+  const normalizedFulfillment = ['pickup', 'dine_in', 'delivery'].includes(fulfillment_type) ? fulfillment_type : 'pickup';
+  const normalizedPaymentStatus = payment_status || (normalizedSource === 'online_paid' ? 'paid' : 'pay_on_pickup');
+
+  try {
+    const orderRes = await fetch(getSupabaseUrl('/rest/v1/orders'), {
+      method: 'POST',
+      headers: getServiceHeaders({
+        'Content-Type': 'application/json',
+        Prefer: 'return=representation'
+      }),
       body: JSON.stringify({
-        status: "新订单",
-        items: validatedItems,
-        address: address ? address.trim() : null,
-        phone: phone ? phone.trim() : null,
-        notes: notes ? notes.trim() : null,
-        customer_name: customer_name.trim()
+        source: normalizedSource,
+        channel: normalizedChannel,
+        order_status: 'new',
+        payment_status: normalizedPaymentStatus,
+        customer_name: customer_name.trim(),
+        customer_phone: phone ? String(phone).trim() : null,
+        customer_address: address ? String(address).trim() : null,
+        customer_notes: notes ? String(notes).trim() : null,
+        fulfillment_type: normalizedFulfillment,
+        subtotal_amount: subtotalAmount,
+        tax_amount: taxAmount,
+        total_amount: totalAmount,
+        currency: 'EUR'
       })
     });
 
-    if (!supabaseRes.ok) {
-      const errorText = await supabaseRes.text();
-      console.error('Supabase error:', errorText);
-      throw new Error("Erreur Supabase");
+    if (!orderRes.ok) {
+      const errorText = await orderRes.text();
+      console.error('Supabase order insert error:', errorText);
+      throw new Error('Erreur lors de la création de la commande');
     }
 
-    // 记录成功的订单
-    console.log(`[ORDER] ${new Date().toISOString()} - IP: ${clientIP} - Order: €${serverTotal} - Customer: ${customer_name.trim()}`);
+    const [createdOrder] = await orderRes.json();
 
-    res.status(200).json({ 
-      status: "ok",
-      serverTotal: serverTotal 
+    const itemsRes = await fetch(getSupabaseUrl('/rest/v1/order_items'), {
+      method: 'POST',
+      headers: getServiceHeaders({
+        'Content-Type': 'application/json',
+        Prefer: 'return=minimal'
+      }),
+      body: JSON.stringify(
+        validatedItems.map((item) => ({
+          ...item,
+          order_id: createdOrder.id
+        }))
+      )
+    });
+
+    if (!itemsRes.ok) {
+      const errorText = await itemsRes.text();
+      console.error('Supabase order items insert error:', errorText);
+      throw new Error('Erreur lors de la création des articles');
+    }
+
+    console.log(
+      `[ORDER] ${new Date().toISOString()} - IP: ${clientIP} - Order: €${totalAmount} - Customer: ${customer_name.trim()} - Number: ${createdOrder.order_number}`
+    );
+
+    return res.status(200).json({
+      status: 'ok',
+      serverTotal: totalAmount,
+      orderId: createdOrder.id,
+      orderNumber: createdOrder.order_number
     });
   } catch (err) {
     console.error('Order processing error:', err);
-    logSuspiciousActivity(clientIP, 'Database error', { 
-      error: err.message 
-    });
-    res.status(500).json({ error: "Erreur serveur" });
+    logSuspiciousActivity(clientIP, 'Database error', { error: err.message });
+    return res.status(500).json({ error: 'Erreur serveur' });
   }
 }

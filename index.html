@@ -662,7 +662,11 @@ document.getElementById("orderForm").addEventListener("submit", async (e) => {
         items,
         address: document.getElementById("address").value.trim(),
         phone: document.getElementById("phone").value.trim(),
-        notes: document.getElementById("notes").value.trim()
+        notes: document.getElementById("notes").value.trim(),
+        source: "online_pickup",
+        channel: "web",
+        fulfillment_type: "pickup",
+        payment_status: "pay_on_pickup"
       })
     });
 
@@ -688,7 +692,10 @@ document.getElementById("orderForm").addEventListener("submit", async (e) => {
       updateTotal();
       updateCartSummary();
       
-      showResult("✅ " + (document.documentElement.lang === 'zh' ? '订单提交成功！' : 'Commande envoyée avec succès !'), 'success');
+      const successMessage = document.documentElement.lang === 'zh'
+        ? `订单提交成功${data.orderNumber ? `，订单号：${data.orderNumber}` : ''}！`
+        : `Commande envoyée avec succès${data.orderNumber ? `, numéro : ${data.orderNumber}` : ''} !`;
+      showResult("✅ " + successMessage, 'success');
     } else {
       showResult(`❌ ${data.error}`, 'error');
     }

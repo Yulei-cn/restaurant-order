@@ -3,520 +3,526 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CUBE 打印管理</title>
+  <title>CUBE 订单面板</title>
   <link rel="icon" href="logo.png" type="image/png">
   <style>
-    body {
-      font-family: sans-serif;
-      background-color: #f9f9f9;
-      padding: 20px;
-    }
-    h2 {
-      font-size: 22px;
-    }
-    .order {
-      border: 1px solid #ccc;
-      background: #fff;
-      padding: 12px 16px;
-      margin: 16px 0;
-      border-radius: 6px;
-      transition: all 0.3s ease;
-    }
-    .order.new-order {
-      animation: flashOrder 2s ease-in-out 3;
-      border-color: #ff4444;
-      box-shadow: 0 0 20px rgba(255, 68, 68, 0.3);
-    }
-    .order ul {
-      margin-top: 5px;
-      margin-bottom: 10px;
-    }
-    .order button {
-      margin-right: 10px;
-      margin-top: 6px;
-    }
-    
-    /* 屏幕闪烁效果 */
-    .screen-flash {
-      animation: screenFlash 0.5s ease-in-out 6;
-    }
-    
-    @keyframes flashOrder {
-      0%, 100% { background-color: #fff; }
-      50% { background-color: #ffe6e6; }
-    }
-    
-    @keyframes screenFlash {
-      0%, 100% { background-color: #f9f9f9; }
-      50% { background-color: #ffeeee; }
-    }
-    
-    /* 音频控制面板 */
-    .audio-controls {
-      background: #e8f4f8;
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      border: 1px solid #b3d9e6;
-    }
-    
-    .audio-status {
-      display: inline-block;
-      padding: 5px 10px;
-      border-radius: 4px;
-      font-size: 12px;
-      margin-left: 10px;
-    }
-    
-    .audio-enabled {
-      background: #d4edda;
-      color: #155724;
-    }
-    
-    .audio-disabled {
-      background: #f8d7da;
-      color: #721c24;
-    }
-    
-    /* 连接状态指示器 */
-    .connection-status {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      padding: 5px 10px;
-      border-radius: 4px;
-      font-size: 12px;
-      z-index: 1000;
-    }
-    
-    .connected {
-      background: #d4edda;
-      color: #155724;
-    }
-    
-    .disconnected {
-      background: #f8d7da;
-      color: #721c24;
-    }
-    
-    .manual-refresh {
-      background: #007bff;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-right: 10px;
-    }
-    
-    .manual-refresh:hover {
-      background: #0056b3;
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --line: #d9e0ea;
+      --text: #1e293b;
+      --muted: #64748b;
+      --green: #0f9d58;
+      --blue: #2563eb;
+      --orange: #ea580c;
+      --red: #dc2626;
     }
 
-    #enableAudioBtn {
-      padding: 24px 40px;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      font-size: 32px;
-      font-weight: bold;
-      margin: 0 10px;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    * {
+      box-sizing: border-box;
     }
-    
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 24px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .title-block h1 {
+      margin: 0 0 6px;
+      font-size: 28px;
+    }
+
+    .title-block p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .status-badge {
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .connected {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .disconnected {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .controls,
+    .audio-controls {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .primary-btn {
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .secondary-btn {
+      background: #e2e8f0;
+      color: var(--text);
+    }
+
+    .audio-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .audio-status {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .orders-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .order-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
+    }
+
+    .order-card.new-order {
+      border-color: #f87171;
+      box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.15);
+    }
+
+    .order-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .order-number {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .order-meta,
+    .order-extra {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .pill-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 8px 0 12px;
+    }
+
+    .pill {
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .pill-source {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    .pill-payment {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .pill-status {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .item-list {
+      margin: 12px 0;
+      padding-left: 18px;
+    }
+
+    .item-list li {
+      margin-bottom: 6px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .btn-confirm { background: #e0f2fe; color: #075985; }
+    .btn-preparing { background: #ede9fe; color: #5b21b6; }
+    .btn-ready { background: #ffedd5; color: #9a3412; }
+    .btn-completed { background: #dcfce7; color: #166534; }
+
+    .empty-state {
+      background: var(--card);
+      border: 1px dashed var(--line);
+      border-radius: 16px;
+      padding: 32px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    @media (max-width: 700px) {
+      body {
+        padding: 14px;
+      }
+
+      .order-number {
+        font-size: 18px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="connection-status" id="connectionStatus">🔴 未连接</div>
-  
-  <h2>📋 当前新订单</h2>
-
-  <!-- 音频控制面板 -->
-  <div class="audio-controls">
-    <strong>🔊 音频设置：</strong>
-    <button id="enableAudioBtn" onclick="enableAudio()" style="background: #28a745; color: white; font-weight: bold; animation: pulse 2s infinite;">🔔 点击启用声音提醒</button>
-    <button id="testSoundBtn" onclick="testSound()" disabled>🔔 测试音效</button>
-    <span id="audioStatus" class="audio-status audio-disabled">音频未激活</span>
+  <div class="topbar">
+    <div class="title-block">
+      <h1>订单接收面板</h1>
+      <p>店内点单和外部点单将统一显示在这里</p>
+    </div>
+    <div id="connectionStatus" class="status-badge disconnected">未连接</div>
   </div>
 
-  <!-- 音频元素 -->
-  <audio id="alertSound" preload="auto">
-    <source src="新订单.mp3" type="audio/mpeg">
-    <!-- 如果没有音频文件，我们用Web Audio API生成提示音 -->
-  </audio>
+  <div class="audio-controls">
+    <strong>声音提醒</strong>
+    <button id="enableAudioBtn" class="primary-btn" onclick="enableAudio()">启用声音提醒</button>
+    <button id="testSoundBtn" class="secondary-btn" onclick="testSound()" disabled>测试提示音</button>
+    <span id="audioStatus" class="audio-status">尚未启用</span>
+    <audio id="alertSound" preload="auto">
+      <source src="新订单.mp3" type="audio/mpeg">
+    </audio>
+  </div>
 
-  <div id="orders">加载中...</div>
-  <button class="manual-refresh" onclick="loadOrders()">🔄 手动刷新订单</button>
-  <button class="manual-refresh" onclick="toggleRealtime()">📡 切换实时模式</button>
+  <div class="controls">
+    <button class="primary-btn" onclick="loadOrders()">刷新订单</button>
+    <button class="secondary-btn" onclick="toggleRealtime()">切换实时模式</button>
+  </div>
+
+  <div id="orders" class="orders-grid">
+    <div class="empty-state">加载中...</div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const adminPassword = "88888888";
-    
-    // 验证密码
-    const input = prompt("请输入管理员密码：");
+    const SUPABASE_URL = "https://jjkyltquurcuznukxakv.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_KZezonRMvncSjXTgiSz-Kg_Ra2O4HhH";
+
+    const input = prompt("请输入管理员密码");
     if (input !== adminPassword) {
-      alert("密码错误！即将离开...");
-      window.location.href = "https://www.baidu.com";
+      alert("密码错误，即将离开页面");
+      window.location.href = "https://cube-paris.vercel.app/";
     }
 
-    // Supabase 配置
-    const SUPABASE_URL = 'https://fdbcypvxuikhmxvyyvmb.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkYmN5cHZ4dWlraG14dnl5dm1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjY5MzUsImV4cCI6MjA2MDg0MjkzNX0.Ju8wyqBS1irCWgtpBT_RanrqVErQt-gQkWdzb69XMr4';
-    
-    // 如果没有配置 Supabase，将使用轮询模式
     let supabase = null;
     let realtimeChannel = null;
     let isRealtimeMode = false;
     let isAudioEnabled = false;
     let audioContext = null;
-    
-    // 尝试初始化 Supabase
-    if (SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY') {
-      try {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        isRealtimeMode = true;
-        updateConnectionStatus('connected', '🟢 实时连接');
-      } catch (error) {
-        console.warn('Supabase 初始化失败，使用轮询模式:', error);
-        updateConnectionStatus('disconnected', '🔴 轮询模式');
-      }
-    } else {
-      updateConnectionStatus('disconnected', '🔴 轮询模式');
-    }
-
-    let lastOrderIds = new Set();
     let pollingInterval = null;
+    let lastOrderIds = new Set();
 
-    // 更新连接状态
     function updateConnectionStatus(status, text) {
-      const statusEl = document.getElementById('connectionStatus');
-      statusEl.className = `connection-status ${status}`;
+      const statusEl = document.getElementById("connectionStatus");
+      statusEl.className = `status-badge ${status}`;
       statusEl.textContent = text;
     }
 
-    // 启用音频功能
+    function initRealtime() {
+      try {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+        isRealtimeMode = true;
+        updateConnectionStatus("connected", "实时连接中");
+      } catch (error) {
+        console.warn("Supabase 初始化失败，改用轮询模式", error);
+        updateConnectionStatus("disconnected", "轮询模式");
+      }
+    }
+
     function enableAudio() {
-      const audio = document.getElementById('alertSound');
-      const enableBtn = document.getElementById('enableAudioBtn');
-      const testBtn = document.getElementById('testSoundBtn');
-      const statusEl = document.getElementById('audioStatus');
-      
-      // 创建 AudioContext（需要用户交互）
+      const audio = document.getElementById("alertSound");
+      const statusEl = document.getElementById("audioStatus");
+      const testBtn = document.getElementById("testSoundBtn");
+
       if (!audioContext) {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
       }
-      
-      // 尝试恢复 AudioContext
-      if (audioContext.state === 'suspended') {
+
+      if (audioContext.state === "suspended") {
         audioContext.resume();
       }
-      
-      // 设置最大音量
-      audio.volume = 1.0;
-      
+
+      audio.volume = 1;
       const playPromise = audio.play();
-      if (playPromise !== undefined) {
+      if (playPromise) {
         playPromise.then(() => {
-          // 成功播放，现在暂停
           audio.pause();
           audio.currentTime = 0;
-          
           isAudioEnabled = true;
-          enableBtn.style.display = 'none'; // 隐藏按钮
-          testBtn.style.display = 'inline-block'; // 显示测试按钮
+          document.getElementById("enableAudioBtn").style.display = "none";
           testBtn.disabled = false;
-          statusEl.className = 'audio-status audio-enabled';
-          statusEl.textContent = '✅ 声音提醒已启用';
-          
-          // 隐藏整个音频控制面板
-          document.querySelector('.audio-controls').style.background = '#d4edda';
-          document.querySelector('.audio-controls').style.border = '2px solid #28a745';
-          
-          console.log('音频已成功激活！');
-        }).catch(error => {
-          console.warn('音频文件播放失败，使用 Web Audio API:', error);
-          // 如果音频文件不存在，使用 Web Audio API 生成提示音
-          setupWebAudioFallback();
+          statusEl.textContent = "已启用";
+        }).catch(() => {
+          isAudioEnabled = true;
+          testBtn.disabled = false;
+          statusEl.textContent = "已启用（Web Audio）";
         });
       }
     }
 
-    // 使用 Web Audio API 生成提示音（备选方案）
-    function setupWebAudioFallback() {
-      if (audioContext) {
-        isAudioEnabled = true;
-        document.getElementById('enableAudioBtn').disabled = true;
-        document.getElementById('enableAudioBtn').textContent = '✅ 音频已启用';
-        document.getElementById('testSoundBtn').disabled = false;
-        document.getElementById('audioStatus').className = 'audio-status audio-enabled';
-        document.getElementById('audioStatus').textContent = '音频已激活（Web Audio）';
-        console.log('使用 Web Audio API 生成提示音');
-      }
-    }
-
-    // 播放提示音
-    function playAlertSound() {
-      if (!isAudioEnabled) return;
-      
-      const audio = document.getElementById('alertSound');
-      
-      // 强制使用 mp3 文件
-      audio.currentTime = 0;
-      audio.volume = 1.0;
-      
-      console.log('播放 mp3 文件:', audio.src);
-      
-      const playPromise = audio.play();
-      if (playPromise !== undefined) {
-        playPromise.then(() => {
-          console.log('mp3 播放成功');
-        }).catch(error => {
-          console.warn('mp3 播放失败:', error);
-          playWebAudioAlert();
-        });
-      } else {
-        playWebAudioAlert();
-      }
-    }
-
-    // 使用 Web Audio API 播放提示音
     function playWebAudioAlert() {
       if (!audioContext || !isAudioEnabled) return;
-      
-      try {
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-        oscillator.frequency.setValueAtTime(1000, audioContext.currentTime + 0.1);
-        oscillator.frequency.setValueAtTime(800, audioContext.currentTime + 0.2);
-        
-        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-        
-        oscillator.start(audioContext.currentTime);
-        oscillator.stop(audioContext.currentTime + 0.3);
-      } catch (error) {
-        console.warn('Web Audio API 播放失败:', error);
-      }
+
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+      oscillator.frequency.setValueAtTime(1000, audioContext.currentTime + 0.1);
+      oscillator.frequency.setValueAtTime(800, audioContext.currentTime + 0.2);
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.3);
     }
 
-    // 测试音效
+    function playAlertSound() {
+      if (!isAudioEnabled) return;
+
+      const audio = document.getElementById("alertSound");
+      audio.currentTime = 0;
+      audio.play().catch(() => playWebAudioAlert());
+    }
+
     function testSound() {
       playAlertSound();
-      // 同时测试屏幕闪烁
-      document.body.classList.add('screen-flash');
-      setTimeout(() => {
-        document.body.classList.remove('screen-flash');
-      }, 3000);
     }
 
-    // 屏幕闪烁效果
-    function flashScreen() {
-      document.body.classList.add('screen-flash');
-      setTimeout(() => {
-        document.body.classList.remove('screen-flash');
-      }, 3000);
-    }
-
-    // 新订单提醒
     function showNewOrderAlert() {
-      // 播放提示音
       playAlertSound();
-      
-      // 屏幕闪烁
-      flashScreen();
-      
-      // 如果页面不可见，尝试显示通知
-      if (document.visibilityState === 'hidden') {
-        if ('Notification' in window && Notification.permission === 'granted') {
-          new Notification('新订单提醒', {
-            body: '收到新的订单，请查看！',
-            icon: 'logo.png'
-          });
-        }
+
+      if (document.visibilityState === "hidden" && "Notification" in window && Notification.permission === "granted") {
+        new Notification("收到新订单", {
+          body: "请查看订单面板",
+          icon: "logo.png"
+        });
       }
     }
 
-    // Supabase 实时订阅
+    function getSourceLabel(source) {
+      if (source === "internal") return "店内";
+      if (source === "online_paid") return "线上已支付";
+      return "线上到店付款";
+    }
+
+    function getStatusLabel(status) {
+      const labels = {
+        new: "新订单",
+        confirmed: "已确认",
+        preparing: "制作中",
+        ready: "可取餐",
+        completed: "已完成",
+        cancelled: "已取消"
+      };
+      return labels[status] || status;
+    }
+
+    function getPaymentLabel(status) {
+      const labels = {
+        unpaid: "未支付",
+        pay_on_pickup: "到店付款",
+        paid: "已支付",
+        failed: "支付失败",
+        refunded: "已退款"
+      };
+      return labels[status] || status;
+    }
+
+    async function updateOrderStatus(id, orderStatus) {
+      try {
+        const res = await fetch("/api/mark-printed", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id, order_status: orderStatus })
+        });
+
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.error || "状态更新失败");
+        }
+
+        loadOrders();
+      } catch (error) {
+        console.error("订单状态更新失败", error);
+        alert("订单状态更新失败，请重试");
+      }
+    }
+
+    function renderOrders(orders) {
+      const container = document.getElementById("orders");
+      container.innerHTML = "";
+
+      if (!orders.length) {
+        container.innerHTML = '<div class="empty-state">当前没有待处理订单</div>';
+        return;
+      }
+
+      const thirtySecondsAgo = Date.now() - 30000;
+
+      orders.forEach((order) => {
+        const div = document.createElement("div");
+        div.className = "order-card";
+
+        if (new Date(order.created_at).getTime() > thirtySecondsAgo) {
+          div.classList.add("new-order");
+        }
+
+        const items = Array.isArray(order.items) ? order.items : [];
+        const itemHtml = items.length
+          ? items.map((item) => `<li>${item.name} x${item.qty} - €${Number(item.total ?? item.price * item.qty).toFixed(2)}</li>`).join("")
+          : "<li>无商品</li>";
+
+        div.innerHTML = `
+          <div class="order-head">
+            <div>
+              <div class="order-number">${order.order_number || "未生成订单号"}</div>
+              <div class="order-meta">${new Date(order.created_at).toLocaleString("zh-CN")}</div>
+            </div>
+            <div class="order-extra">总价 €${Number(order.total_amount || 0).toFixed(2)}</div>
+          </div>
+          <div class="pill-row">
+            <span class="pill pill-source">${getSourceLabel(order.source)}</span>
+            <span class="pill pill-payment">${getPaymentLabel(order.payment_status)}</span>
+            <span class="pill pill-status">${getStatusLabel(order.order_status)}</span>
+          </div>
+          <div class="order-extra">姓名：${order.customer_name || "未填写"}</div>
+          <div class="order-extra">电话：${order.customer_phone || "无"}</div>
+          <div class="order-extra">地址：${order.customer_address || "无"}</div>
+          <div class="order-extra">备注：${order.customer_notes || "无"}</div>
+          <ul class="item-list">${itemHtml}</ul>
+          <div class="actions">
+            <button class="btn-confirm" onclick="updateOrderStatus('${order.id}', 'confirmed')">确认</button>
+            <button class="btn-preparing" onclick="updateOrderStatus('${order.id}', 'preparing')">制作中</button>
+            <button class="btn-ready" onclick="updateOrderStatus('${order.id}', 'ready')">可取餐</button>
+            <button class="btn-completed" onclick="updateOrderStatus('${order.id}', 'completed')">完成</button>
+          </div>
+        `;
+
+        container.appendChild(div);
+      });
+    }
+
+    async function loadOrdersIfChanged() {
+      try {
+        const res = await fetch("/api/list-orders");
+        const orders = await res.json();
+        const currentIds = new Set(orders.map((order) => order.id));
+        const newOrders = [...currentIds].filter((id) => !lastOrderIds.has(id));
+
+        if (newOrders.length > 0) {
+          showNewOrderAlert();
+        }
+
+        const changed =
+          currentIds.size !== lastOrderIds.size ||
+          [...currentIds].some((id) => !lastOrderIds.has(id));
+
+        if (changed) {
+          lastOrderIds = currentIds;
+          renderOrders(orders);
+        }
+      } catch (error) {
+        console.error("检查订单变化失败", error);
+        updateConnectionStatus("disconnected", "连接错误");
+      }
+    }
+
+    async function loadOrders() {
+      try {
+        const res = await fetch("/api/list-orders");
+        const orders = await res.json();
+        lastOrderIds = new Set(orders.map((order) => order.id));
+        renderOrders(orders);
+      } catch (error) {
+        console.error("加载订单失败", error);
+        document.getElementById("orders").innerHTML = '<div class="empty-state">加载订单失败，请检查网络或 API 配置</div>';
+      }
+    }
+
     function setupRealtimeSubscription() {
       if (!supabase) return;
-      
-      // 订阅订单表的变化
+
       realtimeChannel = supabase
-        .channel('orders-channel')
-        .on('postgres_changes', 
-          { event: 'INSERT', schema: 'public', table: 'orders' }, 
-          (payload) => {
-            console.log('新订单:', payload);
-            showNewOrderAlert();
-            loadOrders();
-          })
-        .on('postgres_changes',
-          { event: 'UPDATE', schema: 'public', table: 'orders' },
-          (payload) => {
-            console.log('订单更新:', payload);
-            loadOrders();
-          })
-        .on('postgres_changes',
-          { event: 'DELETE', schema: 'public', table: 'orders' },
-          (payload) => {
-            console.log('订单删除:', payload);
-            loadOrders();
-          })
+        .channel("orders-channel")
+        .on("postgres_changes", { event: "INSERT", schema: "public", table: "orders" }, () => {
+          showNewOrderAlert();
+          loadOrders();
+        })
+        .on("postgres_changes", { event: "UPDATE", schema: "public", table: "orders" }, () => {
+          loadOrders();
+        })
         .subscribe((status) => {
-          if (status === 'SUBSCRIBED') {
-            updateConnectionStatus('connected', '🟢 实时连接');
-            console.log('Supabase 实时订阅成功');
-          } else if (status === 'CHANNEL_ERROR') {
-            updateConnectionStatus('disconnected', '🔴 连接错误');
-            console.error('Supabase 实时订阅失败');
-            // 回退到轮询模式
+          if (status === "SUBSCRIBED") {
+            updateConnectionStatus("connected", "实时模式");
+          } else if (status === "CHANNEL_ERROR") {
+            updateConnectionStatus("disconnected", "轮询模式");
             startPolling();
           }
         });
     }
 
-    // 轮询模式检查订单变化
-    async function loadOrdersIfChanged() {
-      try {
-        const res = await fetch("/api/list-orders");
-        const orders = await res.json();
-        const currentIds = new Set(orders.map(o => o.id));
-        
-        // 检查是否有新订单
-        const newOrders = [...currentIds].filter(id => !lastOrderIds.has(id));
-        if (newOrders.length > 0) {
-          showNewOrderAlert();
-        }
-        
-        const changed = currentIds.size !== lastOrderIds.size || 
-                       [...currentIds].some(id => !lastOrderIds.has(id));
-        
-        if (changed) {
-          lastOrderIds = currentIds;
-          loadOrders();
-        }
-      } catch (error) {
-        console.error('检查订单变化失败:', error);
-        updateConnectionStatus('disconnected', '🔴 连接错误');
-      }
-    }
-
-    // 加载订单
-    async function loadOrders() {
-      try {
-        const res = await fetch("/api/list-orders");
-        const orders = await res.json();
-        const container = document.getElementById("orders");
-        container.innerHTML = "";
-
-        // 识别新订单（最近30秒内的订单）
-        const thirtySecondsAgo = Date.now() - 30000;
-
-        orders.forEach(order => {
-          const div = document.createElement("div");
-          div.className = "order";
-          
-          // 如果是新订单，添加闪烁效果
-          const orderTime = new Date(order.created_at).getTime();
-          if (orderTime > thirtySecondsAgo) {
-            div.classList.add('new-order');
-          }
-
-          const items = order.items || [];
-          const main = items.length > 0 ? items[0] : null;
-          const sides = items.slice(1);
-
-          const mainText = main
-            ? `${main.name}（€${main.price.toFixed(2)}）`
-            : "无（€0.00）";
-
-          const sideHTML = sides.length
-            ? sides.map(i => `<li>• ${i.name} ×${i.qty}（€${(i.price * i.qty).toFixed(2)}）</li>`).join("")
-            : "<li>无</li>";
-
-          const total = items.reduce((sum, i) => sum + i.qty * i.price, 0);
-
-          div.innerHTML = `
-            🕒 <strong>下单时间：</strong> ${new Date(order.created_at).toLocaleString("zh-CN")}<br>
-            👤 <strong>姓名：</strong> ${order.customer_name || "未填写"}<br>
-            🍰 <strong>主食：</strong> ${mainText}<br>
-            🥗 <strong>配菜：</strong>
-            <ul>${sideHTML}</ul>
-            💳 <strong>总价：</strong> €${total.toFixed(2)}<br>
-            📝 <strong>备注：</strong> ${order.notes || "无"}<br>
-            📍 <strong>地址：</strong> ${order.address || "未填写"}<br>
-            📞 <strong>电话：</strong> ${order.phone || "无"}<br>
-            <small style="color:gray;">🆔 订单ID：${order.id}</small><br>
-            <button onclick="markPrinted('${order.id}')">✅ 标记为已打印</button>
-            <button onclick="autoPrint('${order.id}')">🖨️ 自动打印</button>
-          `;
-          container.appendChild(div);
-        });
-        
-        // 更新订单ID集合
-        lastOrderIds = new Set(orders.map(o => o.id));
-        
-      } catch (error) {
-        console.error('加载订单失败:', error);
-        document.getElementById("orders").innerHTML = '<div class="order">❌ 加载订单失败，请检查网络连接</div>';
-      }
-    }
-
-    // 标记订单为已打印
-    async function markPrinted(id) {
-      try {
-        await fetch("/api/mark-printed", {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id })
-        });
-        loadOrders();
-      } catch (error) {
-        console.error('标记打印失败:', error);
-        alert('❌ 标记失败，请重试');
-      }
-    }
-
-    // 自动打印
-    function autoPrint(orderId) {
-      fetch("https://localhost:5005/print", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: orderId })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.status === "success") {
-          alert("🖨️ 已自动打印！");
-        } else {
-          alert("❌ 打印失败：" + data.detail);
-        }
-      })
-      .catch(() => {
-        alert("❌ 打印请求失败，可能是打印服务未启动。");
-      });
-    }
-
-    // 开始轮询
     function startPolling() {
-      stopPolling(); // 先停止现有轮询
-      updateConnectionStatus('connected', '🟡 轮询模式 (3秒)');
-      pollingInterval = setInterval(loadOrdersIfChanged, 3000); // 3秒检查一次，更快响应
+      stopPolling();
+      updateConnectionStatus("connected", "轮询模式");
+      pollingInterval = setInterval(loadOrdersIfChanged, 3000);
     }
 
-    // 停止轮询
     function stopPolling() {
       if (pollingInterval) {
         clearInterval(pollingInterval);
@@ -524,62 +530,39 @@
       }
     }
 
-    // 切换实时模式
     function toggleRealtime() {
       if (isRealtimeMode && realtimeChannel) {
-        // 切换到轮询模式
         realtimeChannel.unsubscribe();
         realtimeChannel = null;
         isRealtimeMode = false;
         startPolling();
       } else if (supabase) {
-        // 切换到实时模式
         stopPolling();
         isRealtimeMode = true;
         setupRealtimeSubscription();
       } else {
-        alert('Supabase 未配置，无法使用实时模式');
+        alert("Supabase 未初始化，无法启用实时模式");
       }
     }
 
-    // 页面可见性变化处理
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") {
         loadOrders();
-        if (!isRealtimeMode) {
-          startPolling();
-        }
-      } else {
-        if (!isRealtimeMode) {
-          stopPolling();
-        }
       }
     });
 
-    // 请求通知权限
-    if ('Notification' in window && Notification.permission === 'default') {
+    if ("Notification" in window && Notification.permission === "default") {
       Notification.requestPermission();
     }
 
-    // 初始化
+    initRealtime();
     loadOrders();
-    
+
     if (isRealtimeMode) {
       setupRealtimeSubscription();
     } else {
       startPolling();
     }
-
-    // 页面加载完成后提示用户启用音频
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        if (!isAudioEnabled) {
-          const enableBtn = document.getElementById('enableAudioBtn');
-          enableBtn.style.animation = 'pulse 1s infinite';
-          enableBtn.style.backgroundColor = '#28a745';
-        }
-      }, 2000);
-    });
   </script>
 </body>
 </html>
