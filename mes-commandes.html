@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -46,6 +46,13 @@
       color: var(--muted);
     }
 
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
     .status-badge {
       padding: 8px 12px;
       border-radius: 999px;
@@ -76,6 +83,13 @@
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .poll-note {
+      color: var(--muted);
+      font-size: 13px;
+      margin-left: auto;
     }
 
     button {
@@ -95,6 +109,10 @@
     .secondary-btn {
       background: #e2e8f0;
       color: var(--text);
+    }
+
+    .lang-btn.active {
+      background: #cbd5e1;
     }
 
     .audio-controls {
@@ -214,35 +232,45 @@
       .order-number {
         font-size: 18px;
       }
+
+      .poll-note {
+        width: 100%;
+        margin-left: 0;
+      }
     }
   </style>
 </head>
 <body>
   <div class="topbar">
     <div class="title-block">
-      <h1>Order Panel</h1>
-      <p>Internal and online pickup orders appear here.</p>
+      <h1 id="pageTitle">订单面板</h1>
+      <p id="pageSubtitle">店内和线上到店付款订单统一显示在这里。</p>
     </div>
-    <div id="connectionStatus" class="status-badge disconnected">Disconnected</div>
+    <div class="topbar-right">
+      <button id="langZhBtn" class="secondary-btn lang-btn active" onclick="setLanguage('zh')">中文</button>
+      <button id="langFrBtn" class="secondary-btn lang-btn" onclick="setLanguage('fr')">FR</button>
+      <div id="connectionStatus" class="status-badge disconnected">未连接</div>
+    </div>
   </div>
 
   <div class="audio-controls">
-    <strong>Audio</strong>
-    <button id="enableAudioBtn" class="primary-btn" onclick="enableAudio()">Enable alert sound</button>
-    <button id="testSoundBtn" class="secondary-btn" onclick="testSound()" disabled>Test sound</button>
-    <span id="audioStatus" class="audio-status">Disabled</span>
+    <strong id="audioLabel">声音提醒</strong>
+    <button id="enableAudioBtn" class="primary-btn" onclick="enableAudio()">启用声音提醒</button>
+    <button id="testSoundBtn" class="secondary-btn" onclick="testSound()" disabled>测试声音</button>
+    <span id="audioStatus" class="audio-status">未启用</span>
     <audio id="alertSound" preload="auto">
       <source src="新订单.mp3" type="audio/mpeg">
     </audio>
   </div>
 
   <div class="controls">
-    <button class="primary-btn" onclick="loadOrders()">Refresh orders</button>
-    <button class="secondary-btn" onclick="toggleRealtime()">Toggle realtime</button>
+    <button id="refreshBtn" class="primary-btn" onclick="loadOrders()">手动刷新</button>
+    <button id="toggleRealtimeBtn" class="secondary-btn" onclick="toggleRealtime()">切换实时</button>
+    <span id="pollNote" class="poll-note">轮询每 60 秒一次，5 分钟无操作时暂停。</span>
   </div>
 
   <div id="orders" class="orders-grid">
-    <div class="empty-state">Loading...</div>
+    <div id="loadingText" class="empty-state">加载中...</div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -250,13 +278,123 @@
     const adminPassword = "88888888";
     const SUPABASE_URL = "https://jjkyltquurcuznukxakv.supabase.co";
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_KZezonRMvncSjXTgiSz-Kg_Ra2O4HhH";
+    const POLLING_MS = 60000;
+    const INACTIVITY_MS = 5 * 60 * 1000;
 
-    const input = prompt("Enter admin password");
-    if (input !== adminPassword) {
-      alert("Wrong password");
-      window.location.href = "https://cube-paris.vercel.app/";
-    }
+    const translations = {
+      zh: {
+        pageTitle: "订单面板",
+        pageSubtitle: "店内和线上到店付款订单统一显示在这里。",
+        connected: "实时连接",
+        disconnected: "未连接",
+        polling: "轮询模式",
+        error: "连接错误",
+        audioLabel: "声音提醒",
+        enableAudioBtn: "启用声音提醒",
+        testSoundBtn: "测试声音",
+        audioDisabled: "未启用",
+        audioEnabled: "已启用",
+        audioEnabledWeb: "已启用（网页音频）",
+        refreshBtn: "手动刷新",
+        toggleRealtimeBtn: "切换实时",
+        pollNote: "轮询每 60 秒一次，5 分钟无操作时暂停。",
+        wrongPassword: "密码错误",
+        enterPassword: "请输入管理员密码",
+        newOrderTitle: "收到新订单",
+        newOrderBody: "请查看订单面板",
+        source_internal: "店内",
+        source_online_paid: "线上已支付",
+        source_online_pickup: "线上到店付款",
+        status_new: "新订单",
+        status_confirmed: "已确认",
+        status_preparing: "制作中",
+        status_ready: "可取餐",
+        status_completed: "已完成",
+        status_cancelled: "已取消",
+        payment_unpaid: "未支付",
+        payment_pay_on_pickup: "到店付款",
+        payment_paid: "已支付",
+        payment_failed: "支付失败",
+        payment_refunded: "已退款",
+        noOrders: "当前没有待处理订单",
+        loading: "加载中...",
+        loadFailed: "加载订单失败",
+        noItems: "无商品",
+        noNumber: "未生成订单号",
+        total: "总价",
+        customer: "姓名",
+        phone: "电话",
+        address: "地址",
+        notes: "备注",
+        emptyValue: "-",
+        confirm: "确认",
+        preparing: "制作中",
+        ready: "可取餐",
+        completed: "完成",
+        statusUpdateFailed: "订单状态更新失败",
+        supabaseUnavailable: "Supabase 不可用",
+        orderLoadFailedLog: "加载订单失败",
+        orderPollingFailedLog: "轮询订单失败",
+        orderStatusFailedLog: "更新订单状态失败"
+      },
+      fr: {
+        pageTitle: "Panneau de commandes",
+        pageSubtitle: "Les commandes internes et en retrait sont affichees ici.",
+        connected: "Temps reel",
+        disconnected: "Deconnecte",
+        polling: "Mode sondage",
+        error: "Erreur reseau",
+        audioLabel: "Alerte sonore",
+        enableAudioBtn: "Activer le son",
+        testSoundBtn: "Tester le son",
+        audioDisabled: "Desactive",
+        audioEnabled: "Active",
+        audioEnabledWeb: "Active (audio web)",
+        refreshBtn: "Rafraichir",
+        toggleRealtimeBtn: "Basculer temps reel",
+        pollNote: "Sondage toutes les 60 secondes, pause apres 5 minutes d'inactivite.",
+        wrongPassword: "Mot de passe incorrect",
+        enterPassword: "Entrez le mot de passe admin",
+        newOrderTitle: "Nouvelle commande",
+        newOrderBody: "Verifiez le panneau",
+        source_internal: "Interne",
+        source_online_paid: "En ligne payee",
+        source_online_pickup: "Paiement sur place",
+        status_new: "Nouvelle",
+        status_confirmed: "Confirmee",
+        status_preparing: "Preparation",
+        status_ready: "Prete",
+        status_completed: "Terminee",
+        status_cancelled: "Annulee",
+        payment_unpaid: "Non payee",
+        payment_pay_on_pickup: "Paiement sur place",
+        payment_paid: "Payee",
+        payment_failed: "Paiement echoue",
+        payment_refunded: "Remboursee",
+        noOrders: "Aucune commande active",
+        loading: "Chargement...",
+        loadFailed: "Echec du chargement",
+        noItems: "Aucun article",
+        noNumber: "Sans numero",
+        total: "Total",
+        customer: "Client",
+        phone: "Telephone",
+        address: "Adresse",
+        notes: "Remarques",
+        emptyValue: "-",
+        confirm: "Confirmer",
+        preparing: "Preparation",
+        ready: "Pret",
+        completed: "Terminer",
+        statusUpdateFailed: "Echec de mise a jour",
+        supabaseUnavailable: "Supabase indisponible",
+        orderLoadFailedLog: "Echec du chargement",
+        orderPollingFailedLog: "Echec du sondage",
+        orderStatusFailedLog: "Echec de mise a jour"
+      }
+    };
 
+    let currentLang = "zh";
     let supabaseClient = null;
     let realtimeChannel = null;
     let isRealtimeMode = false;
@@ -264,6 +402,43 @@
     let audioContext = null;
     let pollingInterval = null;
     let lastOrderIds = new Set();
+    let lastOrders = [];
+    let isPollingPaused = false;
+    let inactivityTimer = null;
+
+    function t(key) {
+      return translations[currentLang][key] || key;
+    }
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      document.documentElement.lang = lang;
+      document.getElementById("pageTitle").textContent = t("pageTitle");
+      document.getElementById("pageSubtitle").textContent = t("pageSubtitle");
+      document.getElementById("audioLabel").textContent = t("audioLabel");
+      document.getElementById("enableAudioBtn").textContent = t("enableAudioBtn");
+      document.getElementById("testSoundBtn").textContent = t("testSoundBtn");
+      document.getElementById("refreshBtn").textContent = t("refreshBtn");
+      document.getElementById("toggleRealtimeBtn").textContent = t("toggleRealtimeBtn");
+      document.getElementById("pollNote").textContent = t("pollNote");
+      document.getElementById("langZhBtn").classList.toggle("active", lang === "zh");
+      document.getElementById("langFrBtn").classList.toggle("active", lang === "fr");
+      document.getElementById("audioStatus").textContent = isAudioEnabled ? t("audioEnabled") : t("audioDisabled");
+      renderOrders(lastOrders);
+      refreshConnectionBadge();
+    }
+
+    function refreshConnectionBadge() {
+      if (isRealtimeMode && realtimeChannel) {
+        updateConnectionStatus("connected", t("connected"));
+      } else if (isPollingPaused) {
+        updateConnectionStatus("disconnected", t("polling"));
+      } else if (pollingInterval) {
+        updateConnectionStatus("connected", t("polling"));
+      } else {
+        updateConnectionStatus("disconnected", t("disconnected"));
+      }
+    }
 
     function updateConnectionStatus(status, text) {
       const statusEl = document.getElementById("connectionStatus");
@@ -271,14 +446,37 @@
       statusEl.textContent = text;
     }
 
+    function handleActivity() {
+      isPollingPaused = false;
+      if (!isRealtimeMode && !pollingInterval) {
+        startPolling();
+      }
+      refreshConnectionBadge();
+      resetInactivityTimer();
+    }
+
+    function resetInactivityTimer() {
+      if (inactivityTimer) {
+        clearTimeout(inactivityTimer);
+      }
+      inactivityTimer = setTimeout(() => {
+        if (!isRealtimeMode) {
+          isPollingPaused = true;
+          stopPolling();
+          refreshConnectionBadge();
+        }
+      }, INACTIVITY_MS);
+    }
+
     function initRealtime() {
       try {
         supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
         isRealtimeMode = true;
-        updateConnectionStatus("connected", "Realtime");
+        refreshConnectionBadge();
       } catch (error) {
         console.warn("Supabase init failed, fallback to polling", error);
-        updateConnectionStatus("disconnected", "Polling");
+        isRealtimeMode = false;
+        refreshConnectionBadge();
       }
     }
 
@@ -304,18 +502,17 @@
           isAudioEnabled = true;
           document.getElementById("enableAudioBtn").style.display = "none";
           testBtn.disabled = false;
-          statusEl.textContent = "Enabled";
+          statusEl.textContent = t("audioEnabled");
         }).catch(() => {
           isAudioEnabled = true;
           testBtn.disabled = false;
-          statusEl.textContent = "Enabled (Web Audio)";
+          statusEl.textContent = t("audioEnabledWeb");
         });
       }
     }
 
     function playWebAudioAlert() {
       if (!audioContext || !isAudioEnabled) return;
-
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
       oscillator.connect(gainNode);
@@ -342,42 +539,26 @@
 
     function showNewOrderAlert() {
       playAlertSound();
-
       if (document.visibilityState === "hidden" && "Notification" in window && Notification.permission === "granted") {
-        new Notification("New order", {
-          body: "Check the order panel",
+        new Notification(t("newOrderTitle"), {
+          body: t("newOrderBody"),
           icon: "logo.png"
         });
       }
     }
 
     function getSourceLabel(source) {
-      if (source === "internal") return "Internal";
-      if (source === "online_paid") return "Online paid";
-      return "Pickup payment";
+      if (source === "internal") return t("source_internal");
+      if (source === "online_paid") return t("source_online_paid");
+      return t("source_online_pickup");
     }
 
     function getStatusLabel(status) {
-      const labels = {
-        new: "New",
-        confirmed: "Confirmed",
-        preparing: "Preparing",
-        ready: "Ready",
-        completed: "Completed",
-        cancelled: "Cancelled"
-      };
-      return labels[status] || status;
+      return t(`status_${status}`);
     }
 
     function getPaymentLabel(status) {
-      const labels = {
-        unpaid: "Unpaid",
-        pay_on_pickup: "Pay on pickup",
-        paid: "Paid",
-        failed: "Failed",
-        refunded: "Refunded"
-      };
-      return labels[status] || status;
+      return t(`payment_${status}`);
     }
 
     async function updateOrderStatus(id, orderStatus) {
@@ -390,28 +571,29 @@
 
         if (!res.ok) {
           const data = await res.json();
-          throw new Error(data.error || "Status update failed");
+          throw new Error(data.error || t("statusUpdateFailed"));
         }
 
         loadOrders();
       } catch (error) {
-        console.error("Order status update failed", error);
-        alert("Order status update failed");
+        console.error(t("orderStatusFailedLog"), error);
+        alert(t("statusUpdateFailed"));
       }
     }
 
     function renderOrders(orders) {
+      lastOrders = Array.isArray(orders) ? orders : [];
       const container = document.getElementById("orders");
       container.innerHTML = "";
 
-      if (!orders.length) {
-        container.innerHTML = '<div class="empty-state">No active orders</div>';
+      if (!lastOrders.length) {
+        container.innerHTML = `<div class="empty-state">${t("noOrders")}</div>`;
         return;
       }
 
       const thirtySecondsAgo = Date.now() - 30000;
 
-      orders.forEach((order) => {
+      lastOrders.forEach((order) => {
         const div = document.createElement("div");
         div.className = "order-card";
 
@@ -422,31 +604,31 @@
         const items = Array.isArray(order.items) ? order.items : [];
         const itemHtml = items.length
           ? items.map((item) => `<li>${item.name} x${item.qty} - EUR ${Number(item.total ?? item.price * item.qty).toFixed(2)}</li>`).join("")
-          : "<li>No items</li>";
+          : `<li>${t("noItems")}</li>`;
 
         div.innerHTML = `
           <div class="order-head">
             <div>
-              <div class="order-number">${order.order_number || "No number"}</div>
-              <div class="order-meta">${new Date(order.created_at).toLocaleString("fr-FR")}</div>
+              <div class="order-number">${order.order_number || t("noNumber")}</div>
+              <div class="order-meta">${new Date(order.created_at).toLocaleString(currentLang === "fr" ? "fr-FR" : "zh-CN")}</div>
             </div>
-            <div class="order-extra">Total EUR ${Number(order.total_amount || 0).toFixed(2)}</div>
+            <div class="order-extra">${t("total")} EUR ${Number(order.total_amount || 0).toFixed(2)}</div>
           </div>
           <div class="pill-row">
             <span class="pill pill-source">${getSourceLabel(order.source)}</span>
             <span class="pill pill-payment">${getPaymentLabel(order.payment_status)}</span>
             <span class="pill pill-status">${getStatusLabel(order.order_status)}</span>
           </div>
-          <div class="order-extra">Customer: ${order.customer_name || "-"}</div>
-          <div class="order-extra">Phone: ${order.customer_phone || "-"}</div>
-          <div class="order-extra">Address: ${order.customer_address || "-"}</div>
-          <div class="order-extra">Notes: ${order.customer_notes || "-"}</div>
+          <div class="order-extra">${t("customer")}: ${order.customer_name || t("emptyValue")}</div>
+          <div class="order-extra">${t("phone")}: ${order.customer_phone || t("emptyValue")}</div>
+          <div class="order-extra">${t("address")}: ${order.customer_address || t("emptyValue")}</div>
+          <div class="order-extra">${t("notes")}: ${order.customer_notes || t("emptyValue")}</div>
           <ul class="item-list">${itemHtml}</ul>
           <div class="actions">
-            <button class="btn-confirm" onclick="updateOrderStatus('${order.id}', 'confirmed')">Confirm</button>
-            <button class="btn-preparing" onclick="updateOrderStatus('${order.id}', 'preparing')">Preparing</button>
-            <button class="btn-ready" onclick="updateOrderStatus('${order.id}', 'ready')">Ready</button>
-            <button class="btn-completed" onclick="updateOrderStatus('${order.id}', 'completed')">Complete</button>
+            <button class="btn-confirm" onclick="updateOrderStatus('${order.id}', 'confirmed')">${t("confirm")}</button>
+            <button class="btn-preparing" onclick="updateOrderStatus('${order.id}', 'preparing')">${t("preparing")}</button>
+            <button class="btn-ready" onclick="updateOrderStatus('${order.id}', 'ready')">${t("ready")}</button>
+            <button class="btn-completed" onclick="updateOrderStatus('${order.id}', 'completed')">${t("completed")}</button>
           </div>
         `;
 
@@ -474,8 +656,8 @@
           renderOrders(orders);
         }
       } catch (error) {
-        console.error("Order polling failed", error);
-        updateConnectionStatus("disconnected", "Error");
+        console.error(t("orderPollingFailedLog"), error);
+        updateConnectionStatus("disconnected", t("error"));
       }
     }
 
@@ -486,8 +668,8 @@
         lastOrderIds = new Set(orders.map((order) => order.id));
         renderOrders(orders);
       } catch (error) {
-        console.error("Order load failed", error);
-        document.getElementById("orders").innerHTML = '<div class="empty-state">Order loading failed</div>';
+        console.error(t("orderLoadFailedLog"), error);
+        document.getElementById("orders").innerHTML = `<div class="empty-state">${t("loadFailed")}</div>`;
       }
     }
 
@@ -505,9 +687,10 @@
         })
         .subscribe((status) => {
           if (status === "SUBSCRIBED") {
-            updateConnectionStatus("connected", "Realtime");
+            isRealtimeMode = true;
+            refreshConnectionBadge();
           } else if (status === "CHANNEL_ERROR") {
-            updateConnectionStatus("disconnected", "Polling");
+            isRealtimeMode = false;
             startPolling();
           }
         });
@@ -515,8 +698,12 @@
 
     function startPolling() {
       stopPolling();
-      updateConnectionStatus("connected", "Polling");
-      pollingInterval = setInterval(loadOrdersIfChanged, 3000);
+      if (isPollingPaused) {
+        refreshConnectionBadge();
+        return;
+      }
+      pollingInterval = setInterval(loadOrdersIfChanged, POLLING_MS);
+      refreshConnectionBadge();
     }
 
     function stopPolling() {
@@ -534,15 +721,26 @@
         startPolling();
       } else if (supabaseClient) {
         stopPolling();
-        isRealtimeMode = true;
+        isPollingPaused = false;
         setupRealtimeSubscription();
       } else {
-        alert("Supabase is not available");
+        alert(t("supabaseUnavailable"));
       }
     }
 
+    const input = prompt(translations.zh.enterPassword);
+    if (input !== adminPassword) {
+      alert(t("wrongPassword"));
+      window.location.href = "https://cube-paris.vercel.app/";
+    }
+
+    ["mousemove", "mousedown", "keydown", "touchstart", "scroll"].forEach((eventName) => {
+      window.addEventListener(eventName, handleActivity, { passive: true });
+    });
+
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") {
+        handleActivity();
         loadOrders();
       }
     });
@@ -552,7 +750,9 @@
     }
 
     initRealtime();
+    setLanguage("zh");
     loadOrders();
+    resetInactivityTimer();
 
     if (isRealtimeMode) {
       setupRealtimeSubscription();

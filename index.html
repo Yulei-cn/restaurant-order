@@ -336,35 +336,207 @@
         border-radius: 15px;
       }
 
-      .menu-item {
-        flex-direction: column;
-        text-align: center;
-        gap: 15px;
+      .header {
+        padding: 22px 16px;
       }
 
-      .item-info {
-        margin-right: 0;
+      .info-box {
+        margin-top: 14px;
+        padding: 12px;
+        font-size: 0.95rem;
       }
 
       .lang-switch {
-        flex-direction: column;
-        align-items: center;
+        gap: 10px;
+        margin: 18px 16px;
+      }
+
+      .lang-switch button {
+        flex: 1 1 0;
+        min-height: 42px;
+        padding: 10px 12px;
+        font-size: 15px;
+      }
+
+      .content {
+        padding: 14px;
+      }
+
+      .category {
+        margin-bottom: 18px;
+        border-radius: 12px;
+      }
+
+      .category h2 {
+        padding: 12px 14px;
+        font-size: 1rem;
+        border-bottom-width: 2px;
+      }
+
+      .menu-grid {
+        gap: 8px;
+        padding: 10px;
+      }
+
+      .menu-item {
+        flex-direction: row;
+        text-align: left;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: 10px;
+      }
+
+      .item-info {
+        margin-right: 8px;
+        min-width: 0;
+      }
+
+      .item-name {
+        font-size: 0.9rem;
+        line-height: 1.25;
+        margin-bottom: 2px;
+      }
+
+      .item-price {
+        font-size: 0.95rem;
+      }
+
+      .item-controls {
+        gap: 6px;
       }
 
       .form-grid {
-        padding: 0 10px;
+        padding: 0;
+      }
+
+      .cart-summary {
+        padding: 14px 16px;
+        margin: 20px -14px -14px -14px;
+      }
+
+      .total-price {
+        font-size: 1.2rem;
+        margin-bottom: 12px;
+      }
+
+      .form-section {
+        padding: 20px 14px;
+        margin: 0 -14px;
+      }
+
+      .form-section h2 {
+        margin-bottom: 18px;
+        font-size: 1.15rem;
+      }
+
+      .form-grid {
+        gap: 14px;
+      }
+
+      .form-field input {
+        padding: 12px;
+      }
+
+      .submit-btn {
+        width: 100%;
+        padding: 14px 20px;
+        min-height: 50px;
+        font-size: 16px;
+      }
+
+      .map-section {
+        margin-top: 24px;
+        padding: 20px 8px 8px;
       }
     }
 
     @media (max-width: 480px) {
+      .container {
+        margin: 6px;
+        border-radius: 12px;
+      }
+
+      .header {
+        padding: 18px 12px;
+      }
+
+      .info-box {
+        padding: 10px;
+        font-size: 0.88rem;
+      }
+
+      .lang-switch {
+        margin: 14px 12px;
+      }
+
+      .content {
+        padding: 10px;
+      }
+
+      .category h2 {
+        padding: 10px 12px;
+        font-size: 0.95rem;
+      }
+
+      .menu-grid {
+        gap: 6px;
+        padding: 8px;
+      }
+
+      .menu-item {
+        padding: 8px 10px;
+        gap: 8px;
+      }
+
       .qty-button {
-        width: 36px;
-        height: 36px;
-        font-size: 16px;
+        width: 30px;
+        height: 30px;
+        min-width: 30px;
+        min-height: 30px;
+        font-size: 15px;
       }
 
       .item-controls {
-        gap: 10px;
+        gap: 4px;
+      }
+
+      .qty-display {
+        min-width: 28px;
+        padding: 4px 6px;
+        font-size: 13px;
+      }
+
+      .item-name {
+        font-size: 0.82rem;
+      }
+
+      .item-price {
+        font-size: 0.88rem;
+      }
+
+      .cart-summary {
+        padding: 12px 12px calc(12px + env(safe-area-inset-bottom));
+        margin: 16px -10px -10px -10px;
+      }
+
+      .total-price {
+        font-size: 1.05rem;
+        margin-bottom: 10px;
+      }
+
+      .form-section {
+        padding: 16px 10px;
+        margin: 0 -10px;
+      }
+
+      .form-field input {
+        padding: 10px 12px;
+        font-size: 15px;
+      }
+
+      .submit-btn {
+        padding: 12px 18px;
+        font-size: 15px;
       }
     }
 
