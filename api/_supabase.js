@@ -12,11 +12,17 @@ export function getSupabaseUrl(path) {
 }
 
 export function getServiceHeaders(extraHeaders = {}) {
-  return {
+  const headers = {
     apikey: SUPABASE_KEY,
-    Authorization: `Bearer ${SUPABASE_KEY}`,
     ...extraHeaders
   };
+
+  // New Supabase secret/publishable keys are not JWTs and should not be sent as Bearer tokens.
+  if (!SUPABASE_KEY?.startsWith('sb_')) {
+    headers.Authorization = `Bearer ${SUPABASE_KEY}`;
+  }
+
+  return headers;
 }
 
 export function roundMoney(value) {

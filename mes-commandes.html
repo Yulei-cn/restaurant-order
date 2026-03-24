@@ -621,6 +621,9 @@
       try {
         const res = await fetch("/api/list-orders");
         const orders = await res.json();
+        if (!Array.isArray(orders)) {
+          throw new Error(orders?.error || "Invalid response");
+        }
         const currentIds = new Set(orders.map((order) => order.id));
         const newOrders = [...currentIds].filter((id) => !lastOrderIds.has(id));
 
@@ -646,6 +649,9 @@
       try {
         const res = await fetch("/api/list-orders");
         const orders = await res.json();
+        if (!Array.isArray(orders)) {
+          throw new Error(orders?.error || "Invalid response");
+        }
         lastOrderIds = new Set(orders.map((order) => order.id));
         renderOrders(orders);
       } catch (error) {
