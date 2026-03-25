@@ -244,6 +244,16 @@
       box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
     }
 
+    .anti-bot-field {
+      position: absolute !important;
+      left: -9999px !important;
+      width: 1px !important;
+      height: 1px !important;
+      overflow: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+
     .submit-btn {
       background: linear-gradient(135deg, #4caf50, #45a049);
       border: none;
@@ -518,6 +528,13 @@
               <input type="text" name="notes" id="notes">
             </div>
 
+            <div class="anti-bot-field" aria-hidden="true">
+              <label for="website">Website</label>
+              <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+            </div>
+
+            <input type="hidden" id="form_started_at" name="form_started_at" value="">
+
             <button type="submit" class="submit-btn" id="submitBtn"></button>
           </div>
         </div>
@@ -688,6 +705,7 @@
     let currentLang = "fr";
     let cart = {};
     let lastPickupData = null;
+    let formStartedAt = Date.now();
 
     function t(key) {
       return i18n[currentLang][key];
@@ -845,6 +863,12 @@
       }
     }
 
+    function resetFormProtection() {
+      formStartedAt = Date.now();
+      document.getElementById("form_started_at").value = String(formStartedAt);
+      document.getElementById("website").value = "";
+    }
+
     document.getElementById("orderForm").addEventListener("submit", async (event) => {
       event.preventDefault();
 
@@ -885,6 +909,8 @@
             address: document.getElementById("address").value.trim(),
             phone: document.getElementById("phone").value.trim(),
             notes: document.getElementById("notes").value.trim(),
+            website: document.getElementById("website").value,
+            form_started_at: document.getElementById("form_started_at").value,
             source: "online_pickup",
             channel: "web",
             fulfillment_type: "pickup",
@@ -905,6 +931,7 @@
           renderCategories();
           updateTotal();
           updateCartSummary();
+          resetFormProtection();
           showPickupResult(data, clientTotal, customerName);
         } else {
           showResult(`❌ ${data.error}`, "error");
@@ -917,6 +944,7 @@
     });
 
     setLang("fr");
+    resetFormProtection();
     document.addEventListener("touchstart", function () {}, { passive: true });
   </script>
 </body>

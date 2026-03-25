@@ -2,8 +2,42 @@ import { getServiceHeaders, getSupabaseUrl, requireSupabaseConfig, roundMoney } 
 
 const rateLimitMap = new Map();
 const TAX_RATE = 0.1;
+const MIN_FORM_FILL_MS = 2500;
 
 const allowedPrices = new Set([2.0, 2.5, 5.8, 6.8, 8.8, 11.8, 13.8]);
+const allowedOriginHosts = new Set([
+  'cube-paris.vercel.app',
+  'www.cube-paris.vercel.app'
+]);
+const allowedMenuItems = new Map([
+  ['Concombre marine', 5.8],
+  ['Radis aigre-doux', 5.8],
+  ['Pommes de terre rapees', 5.8],
+  ['Algues marinees', 5.8],
+  ['Boeuf mijote', 8.8],
+  ['Porc braise', 8.8],
+  ['Poulet aigre-doux', 8.8],
+  ['Porc saute croustillant', 8.8],
+  ['Poulet frit', 8.8],
+  ['Porc frit croustillant', 8.8],
+  ['Poulet Kung Pao', 8.8],
+  ['Aubergines braisees', 6.8],
+  ['Haricots verts sautes', 6.8],
+  ['Oeufs aux tomates', 6.8],
+  ['Riz nature', 2.5],
+  ['Riz saute', 5.8],
+  ['Nouilles sautees', 6.8],
+  ['Roujiamo porc', 5.8],
+  ['Roujiamo boeuf', 6.8],
+  ['Coca-Cola', 2.0],
+  ['Sprite', 2.0],
+  ['Fanta', 2.0],
+  ['The a la peche', 2.0],
+  ["Jus d'orange", 2.0],
+  ['Eau minerale', 2.0],
+  ['Formule 1', 11.8],
+  ['Formule 2', 13.8]
+]);
 
 function checkRateLimit(ip) {
   const now = Date.now();
@@ -38,6 +72,23 @@ function getClientIp(req) {
   return req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || req.connection?.remoteAddress || 'unknown';
 }
 
+function isAllowedOrigin(req) {
+  const origin = req.headers.origin;
+  const referer = req.headers.referer;
+  const source = origin || referer;
+
+  if (!source) {
+    return false;
+  }
+
+  try {
+    const url = new URL(source);
+    return allowedOriginHosts.has(url.host);
+  } catch {
+    return false;
+  }
+}
+
 function getCategoryFromName(name) {
   const lowerName = name.toLowerCase();
   if (lowerName.includes('formule')) return 'formula';
@@ -70,11 +121,37 @@ export default async function handler(req, res) {
     phone,
     notes,
     customer_name,
+    website = '',
+    form_started_at,
     source = 'online_pickup',
     channel = 'web',
     fulfillment_type = 'pickup',
     payment_status
   } = req.body || {};
+
+  if (!isAllowedOrigin(req)) {
+    logSuspiciousActivity(clientIP, 'Blocked by origin check', {
+      origin: req.headers.origin,
+      referer: req.headers.referer
+    });
+    return res.status(403).json({ error: 'Origine non autorisee' });
+  }
+
+  if (typeof website === 'string' && website.trim() !== '') {
+    logSuspiciousActivity(clientIP, 'Honeypot field filled', { website });
+    return res.status(400).json({ error: 'Requete invalide' });
+  }
+
+  const startedAt = Number(form_started_at);
+  if (!Number.isFinite(startedAt) || startedAt <= 0) {
+    logSuspiciousActivity(clientIP, 'Missing form timestamp', { form_started_at });
+    return res.status(400).json({ error: 'Requete invalide' });
+  }
+
+  if (Date.now() - startedAt < MIN_FORM_FILL_MS) {
+    logSuspiciousActivity(clientIP, 'Submitted too quickly', { elapsedMs: Date.now() - startedAt });
+    return res.status(400).json({ error: 'Soumission trop rapide' });
+  }
 
   if (!customer_name || !customer_name.trim()) {
     logSuspiciousActivity(clientIP, 'Empty customer name', { customer_name });
@@ -112,6 +189,12 @@ export default async function handler(req, res) {
     if (!allowedPrices.has(submittedPrice)) {
       logSuspiciousActivity(clientIP, 'Invalid price attempted', { product: itemName, price: submittedPrice });
       return res.status(400).json({ error: `Prix invalide: ${submittedPrice}` });
+    }
+
+    const expectedPrice = allowedMenuItems.get(itemName);
+    if (expectedPrice === undefined || roundMoney(expectedPrice) !== submittedPrice) {
+      logSuspiciousActivity(clientIP, 'Invalid menu item attempted', { product: itemName, price: submittedPrice });
+      return res.status(400).json({ error: `Produit invalide: ${itemName}` });
     }
 
     validatedItems.push({
