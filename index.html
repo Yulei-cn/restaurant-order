@@ -374,6 +374,44 @@
       box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
     }
 
+    .legal-section {
+      margin-top: 24px;
+      padding: 22px 20px 10px;
+      text-align: left;
+    }
+
+    .legal-card {
+      background: #f8f9fa;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+    }
+
+    .legal-card h3 {
+      margin-bottom: 10px;
+      color: #166534;
+      font-size: clamp(1.05rem, 3vw, 1.25rem);
+    }
+
+    .legal-card p {
+      margin-bottom: 10px;
+      color: #475467;
+    }
+
+    .legal-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #16a34a, #15803d);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 700;
+      min-height: 46px;
+    }
+
     @media (max-width: 768px) {
       .container {
         margin: 10px;
@@ -555,6 +593,14 @@
           </iframe>
         </div>
       </div>
+
+      <div class="legal-section">
+        <div class="legal-card">
+          <h3 id="legalTitle"></h3>
+          <p id="legalBody"></p>
+          <a class="legal-link" id="legalLink" href="politique-confidentialite.html" target="_blank" rel="noopener"></a>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -570,6 +616,9 @@
         phoneLabel: "Telephone (optionnel)",
         notesLabel: "Remarques (optionnel)",
         mapTitle: "📍 Nous trouver",
+        legalTitle: "Informations legales",
+        legalBody: "CUBE, SAS au capital de 6 000,00 EUR, RCS Paris 928 586 973, siege social : 7 rue Blanche, 75009 Paris. Consultez les mentions legales et la politique de confidentialite pour les details sur l'editeur, les donnees traitees et vos droits.",
+        legalLink: "Mentions legales et confidentialite",
         submitReady: "✅ Commander",
         submitDisabled: "Selectionnez des articles",
         submitLoading: "Envoi en cours...",
@@ -598,6 +647,9 @@
         phoneLabel: "电话（可选）",
         notesLabel: "备注（可选）",
         mapTitle: "📍 我们的位置",
+        legalTitle: "法律与隐私信息",
+        legalBody: "CUBE 为法国简化股份公司（SAS），注册资本 6 000,00 欧元，Paris RCS 编号 928 586 973，注册地址 7 rue Blanche, 75009 Paris。请查看法律声明与隐私政策页面，了解网站主体、数据处理和您的权利。",
+        legalLink: "查看法律声明与隐私政策",
         submitReady: "✅ 提交订单",
         submitDisabled: "选择商品后提交",
         submitLoading: "提交中...",
@@ -777,6 +829,9 @@
       document.getElementById("labelPhone").textContent = t("phoneLabel");
       document.getElementById("labelNotes").textContent = t("notesLabel");
       document.getElementById("mapTitle").textContent = t("mapTitle");
+      document.getElementById("legalTitle").textContent = t("legalTitle");
+      document.getElementById("legalBody").textContent = t("legalBody");
+      document.getElementById("legalLink").textContent = t("legalLink");
       document.getElementById("lang-fr").classList.toggle("active", currentLang === "fr");
       document.getElementById("lang-zh").classList.toggle("active", currentLang === "zh");
     }
