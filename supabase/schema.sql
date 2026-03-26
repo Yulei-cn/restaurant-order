@@ -130,6 +130,15 @@ alter table public.orders
   add constraint fk_orders_invoice
   foreign key (invoice_id) references public.invoices(id) on delete set null;
 
+create table if not exists public.daily_counters (
+  counter_name text not null,
+  counter_date text not null,
+  last_value integer not null default 0,
+  created_at timestamptz not null default timezone('utc', now()),
+  updated_at timestamptz not null default timezone('utc', now()),
+  primary key (counter_name, counter_date)
+);
+
 drop trigger if exists trg_orders_updated_at on public.orders;
 create trigger trg_orders_updated_at
 before update on public.orders
@@ -148,6 +157,31 @@ before update on public.invoices
 for each row
 execute function public.set_updated_at();
 
+drop trigger if exists trg_daily_counters_updated_at on public.daily_counters;
+create trigger trg_daily_counters_updated_at
+before update on public.daily_counters
+for each row
+execute function public.set_updated_at();
+
+create or replace function public.next_daily_counter(counter_name_input text, counter_date_input text)
+returns integer
+language plpgsql
+as $$
+declare
+  next_value integer;
+begin
+  insert into public.daily_counters (counter_name, counter_date, last_value)
+  values (counter_name_input, counter_date_input, 1)
+  on conflict (counter_name, counter_date)
+  do update
+    set last_value = public.daily_counters.last_value + 1,
+        updated_at = timezone('utc', now())
+  returning last_value into next_value;
+
+  return next_value;
+end;
+$$;
+
 create or replace function public.generate_order_number()
 returns text
 language plpgsql
@@ -157,11 +191,7 @@ declare
   next_sequence integer;
 begin
   current_date_part := to_char(timezone('utc', now()), 'YYYYMMDD');
-
-  select coalesce(max(right(order_number, 3)::integer), 0) + 1
-  into next_sequence
-  from public.orders
-  where order_number like current_date_part || '-%';
+  next_sequence := public.next_daily_counter('order', current_date_part);
 
   return current_date_part || '-' || lpad(next_sequence::text, 3, '0');
 end;
@@ -194,11 +224,7 @@ declare
   next_sequence integer;
 begin
   current_date_part := to_char(timezone('utc', now()), 'YYYYMMDD');
-
-  select coalesce(max(right(invoice_number, 3)::integer), 0) + 1
-  into next_sequence
-  from public.invoices
-  where invoice_number like 'FAC-' || current_date_part || '-%';
+  next_sequence := public.next_daily_counter('invoice', current_date_part);
 
   return 'FAC-' || current_date_part || '-' || lpad(next_sequence::text, 3, '0');
 end;
@@ -221,6 +247,75 @@ create trigger trg_invoices_assign_number
 before insert on public.invoices
 for each row
 execute function public.assign_invoice_number();
+
+create or replace function public.create_order_with_items(order_payload jsonb, item_payloads jsonb)
+returns table (
+  id uuid,
+  order_number text,
+  total_amount numeric
+)
+language plpgsql
+as $$
+declare
+  created_order public.orders%rowtype;
+begin
+  insert into public.orders (
+    source,
+    channel,
+    order_status,
+    payment_status,
+    customer_name,
+    customer_phone,
+    customer_address,
+    customer_notes,
+    fulfillment_type,
+    subtotal_amount,
+    tax_amount,
+    total_amount,
+    currency
+  )
+  values (
+    coalesce(order_payload->>'source', 'online_pickup'),
+    coalesce(order_payload->>'channel', 'web'),
+    coalesce(order_payload->>'order_status', 'new'),
+    coalesce(order_payload->>'payment_status', 'pay_on_pickup'),
+    order_payload->>'customer_name',
+    nullif(order_payload->>'customer_phone', ''),
+    nullif(order_payload->>'customer_address', ''),
+    nullif(order_payload->>'customer_notes', ''),
+    coalesce(order_payload->>'fulfillment_type', 'pickup'),
+    coalesce((order_payload->>'subtotal_amount')::numeric, 0),
+    coalesce((order_payload->>'tax_amount')::numeric, 0),
+    coalesce((order_payload->>'total_amount')::numeric, 0),
+    coalesce(order_payload->>'currency', 'EUR')
+  )
+  returning * into created_order;
+
+  insert into public.order_items (
+    order_id,
+    sort_order,
+    item_name,
+    item_category,
+    quantity,
+    unit_price,
+    tax_rate,
+    notes
+  )
+  select
+    created_order.id,
+    coalesce((item->>'sort_order')::integer, 0),
+    item->>'item_name',
+    nullif(item->>'item_category', ''),
+    (item->>'quantity')::integer,
+    (item->>'unit_price')::numeric,
+    coalesce((item->>'tax_rate')::numeric, 10.00),
+    nullif(item->>'notes', '')
+  from jsonb_array_elements(item_payloads) as item;
+
+  return query
+  select created_order.id, created_order.order_number, created_order.total_amount;
+end;
+$$;
 
 create or replace view public.order_summary as
 select

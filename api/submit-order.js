@@ -92,7 +92,16 @@ function isAllowedOrigin(req) {
 function getCategoryFromName(name) {
   const lowerName = name.toLowerCase();
   if (lowerName.includes('formule')) return 'formula';
-  if (lowerName.includes('coca') || lowerName.includes('sprite') || lowerName.includes('fanta') || lowerName.includes('jus') || lowerName.includes('eau') || lowerName.includes('thé')) return 'drink';
+  if (
+    lowerName.includes('coca') ||
+    lowerName.includes('sprite') ||
+    lowerName.includes('fanta') ||
+    lowerName.includes('jus') ||
+    lowerName.includes('eau') ||
+    lowerName.includes('the')
+  ) {
+    return 'drink';
+  }
   if (lowerName.includes('roujiamo')) return 'snack';
   if (lowerName.includes('riz') || lowerName.includes('nouilles')) return 'side';
   return 'dish';
@@ -100,7 +109,7 @@ function getCategoryFromName(name) {
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Méthode non autorisée' });
+    return res.status(405).json({ error: 'Methode non autorisee' });
   }
 
   try {
@@ -183,7 +192,7 @@ export default async function handler(req, res) {
 
     if (!Number.isInteger(quantity) || quantity <= 0 || quantity > 10) {
       logSuspiciousActivity(clientIP, 'Invalid quantity attempted', { product: itemName, quantity });
-      return res.status(400).json({ error: `Quantité invalide: ${quantity}` });
+      return res.status(400).json({ error: `Quantite invalide: ${quantity}` });
     }
 
     if (!allowedPrices.has(submittedPrice)) {
@@ -218,59 +227,48 @@ export default async function handler(req, res) {
   const normalizedPaymentStatus = payment_status || (normalizedSource === 'online_paid' ? 'paid' : 'pay_on_pickup');
 
   try {
-    const orderRes = await fetch(getSupabaseUrl('/rest/v1/orders'), {
+    const orderRes = await fetch(getSupabaseUrl('/rest/v1/rpc/create_order_with_items'), {
       method: 'POST',
       headers: getServiceHeaders({
         'Content-Type': 'application/json',
         Prefer: 'return=representation'
       }),
       body: JSON.stringify({
-        source: normalizedSource,
-        channel: normalizedChannel,
-        order_status: 'new',
-        payment_status: normalizedPaymentStatus,
-        customer_name: customer_name.trim(),
-        customer_phone: phone ? String(phone).trim() : null,
-        customer_address: address ? String(address).trim() : null,
-        customer_notes: notes ? String(notes).trim() : null,
-        fulfillment_type: normalizedFulfillment,
-        subtotal_amount: subtotalAmount,
-        tax_amount: taxAmount,
-        total_amount: totalAmount,
-        currency: 'EUR'
+        order_payload: {
+          source: normalizedSource,
+          channel: normalizedChannel,
+          order_status: 'new',
+          payment_status: normalizedPaymentStatus,
+          customer_name: customer_name.trim(),
+          customer_phone: phone ? String(phone).trim() : null,
+          customer_address: address ? String(address).trim() : null,
+          customer_notes: notes ? String(notes).trim() : null,
+          fulfillment_type: normalizedFulfillment,
+          subtotal_amount: subtotalAmount,
+          tax_amount: taxAmount,
+          total_amount: totalAmount,
+          currency: 'EUR'
+        },
+        item_payloads: validatedItems
       })
     });
 
     if (!orderRes.ok) {
       const errorText = await orderRes.text();
-      console.error('Supabase order insert error:', errorText);
-      throw new Error('Erreur lors de la création de la commande');
+      console.error('Supabase create_order_with_items error:', errorText);
+      throw new Error('Erreur lors de la creation de la commande');
     }
 
-    const [createdOrder] = await orderRes.json();
+    const orderData = await orderRes.json();
+    const createdOrder = Array.isArray(orderData) ? orderData[0] : orderData;
 
-    const itemsRes = await fetch(getSupabaseUrl('/rest/v1/order_items'), {
-      method: 'POST',
-      headers: getServiceHeaders({
-        'Content-Type': 'application/json',
-        Prefer: 'return=minimal'
-      }),
-      body: JSON.stringify(
-        validatedItems.map((item) => ({
-          ...item,
-          order_id: createdOrder.id
-        }))
-      )
-    });
-
-    if (!itemsRes.ok) {
-      const errorText = await itemsRes.text();
-      console.error('Supabase order items insert error:', errorText);
-      throw new Error('Erreur lors de la création des articles');
+    if (!createdOrder?.id || !createdOrder?.order_number) {
+      console.error('Unexpected create_order_with_items response:', orderData);
+      throw new Error('Reponse serveur invalide');
     }
 
     console.log(
-      `[ORDER] ${new Date().toISOString()} - IP: ${clientIP} - Order: €${totalAmount} - Customer: ${customer_name.trim()} - Number: ${createdOrder.order_number}`
+      `[ORDER] ${new Date().toISOString()} - IP: ${clientIP} - Order: EUR ${totalAmount} - Customer: ${customer_name.trim()} - Number: ${createdOrder.order_number}`
     );
 
     return res.status(200).json({

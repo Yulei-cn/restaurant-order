@@ -410,6 +410,8 @@
     let pollingInterval = null;
     let lastOrderIds = new Set();
     let lastOrders = [];
+    let lastOrdersSnapshot = "[]";
+    let lastSyncedAt = "";
     let isPollingPaused = false;
     let isAutoRefreshEnabled = false;
     let inactivityTimer = null;
@@ -593,6 +595,12 @@
 
     function renderOrders(orders) {
       lastOrders = Array.isArray(orders) ? orders : [];
+      lastOrdersSnapshot = JSON.stringify(lastOrders);
+      lastOrderIds = new Set(lastOrders.map((order) => order.id));
+      lastSyncedAt = lastOrders.reduce((latest, order) => {
+        const updatedAt = String(order?.updated_at || order?.created_at || "");
+        return updatedAt > latest ? updatedAt : latest;
+      }, lastSyncedAt);
       const container = document.getElementById("orders");
       container.innerHTML = "";
 
@@ -646,30 +654,56 @@
       });
     }
 
+    function mergeIncrementalOrders(changes) {
+      const activeStatuses = new Set(["new", "confirmed", "preparing", "ready"]);
+      const ordersMap = new Map(lastOrders.map((order) => [order.id, order]));
+
+      changes.forEach((order) => {
+        const updatedAt = String(order?.updated_at || order?.created_at || "");
+        if (updatedAt > lastSyncedAt) {
+          lastSyncedAt = updatedAt;
+        }
+
+        if (activeStatuses.has(order.order_status)) {
+          ordersMap.set(order.id, order);
+        } else {
+          ordersMap.delete(order.id);
+        }
+      });
+
+      return Array.from(ordersMap.values()).sort((a, b) => {
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      });
+    }
+
     async function loadOrdersIfChanged() {
       try {
-        const res = await fetch("/api/list-orders", { credentials: "same-origin" });
+        const url = lastSyncedAt
+          ? `/api/list-orders?since=${encodeURIComponent(lastSyncedAt)}`
+          : "/api/list-orders";
+        const res = await fetch(url, { credentials: "same-origin" });
         if (res.status === 401) {
           window.location.href = "admin.html?next=mes-commandes.html";
           return;
         }
-        const orders = await res.json();
-        if (!Array.isArray(orders)) {
-          throw new Error(orders?.error || "Invalid response");
+        const changes = await res.json();
+        if (!Array.isArray(changes)) {
+          throw new Error(changes?.error || "Invalid response");
         }
-        const currentIds = new Set(orders.map((order) => order.id));
-        const newOrders = [...currentIds].filter((id) => !lastOrderIds.has(id));
+        if (!changes.length) {
+          return;
+        }
+        const newOrders = changes.filter((order) => !lastOrderIds.has(order.id));
 
         if (newOrders.length > 0) {
           showNewOrderAlert();
         }
 
-        const changed =
-          currentIds.size !== lastOrderIds.size ||
-          [...currentIds].some((id) => !lastOrderIds.has(id));
+        const orders = mergeIncrementalOrders(changes);
+        const nextSnapshot = JSON.stringify(orders);
+        const changed = nextSnapshot !== lastOrdersSnapshot;
 
         if (changed) {
-          lastOrderIds = currentIds;
           renderOrders(orders);
         }
       } catch (error) {
@@ -690,7 +724,6 @@
           throw new Error(orders?.error || "Invalid response");
         }
         const previousIds = new Set(lastOrderIds);
-        lastOrderIds = new Set(orders.map((order) => order.id));
         const newOrders = hasLoadedOrders
           ? orders.filter((order) => !previousIds.has(order.id))
           : [];
@@ -756,6 +789,12 @@
     });
 
     document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") {
+        stopPolling();
+        refreshConnectionBadge();
+        return;
+      }
+
       if (document.visibilityState === "visible") {
         handleActivity();
         loadOrders();

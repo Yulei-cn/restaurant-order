@@ -17,11 +17,22 @@ export default async function handler(req, res) {
     return;
   }
 
-  const query = [
-    'select=id,order_number,source,channel,order_status,payment_status,customer_name,customer_phone,customer_address,customer_notes,total_amount,created_at,items',
-    'order=created_at.desc',
-    'order_status=in.(new,confirmed,preparing,ready)'
-  ].join('&');
+  const since = typeof req.query?.since === 'string' ? req.query.since.trim() : '';
+  const selectFields = 'select=id,order_number,source,channel,order_status,payment_status,customer_name,customer_phone,customer_address,customer_notes,total_amount,created_at,updated_at,items';
+  const activeStatuses = 'order_status=in.(new,confirmed,preparing,ready)';
+  const query = since
+    ? [
+        selectFields,
+        `updated_at=gt.${encodeURIComponent(since)}`,
+        'order=updated_at.desc',
+        'limit=100'
+      ].join('&')
+    : [
+        selectFields,
+        'order=created_at.desc',
+        activeStatuses,
+        'limit=50'
+      ].join('&');
 
   const supabaseRes = await fetch(getSupabaseUrl(`/rest/v1/order_summary?${query}`), {
     headers: getServiceHeaders()
