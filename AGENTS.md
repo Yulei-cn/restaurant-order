@@ -24,8 +24,13 @@ Current implementation snapshot:
 
 - `admin.html` is the backend gateway for `mes-commandes.html` and `FACTURE.html`.
 - `api/list-orders.js` and `api/mark-printed.js` are now protected by server-side admin session checks.
+- `api/submit-order.js` now creates orders through the database RPC `create_order_with_items`, so order creation and item creation succeed or fail together.
+- `supabase/schema.sql` now includes `daily_counters`, `next_daily_counter`, and `create_order_with_items`; order and invoice numbering no longer rely on `max(...)+1`.
 - `index.html` and `box-meals.html` now use true single-language rendering: French view is fully French, Chinese view is fully Chinese.
 - `index.html` submission success shows the pickup number (`orderNumber`), total, time, and pickup instructions.
+- `mes-commandes.html` polling now stops when the tab is hidden, pauses after inactivity, and uses incremental refresh based on `updated_at`; `api/list-orders.js` also limits the active-order response size.
+- `api/payment-webhook.js` and `api/webhook-verify.js` are intentionally disabled until phase 3 and must not be treated as an active payment flow.
+- `politique-confidentialite.html` is currently the public legal/privacy page, and public pages now expose company/legal identity information based on the current Kbis details.
 
 ## Deployment & Development Workflow
 This project is intentionally operated in the cloud. It does not aim to expose a full local server workflow or a complete self-explanatory deployment recipe. Treat Vercel and Supabase as the operational environment.
@@ -35,8 +40,11 @@ Useful repo commands:
 - `rg --files`: list project files quickly.
 - `rg "admin-session|list-orders|mark-printed" api mes-commandes.html`: trace the cashier loop.
 - `rg "setLang|pickupLabel|pickupTitle" index.html box-meals.html`: trace public-page language and pickup UX.
+- `rg "create_order_with_items|daily_counters|next_daily_counter" supabase api`: trace the transactional order-creation path and numbering logic.
+- `rg "payment-webhook|webhook-verify|PAYMENT DISABLED" api`: confirm phase-3 payment code remains disabled.
 
 Update `.env.example` only when required variable names change. Never commit live secrets.
+If `supabase/schema.sql` or `supabase/rls.sql` changes, remember that the corresponding SQL must also be applied manually in the Supabase SQL editor.
 
 ## Coding Style & Naming Conventions
 Use 2-space indentation in HTML, CSS, and JavaScript. Keep files UTF-8 encoded. Prefer direct, readable vanilla JavaScript and preserve the existing static-page structure unless a change clearly benefits maintainability.
@@ -50,7 +58,10 @@ There is no automated suite yet. Validate changes manually against the current p
 - place a customer order from `index.html` and confirm the pickup number is shown
 - confirm it appears in `mes-commandes.html`
 - update status from the cashier UI
+- confirm an order created in one tab appears in another open cashier board without a manual refresh
+- confirm changing an order to `completed` or `cancelled` removes it from other open cashier boards after polling
 - verify French and Chinese both render as single-language pages on `index.html` and `box-meals.html`
+- verify the legal/privacy information is reachable from the public pages and reflects current company identity information
 - verify mobile layout on `index.html`, `box-meals.html`, `FACTURE.html`, and `mes-commandes.html`
 
 ## Commit & Pull Request Guidelines
@@ -65,6 +76,11 @@ Security expectations by phase:
 
 - Phase 2: protect admin access, keep service-role secrets server-side, and stabilize the internal order loop.
 - Phase 3: add payment-webhook integrity, payment-to-order reconciliation, stronger endpoint authorization, and a review of public ordering abuse risks before enabling external ordering.
+
+Operational reminders:
+
+- Do not re-enable payment webhook routes, `online_paid` checkout work, or webhook signature logic before phase 3 is explicitly in scope.
+- Do not replace the transactional RPC order-creation path with separate client-visible inserts into `orders` and `order_items`.
 
 Known intentional boundaries:
 
