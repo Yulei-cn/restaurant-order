@@ -35,6 +35,7 @@ Current implementation snapshot:
 - `supabase/schema.sql` now also includes `create_invoice_with_items`; invoice header and invoice lines must be created transactionally.
 - Database-generated invoice numbers must come from the Supabase invoice trigger/function path, not from hard-coded front-end defaults.
 - `FACTURE.html` now replaces its draft placeholder with the database-generated invoice number returned after save.
+- Before save, `FACTURE.html` must show a date-derived temporary reference based on the current invoice date (for example `0331` for March 31) instead of a generic draft label.
 - `index.html` and `box-meals.html` now use true single-language rendering: French view is fully French, Chinese view is fully Chinese.
 - `index.html` presentation styles are now loaded from `index.css`; keep ordering logic and pickup-result behavior in the HTML script unchanged when adjusting styling.
 - Admin session validation must treat malformed cookies as unauthenticated requests, not as server errors.

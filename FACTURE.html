@@ -29,7 +29,7 @@
             <div class="form-row">
                 <div class="form-group">
                     <label>Reference / Facture</label>
-                    <input type="text" id="ticketNumber" value="" placeholder="Genere lors de l'enregistrement">
+                    <input type="text" id="ticketNumber" value="" placeholder="Reference auto selon la date">
                 </div>
                 <div class="form-group">
                     <label>Formule 1 quantite</label>
@@ -125,7 +125,7 @@
             <div class="invoice-meta">
                 <div>
                     <strong>Facture</strong><br>
-                    Date : <span id="invoiceDate"></span> | Facture n. <span id="displayTicket">Brouillon</span>
+                    Date : <span id="invoiceDate"></span> | Facture n. <span id="displayTicket"></span>
                 </div>
                 <div style="text-align: right;">
                     <strong>Vendeur</strong><br>
@@ -255,9 +255,17 @@
     <script>
     let clients = {};
     let currentClient = null;
+    let lastAutoReference = '';
+    let hasSavedInvoiceNumber = false;
 
     function euro(value) {
         return `${Number(value || 0).toFixed(2).replace('.', ',')} EUR`;
+    }
+
+    function formatDraftReference(dateObj) {
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        return `${month}${day}`;
     }
 
     function setSaveStatus(message, isError = false) {
@@ -441,6 +449,22 @@
         setSaveStatus('Client supprime');
     }
 
+    function syncDraftReference(dateObj) {
+        if (hasSavedInvoiceNumber) {
+            return;
+        }
+
+        const input = document.getElementById('ticketNumber');
+        const nextReference = formatDraftReference(dateObj);
+        const currentValue = (input.value || '').trim();
+        const shouldReplace = !currentValue || currentValue === lastAutoReference;
+
+        if (shouldReplace) {
+            input.value = nextReference;
+            lastAutoReference = nextReference;
+        }
+    }
+
     function updateInvoiceDate() {
         const input = document.getElementById('invoiceDateInput');
         let dateObj;
@@ -463,6 +487,7 @@
         const h = String(dateObj.getHours()).padStart(2, '0');
         const min = String(dateObj.getMinutes()).padStart(2, '0');
         document.getElementById('invoiceDate').textContent = `${d}.${m}.${y} ${h}:${min}`;
+        syncDraftReference(dateObj);
         return dateObj;
     }
 
@@ -529,7 +554,7 @@
         const form2 = data.items.find((item) => item.description === 'Formule 2');
         const custom = data.items.find((item) => item.description !== 'Formule 1' && item.description !== 'Formule 2');
 
-        document.getElementById('displayTicket').textContent = data.reference || 'Brouillon';
+        document.getElementById('displayTicket').textContent = data.reference || lastAutoReference || formatDraftReference(new Date());
 
         document.getElementById('rowF1').style.display = form1 ? '' : 'none';
         if (form1) {
@@ -610,6 +635,7 @@
             return;
         }
 
+        hasSavedInvoiceNumber = true;
         document.getElementById('ticketNumber').value = saved.invoiceNumber;
         document.getElementById('displayTicket').textContent = saved.invoiceNumber;
         setSaveStatus(`Facture sauvegardee: ${saved.invoiceNumber}`);
