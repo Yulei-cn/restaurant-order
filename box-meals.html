@@ -350,6 +350,7 @@
 
     function renderMenu() {
       const menu = pageData[currentLang].menu;
+      const data = pageData[currentLang];
       const container = document.getElementById("menuSections");
 
       const formulasSection = `
@@ -368,6 +369,24 @@
           </div>
         </div>
       `;
+
+      const groupOrderCard = Array.isArray(data.footerCards)
+        ? data.footerCards.find((card) => {
+            const title = String(card?.title || "").toLowerCase();
+            return title.includes("groupe") || title.includes("团");
+          })
+        : null;
+
+      const groupOrderSection = groupOrderCard ? `
+        <div class="section">
+          <h2>${groupOrderCard.title}</h2>
+          <div class="section-content">
+            <div class="info-box">
+              <strong>${groupOrderCard.body.replace(/\n/g, "<br>")}</strong>
+            </div>
+          </div>
+        </div>
+      ` : "";
 
       const standardSections = menu.sections.map((section) => `
         <div class="section">
@@ -399,7 +418,7 @@
         </div>
       `;
 
-      container.innerHTML = formulasSection + standardSections + drinksSection;
+      container.innerHTML = formulasSection + groupOrderSection + standardSections + drinksSection;
     }
 
     function renderFooter() {

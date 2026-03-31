@@ -4,7 +4,10 @@
 This repository supports a cloud-only restaurant workflow: frontend on Vercel, database on Supabase, code in GitHub. The main pages currently maintained are:
 
 - `index.html`: public-facing ordering page. It now returns a customer-facing pickup number after successful submission.
+- `index.html` is the internal cashier/staff ordering page in the current phase-2 operating model; do not use it as the public marketing surface for company/group meal messaging.
 - `box-meals.html`: mobile-first public marketing page exposed on Google Maps; static/promotional only.
+- `box-meals.html` is the public-facing marketing page and is the correct place for company/group catering messaging and contact instructions.
+- On `box-meals.html`, company/group catering information should appear directly below the formula offers and above the standard individual dishes, not be buried only in the footer.
 - `FACTURE.html`: invoice and receipt page.
 - `mes-commandes.html`: cashier order board.
 - `admin.html`: unified backend entry for admin login and navigation.
