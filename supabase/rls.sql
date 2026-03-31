@@ -76,3 +76,8 @@ revoke all on function public.create_order_with_items(jsonb, jsonb) from public;
 revoke all on function public.create_order_with_items(jsonb, jsonb) from anon;
 revoke all on function public.create_order_with_items(jsonb, jsonb) from authenticated;
 grant execute on function public.create_order_with_items(jsonb, jsonb) to service_role;
+
+revoke all on function public.create_invoice_with_items(jsonb, jsonb) from public;
+revoke all on function public.create_invoice_with_items(jsonb, jsonb) from anon;
+revoke all on function public.create_invoice_with_items(jsonb, jsonb) from authenticated;
+grant execute on function public.create_invoice_with_items(jsonb, jsonb) to service_role;

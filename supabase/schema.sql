@@ -248,6 +248,77 @@ before insert on public.invoices
 for each row
 execute function public.assign_invoice_number();
 
+create or replace function public.create_invoice_with_items(invoice_payload jsonb, item_payloads jsonb)
+returns table (
+  id uuid,
+  invoice_number text,
+  total_amount numeric
+)
+language plpgsql
+as $$
+declare
+  created_invoice public.invoices%rowtype;
+  linked_order_id uuid;
+begin
+  insert into public.invoices (
+    order_id,
+    invoice_client_id,
+    issue_date,
+    due_date,
+    payment_method,
+    payment_status,
+    subtotal_amount,
+    tax_amount,
+    total_amount,
+    currency,
+    notes
+  )
+  values (
+    nullif(invoice_payload->>'order_id', '')::uuid,
+    nullif(invoice_payload->>'invoice_client_id', '')::uuid,
+    coalesce((invoice_payload->>'issue_date')::timestamptz, timezone('utc', now())),
+    nullif(invoice_payload->>'due_date', '')::timestamptz,
+    nullif(invoice_payload->>'payment_method', ''),
+    coalesce(invoice_payload->>'payment_status', 'paid'),
+    coalesce((invoice_payload->>'subtotal_amount')::numeric, 0),
+    coalesce((invoice_payload->>'tax_amount')::numeric, 0),
+    coalesce((invoice_payload->>'total_amount')::numeric, 0),
+    coalesce(invoice_payload->>'currency', 'EUR'),
+    nullif(invoice_payload->>'notes', '')
+  )
+  returning * into created_invoice;
+
+  insert into public.invoice_items (
+    invoice_id,
+    sort_order,
+    description,
+    quantity,
+    unit_price_ht,
+    tax_rate,
+    unit_price_ttc
+  )
+  select
+    created_invoice.id,
+    coalesce((item->>'sort_order')::integer, 0),
+    item->>'description',
+    (item->>'quantity')::integer,
+    (item->>'unit_price_ht')::numeric,
+    coalesce((item->>'tax_rate')::numeric, 10.00),
+    (item->>'unit_price_ttc')::numeric
+  from jsonb_array_elements(item_payloads) as item;
+
+  linked_order_id := nullif(invoice_payload->>'order_id', '')::uuid;
+  if linked_order_id is not null then
+    update public.orders
+    set invoice_id = created_invoice.id
+    where public.orders.id = linked_order_id;
+  end if;
+
+  return query
+  select created_invoice.id, created_invoice.invoice_number, created_invoice.total_amount;
+end;
+$$;
+
 create or replace function public.create_order_with_items(order_payload jsonb, item_payloads jsonb)
 returns table (
   id uuid,

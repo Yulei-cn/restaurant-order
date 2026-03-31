@@ -37,8 +37,13 @@ export function verifyAdminSessionValue(sessionValue) {
   const secret = getRequiredEnv('ADMIN_SESSION_SECRET');
   const [encodedPayload, signature] = sessionValue.split('.');
   const expected = signPayload(encodedPayload, secret);
+  const isValidHexSignature = /^[0-9a-f]+$/i.test(signature);
 
-  if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) {
+  if (!isValidHexSignature || signature.length !== expected.length) {
+    return false;
+  }
+
+  if (!crypto.timingSafeEqual(Buffer.from(signature, 'utf8'), Buffer.from(expected, 'utf8'))) {
     return false;
   }
 
