@@ -8,6 +8,7 @@ This repository supports a cloud-only restaurant workflow: frontend on Vercel, d
 - `box-meals.html`: mobile-first public marketing page exposed on Google Maps; static/promotional only.
 - `box-meals.html` is the public-facing marketing page and is the correct place for company/group catering messaging and contact instructions.
 - On `box-meals.html`, company/group catering information should appear directly below the formula offers and above the standard individual dishes, not be buried only in the footer.
+- The company/group catering block on `box-meals.html` should be visually emphasized so public visitors can identify that business-order contact path quickly.
 - `FACTURE.html`: invoice and receipt page.
 - `mes-commandes.html`: cashier order board.
 - `admin.html`: unified backend entry for admin login and navigation.
@@ -40,6 +41,7 @@ Current implementation snapshot:
 - `FACTURE.html` now replaces its draft placeholder with the database-generated invoice number returned after save.
 - Before save, `FACTURE.html` must show a date-derived temporary reference based on the current invoice date (for example `0331` for March 31) instead of a generic draft label.
 - `index.html` and `box-meals.html` now use true single-language rendering: French view is fully French, Chinese view is fully Chinese.
+- Public delivery messaging must not mention Uber Eats; the current intended external channels are PandaGo and the self-operated delivery website only.
 - `index.html` presentation styles are now loaded from `index.css`; keep ordering logic and pickup-result behavior in the HTML script unchanged when adjusting styling.
 - Admin session validation must treat malformed cookies as unauthenticated requests, not as server errors.
 - Admin-facing Chinese copy and asset references in `admin.html` and `mes-commandes.html` have been restored and must stay readable; do not regress them into mojibake/garbled text.

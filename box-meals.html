@@ -84,7 +84,7 @@
           {
             title: "🌶️ Sain, leger et savoureux",
             body: "Nos recettes sont pensees pour offrir un repas complet, equilibre et gourmand.",
-            info: "Bonne nouvelle : Uber Eats et PandaGo arrivent bientot. La precommande et le retrait sur place sont deja possibles."
+            info: "Bonne nouvelle : PandaGo et notre site de livraison en direct sont les canaux prevus. La precommande et le retrait sur place sont deja possibles."
           },
           {
             title: "📍 Infos pratiques",
@@ -208,7 +208,7 @@
           {
             title: "🌶️ 健康、清爽、好吃",
             body: "搭配注重均衡，适合工作日午餐和日常简餐。",
-            info: "好消息：Uber Eats 和 PandaGo 即将上线。目前已经支持预订和到店自取。"
+            info: "好消息：我们目前只规划熊猫外卖和自营外卖网站。现在已经支持预订和到店自取。"
           },
           {
             title: "📍 实用信息",
@@ -307,6 +307,26 @@
     let currentSlide = 0;
     let slideInterval;
 
+    function applyChannelCopyRules() {
+      Object.values(pageData).forEach((langData) => {
+        if (!Array.isArray(langData.sections)) return;
+        langData.sections = langData.sections.map((section) => {
+          if (typeof section?.info !== "string") {
+            return section;
+          }
+
+          let info = section.info
+            .replace("Uber Eats et PandaGo arrivent bientot.", "PandaGo et notre site de livraison en direct sont les canaux prevus.")
+            .replace("Uber Eats 和 PandaGo 即将上线。", "我们目前只规划熊猫外卖和自营外卖网站。");
+
+          return {
+            ...section,
+            info
+          };
+        });
+      });
+    }
+
     function renderOffers() {
       const slider = document.getElementById("offersSlider");
       const offers = pageData[currentLang].offers;
@@ -381,7 +401,8 @@
         <div class="section">
           <h2>${groupOrderCard.title}</h2>
           <div class="section-content">
-            <div class="info-box">
+            <div class="info-box catering-highlight">
+              <div class="catering-badge">${currentLang === "zh" ? "企业 / 团体订餐" : "Commande entreprise / groupe"}</div>
               <strong>${groupOrderCard.body.replace(/\n/g, "<br>")}</strong>
             </div>
           </div>
@@ -482,6 +503,7 @@
     }
 
     window.addEventListener("load", () => {
+      applyChannelCopyRules();
       const savedLang = localStorage.getItem("preferredLanguage") || "fr";
       setLang(savedLang);
       startAutoSlide();
