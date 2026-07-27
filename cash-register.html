@@ -44,7 +44,7 @@
       const res = await fetch(`/api/cash-register?date=${day.value}`, { credentials: 'same-origin' });
       if (res.status === 401) return window.location.href = 'admin.html?next=cash-register.html';
       report = await res.json();
-      document.getElementById('totals').innerHTML = `Especes : ${euro(report.totals.cash)}<br>Carte : ${euro(report.totals.card)}<br>Titres-restaurant : ${euro(report.totals.meal_voucher)}<br>Remboursements : ${euro(report.totals.refunds)}<br>${report.closure ? `Caisse cloturee : ecart ${euro(report.closure.variance_cash)}` : 'Caisse ouverte'}`;
+      document.getElementById('totals').innerHTML = `Transactions : ${report.events.length}<br>Especes : ${euro(report.totals.cash)}<br>Carte : ${euro(report.totals.card)}<br>Titres-restaurant : ${euro(report.totals.meal_voucher)}<br>Autre : ${euro(report.totals.other)}<br>Remboursements / annulations : ${euro(report.totals.refunds)}<br>${report.closure ? `Caisse cloturee : attendu ${euro(report.closure.expected_cash)} | compte ${euro(report.closure.counted_cash)} | ecart ${euro(report.closure.variance_cash)}` : 'Caisse ouverte'}`;
     }
     document.getElementById('refresh').onclick = loadReport;
     document.getElementById('openDay').onclick = async () => {

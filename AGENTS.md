@@ -67,6 +67,7 @@ Useful repo commands:
 - `rg "payment-webhook|webhook-verify|PAYMENT DISABLED" api`: confirm phase-3 payment code remains disabled.
 
 Update `.env.example` only when required variable names change. Never commit live secrets.
+When a change requires deployment, provide the user with a concise GitHub commit message that names the update.
 If `supabase/schema.sql` or `supabase/rls.sql` changes, remember that the corresponding SQL must also be applied manually in the Supabase SQL editor.
 When implementation assumptions are clarified during work, update `AGENTS.md` in the same change cycle instead of batching documentation updates at the end.
 

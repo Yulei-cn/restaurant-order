@@ -1,6 +1,9 @@
 import { getServiceHeaders, getSupabaseUrl, requireSupabaseConfig, roundMoney } from './_supabase.js';
 import { requireAdminConfig, requireAdminSession } from './_adminAuth.js';
 
+const PAYMENT_METHODS = new Set(['cash', 'card', 'meal_voucher', 'other']);
+const EVENT_TYPES = new Set(['payment', 'refund', 'void']);
+
 export default async function handler(req, res) {
   try { requireAdminConfig(); requireSupabaseConfig(); } catch { return res.status(500).json({ error: 'Configuration serveur manquante' }); }
   if (!requireAdminSession(req, res)) return;
@@ -23,6 +26,21 @@ export default async function handler(req, res) {
   const { action } = req.body || {};
   const rpc = action === 'open' ? 'open_cash_register_day' : action === 'close' ? 'close_cash_register_day' : action === 'payment' ? 'record_payment_event' : '';
   if (!rpc) return res.status(400).json({ error: 'Action invalide' });
+  if (action === 'payment') {
+    const amount = roundMoney(Number(req.body.amount));
+    if (!req.body.order_id || !EVENT_TYPES.has(req.body.event_type) || !PAYMENT_METHODS.has(req.body.payment_method) || !Number.isFinite(amount) || amount <= 0) {
+      return res.status(400).json({ error: 'Donnees de paiement invalides' });
+    }
+    if ((req.body.event_type === 'refund' || req.body.event_type === 'void') && !String(req.body.reason || '').trim()) {
+      return res.status(400).json({ error: 'Motif obligatoire pour un remboursement ou une annulation' });
+    }
+    if (String(req.body.terminal_reference || '').length > 100 || String(req.body.reason || '').length > 500) {
+      return res.status(400).json({ error: 'Reference ou motif trop long' });
+    }
+  }
+  if ((action === 'open' || action === 'close') && (!Number.isFinite(roundMoney(Number(action === 'open' ? req.body.opening_cash : req.body.counted_cash))) || Number(action === 'open' ? req.body.opening_cash : req.body.counted_cash) < 0)) {
+    return res.status(400).json({ error: 'Montant de caisse invalide' });
+  }
   const payload = action === 'payment'
     ? { payment_payload: { ...req.body, amount: roundMoney(Number(req.body.amount)), recorded_by: 'admin' } }
     : action === 'open'
@@ -30,6 +48,9 @@ export default async function handler(req, res) {
       : { close_payload: { business_date: req.body.business_date || '', counted_cash: roundMoney(Number(req.body.counted_cash)), closed_by: 'admin' } };
   const response = await fetch(getSupabaseUrl(`/rest/v1/rpc/${rpc}`), { method: 'POST', headers: getServiceHeaders({ 'Content-Type': 'application/json' }), body: JSON.stringify(payload) });
   const data = await response.json().catch(() => null);
-  if (!response.ok) return res.status(400).json({ error: data?.message || 'Operation impossible' });
+  if (!response.ok) {
+    console.error('Cash-register RPC error:', { action, status: response.status, data });
+    return res.status(400).json({ error: data?.message || 'Operation impossible' });
+  }
   return res.status(200).json({ status: 'ok', result: Array.isArray(data) ? data[0] : data });
 }

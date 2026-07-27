@@ -493,9 +493,9 @@
         lastReceiptData.paymentMethod = paymentMethod;
         showPickupResult(currentCashierOrder, lastReceiptData.serverTotal, lastReceiptData.customerName, lastReceiptData.orderTime);
         window.setTimeout(printLastReceipt, 150);
-      } catch {
+      } catch (error) {
         buttons.forEach((button) => { button.disabled = false; });
-        alert(t("paymentError"));
+        alert(`${t("paymentError")} : ${error.message || "inconnue"}`);
       }
     }
 
