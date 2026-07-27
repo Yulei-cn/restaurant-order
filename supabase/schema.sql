@@ -65,8 +65,8 @@ language plpgsql
 as $$
 begin
   if not exists (
-    select 1 from public.cash_register_days
-    where business_date = current_date and status = 'open'
+    select 1 from public.cash_register_days as cash_day
+    where cash_day.business_date = current_date and cash_day.status = 'open'
   ) then
     raise exception 'Cash register is not open for today';
   end if;
@@ -620,15 +620,15 @@ begin
 
   insert into public.cash_register_days (business_date, opening_cash, opened_by)
   values (target_date, 0, target_actor)
-  on conflict (business_date) do nothing;
+  on conflict on constraint cash_register_days_pkey do nothing;
 
-  update public.cash_register_days
+  update public.cash_register_days as cash_day
   set status = 'closed', expected_cash = opening_cash + calculated_cash,
       counted_cash = target_counted, variance_cash = target_counted - (opening_cash + calculated_cash),
       closed_by = target_actor, closed_at = timezone('utc', now()),
       closing_hash = encode(digest(concat_ws('|', target_date::text, calculated_cash::text, target_counted::text, target_actor), 'sha256'), 'hex')
-  where business_date = target_date and status = 'open'
-  returning cash_register_days.expected_cash, cash_register_days.counted_cash, cash_register_days.variance_cash
+  where cash_day.business_date = target_date and cash_day.status = 'open'
+  returning cash_day.expected_cash, cash_day.counted_cash, cash_day.variance_cash
   into expected_cash, counted_cash, variance_cash;
 
   if not found then raise exception 'Business day is already closed'; end if;
@@ -651,7 +651,7 @@ begin
   if target_opening is null or target_opening < 0 or target_actor is null or btrim(target_actor) = '' then raise exception 'Invalid opening'; end if;
   insert into public.cash_register_days (business_date, opening_cash, opened_by)
   values (target_date, target_opening, target_actor)
-  on conflict (business_date) do nothing;
+  on conflict on constraint cash_register_days_pkey do nothing;
   if not found then raise exception 'Business day is already open or closed'; end if;
   insert into public.cashier_audit_logs (event_type, entity_type, actor, details)
   values ('daily_open', 'cash_register_day', target_actor, jsonb_build_object('business_date', target_date, 'opening_cash', target_opening));
