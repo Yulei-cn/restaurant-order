@@ -267,6 +267,7 @@ body {
   justify-content: center;
   min-width: 40px;
   min-height: 40px;
+  touch-action: manipulation;
 }
 
 .qty-display {
@@ -384,6 +385,7 @@ body {
   font-weight: 700;
   cursor: pointer;
   min-height: 56px;
+  touch-action: manipulation;
 }
 
 .submit-btn:disabled {
@@ -735,6 +737,44 @@ body {
     font-size: 15px;
   }
 
+  .cashier-toolbar {
+    align-items: flex-start;
+    gap: 8px;
+    margin: 10px 12px;
+  }
+
+  .cashier-day-actions {
+    flex: 1;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .cashier-day-action {
+    min-height: 46px;
+    padding: 8px 12px;
+    font-size: 0.92rem;
+  }
+
+  .cashier-day-status {
+    order: 3;
+    width: 100%;
+    min-height: auto;
+    padding: 0 2px;
+    font-size: 0.86rem;
+  }
+
+  .cashier-toolbar .lang-switch {
+    flex: 0 0 auto;
+    gap: 6px;
+  }
+
+  .cashier-toolbar .lang-switch button {
+    min-width: 66px;
+    min-height: 46px;
+    padding: 8px 9px;
+    font-size: 0.8rem;
+  }
+
   .content {
     padding: 14px;
   }
@@ -766,6 +806,7 @@ body {
     grid-template-columns: 1fr;
     gap: 10px;
     margin: 0 0 16px;
+    box-shadow: 0 4px 16px rgba(21, 128, 61, 0.24);
   }
 
   .cashier-summary .total-price,
@@ -792,6 +833,41 @@ body {
     padding: 14px 20px;
     min-height: 50px;
     font-size: 16px;
+  }
+}
+
+@media (max-width: 699px) {
+  .category--formules .menu-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .category--formules .menu-item {
+    min-height: 104px;
+  }
+
+  .category--formules .menu-item--quick-add {
+    min-height: 82px;
+    padding: 9px 10px;
+  }
+
+  .category--formules .menu-item--quick-add .item-desc {
+    display: none;
+  }
+
+  .category--formules .menu-item--quick-add .item-name {
+    font-size: 0.9rem;
+  }
+
+  .category--formules .menu-item--quick-add .qty-button {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    min-height: 42px;
+  }
+
+  .category--formules .menu-item--quick-add .qty-display {
+    min-width: 34px;
+    padding: 6px 7px;
   }
 }
 
@@ -943,17 +1019,17 @@ body {
   }
 
   .qty-button {
-    width: 30px;
-    height: 30px;
-    min-width: 30px;
-    min-height: 30px;
-    font-size: 15px;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    font-size: 19px;
   }
 
   .qty-display {
-    min-width: 28px;
-    padding: 4px 6px;
-    font-size: 13px;
+    min-width: 34px;
+    padding: 6px;
+    font-size: 14px;
   }
 
   .cart-summary {
@@ -964,5 +1040,10 @@ body {
   .form-section {
     padding: 16px 10px;
     margin: 0 -10px;
+  }
+
+  .cashier-summary .submit-btn {
+    min-height: 62px;
+    font-size: 17px;
   }
 }
