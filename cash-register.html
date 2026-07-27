@@ -10,7 +10,8 @@
   <main class="container cash-register-page">
     <div class="lang-switch"><a class="legal-link" href="admin.html">Admin</a></div>
     <div class="content">
-      <section class="category"><h2>Cloture de caisse / Z</h2><div class="menu-grid">
+      <section class="category z-report"><h2>Cloture de caisse / Z</h2><div class="menu-grid">
+        <div class="z-legal"><strong>CUBE</strong><br>7 rue Blanche, 75009 Paris<br>SIRET 928 586 973 00010 | TVA FR83 928586973</div>
         <label>Date <input id="day" type="date"></label>
         <button class="payment-btn" id="refresh">Actualiser</button>
         <button class="payment-btn" onclick="window.print()">Imprimer Z</button>
@@ -27,6 +28,7 @@
       </div></section>
       <section class="category"><h2>Remboursement / annulation</h2><div class="menu-grid">
         <label>ID commande<input id="refundOrder" type="text"></label>
+        <label>Operation<select id="refundType"><option value="refund">Remboursement</option><option value="void">Annulation</option></select></label>
         <label>Mode de remboursement<select id="refundMethod"><option value="cash">Especes</option><option value="card">Carte bancaire</option><option value="meal_voucher">Titre-restaurant</option><option value="other">Autre</option></select></label>
         <label>Montant (EUR)<input id="refundAmount" type="number" min="0.01" step="0.01"></label>
         <label>Motif obligatoire<input id="refundReason" type="text"></label>
@@ -54,7 +56,7 @@
       const data = await res.json(); document.getElementById('closeResult').textContent = res.ok ? `Cloture OK. Ecart : ${euro(data.closure.variance_cash)}` : data.error; if (res.ok) loadReport();
     };
     document.getElementById('refund').onclick = async () => {
-      const res = await fetch('/api/record-payment', { method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ order_id:document.getElementById('refundOrder').value, event_type:'refund', payment_method:document.getElementById('refundMethod').value, amount:document.getElementById('refundAmount').value, reason:document.getElementById('refundReason').value }) });
+      const res = await fetch('/api/record-payment', { method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ order_id:document.getElementById('refundOrder').value, event_type:document.getElementById('refundType').value, payment_method:document.getElementById('refundMethod').value, amount:document.getElementById('refundAmount').value, reason:document.getElementById('refundReason').value }) });
       const data = await res.json(); alert(res.ok ? 'Remboursement enregistre' : data.error); if (res.ok) loadReport();
     };
     loadReport();

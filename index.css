@@ -760,6 +760,42 @@ body {
     font-size: 7.5pt;
     text-align: center;
   }
+
+  .cash-register-page,
+  .cash-register-page * {
+    visibility: visible;
+  }
+
+  .cash-register-page {
+    position: static;
+    width: 80mm;
+    margin: 0;
+    box-shadow: none;
+  }
+
+  .cash-register-page .lang-switch,
+  .cash-register-page button,
+  .cash-register-page label,
+  .cash-register-page .category:not(.z-report) {
+    display: none !important;
+  }
+
+  .cash-register-page .content,
+  .cash-register-page .z-report,
+  .cash-register-page .menu-grid {
+    display: block;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+    background: #fff;
+  }
+
+  .cash-register-page .z-legal {
+    display: block;
+    font-size: 8pt;
+    text-align: center;
+    margin-bottom: 3mm;
+  }
 }
 
 @media (max-width: 480px) {
