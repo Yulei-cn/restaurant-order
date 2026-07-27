@@ -59,6 +59,21 @@ begin
 end;
 $$;
 
+create or replace function public.require_open_cash_register_day()
+returns trigger
+language plpgsql
+as $$
+begin
+  if not exists (
+    select 1 from public.cash_register_days
+    where business_date = current_date and status = 'open'
+  ) then
+    raise exception 'Cash register is not open for today';
+  end if;
+  return new;
+end;
+$$;
+
 create table if not exists public.orders (
   id uuid primary key default gen_random_uuid(),
   order_number text not null unique,
@@ -166,6 +181,12 @@ create trigger trg_payment_events_integrity
 before insert on public.payment_events
 for each row
 execute function public.assign_payment_event_hash();
+
+drop trigger if exists trg_payment_events_require_open_day on public.payment_events;
+create trigger trg_payment_events_require_open_day
+before insert on public.payment_events
+for each row
+execute function public.require_open_cash_register_day();
 
 drop trigger if exists trg_payment_events_immutable on public.payment_events;
 create trigger trg_payment_events_immutable
