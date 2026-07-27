@@ -4,7 +4,7 @@ const rateLimitMap = new Map();
 const TAX_RATE = 0.1;
 const MIN_FORM_FILL_MS = 2500;
 
-const allowedPrices = new Set([2.0, 2.5, 5.8, 6.8, 8.8, 11.8, 13.8]);
+const allowedPrices = new Set([1.0, 2.5, 5.8, 6.8, 8.8, 10.0, 11.8, 13.8]);
 const allowedOriginHosts = new Set([
   'cube-paris.vercel.app',
   'www.cube-paris.vercel.app'
@@ -29,14 +29,11 @@ const allowedMenuItems = new Map([
   ['Nouilles sautees', 6.8],
   ['Roujiamo porc', 5.8],
   ['Roujiamo boeuf', 6.8],
-  ['Coca-Cola', 2.0],
-  ['Sprite', 2.0],
-  ['Fanta', 2.0],
-  ['The a la peche', 2.0],
-  ["Jus d'orange", 2.0],
-  ['Eau minerale', 2.0],
+  ['Formule 10 EUR', 10.0],
   ['Formule 1', 11.8],
-  ['Formule 2', 13.8]
+  ['Formule 2', 13.8],
+  ['Supplement nouilles formule', 1.0],
+  ['Supplement boisson formule', 1.0]
 ]);
 
 function checkRateLimit(ip) {
@@ -91,7 +88,7 @@ function isAllowedOrigin(req) {
 
 function getCategoryFromName(name) {
   const lowerName = name.toLowerCase();
-  if (lowerName.includes('formule')) return 'formula';
+  if (lowerName.includes('formule') || lowerName.includes('supplement')) return 'formula';
   if (
     lowerName.includes('coca') ||
     lowerName.includes('sprite') ||
@@ -217,6 +214,17 @@ export default async function handler(req, res) {
     });
 
     totalAmount = roundMoney(totalAmount + submittedPrice * quantity);
+  }
+
+  const formulaCount = validatedItems
+    .filter((item) => item.item_name.startsWith('Formule'))
+    .reduce((sum, item) => sum + item.quantity, 0);
+  const hasTooManySupplements = validatedItems
+    .filter((item) => item.item_name.startsWith('Supplement'))
+    .some((item) => item.quantity > formulaCount);
+
+  if (hasTooManySupplements) {
+    return res.status(400).json({ error: 'Les supplements necessitent une formule' });
   }
 
   const subtotalAmount = roundMoney(totalAmount / (1 + TAX_RATE));

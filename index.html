@@ -37,11 +37,6 @@
             </div>
 
             <div class="form-field">
-              <label for="address" id="labelAddress"></label>
-              <input type="text" name="address" id="address">
-            </div>
-
-            <div class="form-field">
               <label for="phone" id="labelPhone"></label>
               <input type="tel" name="phone" id="phone">
             </div>
@@ -49,6 +44,11 @@
             <div class="form-field">
               <label for="notes" id="labelNotes"></label>
               <input type="text" name="notes" id="notes">
+            </div>
+
+            <div class="form-field">
+              <label for="address" id="labelAddress"></label>
+              <input type="text" name="address" id="address">
             </div>
 
             <div class="anti-bot-field" aria-hidden="true">
@@ -97,7 +97,7 @@
         totalPrefix: "💵 Total :",
         pickupInfoTitle: "Informations de retrait",
         nameLabel: "Nom du client (obligatoire)",
-        addressLabel: "Adresse (optionnel)",
+        addressLabel: "Adresse de livraison (optionnel)",
         phoneLabel: "Telephone (optionnel)",
         notesLabel: "Remarques (optionnel)",
         mapTitle: "📍 Nous trouver",
@@ -128,7 +128,7 @@
         totalPrefix: "💵 总计：",
         pickupInfoTitle: "订单信息",
         nameLabel: "姓名（必填）",
-        addressLabel: "地址（可选）",
+        addressLabel: "送餐地址（可选）",
         phoneLabel: "电话（可选）",
         notesLabel: "备注（可选）",
         mapTitle: "📍 我们的位置",
@@ -156,6 +156,69 @@
     };
 
     const menuData = [
+      {
+        kind: "formules",
+        title: { fr: "🍱 Formules", zh: "🍱 套餐" },
+        items: [
+          {
+            id: "formule10",
+            fr: "Formule 10 EUR",
+            zh: "10 欧套餐",
+            server: "Formule 10 EUR",
+            price: 10,
+            desc: {
+              fr: "Riz, 1 entree et 1 plat chaud.",
+              zh: "米饭、1 份前菜和 1 份热菜。"
+            }
+          },
+          {
+            id: "formule1",
+            fr: "Formule 1",
+            zh: "套餐 1",
+            server: "Formule 1",
+            price: 11.8,
+            desc: {
+              fr: "Riz, 1 entree et 2 plats chauds.",
+              zh: "米饭、1 份前菜和 2 份热菜。"
+            }
+          },
+          {
+            id: "formule2",
+            fr: "Formule 2",
+            zh: "套餐 2",
+            server: "Formule 2",
+            price: 13.8,
+            desc: {
+              fr: "Riz, 1 entree et 3 plats chauds.",
+              zh: "米饭、1 份前菜和 3 份热菜。"
+            }
+          },
+          {
+            id: "formule_nouilles",
+            type: "supplement",
+            fr: "Nouilles a la place du riz",
+            zh: "米饭换炒面",
+            server: "Supplement nouilles formule",
+            price: 1,
+            desc: {
+              fr: "Supplement partage pour les trois formules.",
+              zh: "三种套餐通用加价。"
+            }
+          },
+          {
+            id: "formule_boisson",
+            type: "supplement",
+            fr: "Boisson",
+            zh: "饮料",
+            server: "Supplement boisson formule",
+            price: 1,
+            desc: {
+              fr: "Supplement partage pour les trois formules.",
+              zh: "三种套餐通用加价。"
+            }
+          }
+        ]
+      },
       {
         title: { fr: "🥗 Entrees", zh: "🥗 前菜" },
         items: [
@@ -195,44 +258,6 @@
           { id: "roujiamo_boeuf", fr: "Roujiamo boeuf", zh: "牛肉夹馍", server: "Roujiamo boeuf", price: 6.8 }
         ]
       },
-      {
-        title: { fr: "🥤 Boissons", zh: "🥤 饮品" },
-        items: [
-          { id: "coca", fr: "Coca-Cola", zh: "可乐", server: "Coca-Cola", price: 2.0 },
-          { id: "sprite", fr: "Sprite", zh: "雪碧", server: "Sprite", price: 2.0 },
-          { id: "fanta", fr: "Fanta", zh: "芬达", server: "Fanta", price: 2.0 },
-          { id: "peach_tea", fr: "The a la peche", zh: "桃茶", server: "The a la peche", price: 2.0 },
-          { id: "orange_juice", fr: "Jus d'orange", zh: "橙汁", server: "Jus d'orange", price: 2.0 },
-          { id: "water", fr: "Eau minerale", zh: "矿泉水", server: "Eau minerale", price: 2.0 }
-        ]
-      },
-      {
-        title: { fr: "🍱 Formules", zh: "🍱 套餐" },
-        items: [
-          {
-            id: "formule1",
-            fr: "Formule 1",
-            zh: "套餐 1",
-            server: "Formule 1",
-            price: 11.8,
-            desc: {
-              fr: "Riz ou nouilles sautees (+1,00 EUR), 1 entree, 2 plats chauds. Boisson en supplement : +1,00 EUR.",
-              zh: "米饭或炒面（加 1,00 EUR），1 份前菜，2 份热菜。饮品另加 1,00 EUR。"
-            }
-          },
-          {
-            id: "formule2",
-            fr: "Formule 2",
-            zh: "套餐 2",
-            server: "Formule 2",
-            price: 13.8,
-            desc: {
-              fr: "Riz ou nouilles sautees (+1,00 EUR), 1 entree, 3 plats chauds. Boisson en supplement : +1,00 EUR.",
-              zh: "米饭或炒面（加 1,00 EUR），1 份前菜，3 份热菜。饮品另加 1,00 EUR。"
-            }
-          }
-        ]
-      }
     ];
 
     const itemIndex = Object.fromEntries(
@@ -278,15 +303,15 @@
 
       menuData.forEach((category) => {
         const section = document.createElement("div");
-        section.className = "category";
+        section.className = `category${category.kind ? ` category--${category.kind}` : ""}`;
         section.innerHTML = `
           <h2>${category.title[currentLang]}</h2>
           <div class="menu-grid">
             ${category.items.map((item) => `
-              <div class="menu-item">
+              <div class="menu-item${item.type ? ` menu-item--${item.type}` : ""}">
                 <div class="item-info">
                   <div class="item-name">${item[currentLang]}</div>
-                  <div class="item-price">${item.price.toFixed(2)} EUR</div>
+                  <div class="item-price">${item.type === "supplement" ? "+" : ""}${item.price.toFixed(2)} EUR</div>
                   ${item.desc ? `<div class="item-desc">${item.desc[currentLang]}</div>` : ""}
                 </div>
                 <div class="item-controls">
@@ -451,8 +476,8 @@
             notes: document.getElementById("notes").value.trim(),
             website: document.getElementById("website").value,
             form_started_at: document.getElementById("form_started_at").value,
-            source: "online_pickup",
-            channel: "web",
+            source: "internal",
+            channel: "staff",
             fulfillment_type: "pickup",
             payment_status: "pay_on_pickup"
           })

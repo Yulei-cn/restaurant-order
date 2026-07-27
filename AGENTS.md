@@ -46,6 +46,7 @@ Current implementation snapshot:
 - Admin session validation must treat malformed cookies as unauthenticated requests, not as server errors.
 - Admin-facing Chinese copy and asset references in `admin.html` and `mes-commandes.html` have been restored and must stay readable; do not regress them into mojibake/garbled text.
 - `index.html` submission success shows the pickup number (`orderNumber`), total, time, and pickup instructions.
+- `index.html` is optimized for cashier use on iPad: its three formula choices are listed first, and the shared noodle and drink supplements are each 1 EUR. The delivery-address field is optional.
 - `mes-commandes.html` polling now stops when the tab is hidden, pauses after inactivity, and uses incremental refresh based on `updated_at`; `api/list-orders.js` also limits the active-order response size.
 - `mes-commandes.html` presentation styles are now loaded from `mes-commandes.css`; keep polling, admin-session checks, audio alerts, and status-update flows unchanged when adjusting styling.
 - `api/payment-webhook.js` and `api/webhook-verify.js` are intentionally disabled until phase 3 and must not be treated as an active payment flow.
