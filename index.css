@@ -120,6 +120,16 @@ body {
   background: #1e3a8a;
 }
 
+.cashier-day-status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 52px;
+  padding: 0 12px;
+  color: #334155;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
 .lang-switch button.active {
   background: linear-gradient(135deg, #2e7d32, #1b5e20);
 }

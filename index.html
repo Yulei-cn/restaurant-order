@@ -13,6 +13,7 @@
       <div class="cashier-day-actions">
         <button class="cashier-day-action cashier-day-action--open" id="openDayButton" type="button" onclick="openCashDay()"></button>
         <button class="cashier-day-action cashier-day-action--close" id="closeDayButton" type="button" onclick="closeCashDay()"></button>
+        <span class="cashier-day-status" id="cashDayStatus"></span>
       </div>
       <div class="lang-switch">
         <button id="lang-fr" type="button" onclick="setLang('fr')">Français</button>
@@ -98,9 +99,14 @@
         methodOther: "Autre"
         ,receiptLegal: "SAS au capital de 6 000,00 EUR | RCS Paris / SIREN 928 586 973 | SIRET 928 586 973 00010 | TVA FR83 928586973 | NAF / APE 5610C | 7 rue Blanche, 75009 Paris | Tel. 01 88 61 44 96"
         ,openDay: "Ouvrir la caisse"
+        ,reopenDay: "Reouvrir la caisse"
         ,closeDay: "Cloturer et imprimer Z"
         ,dayOpened: "Caisse ouverte"
+        ,dayReopened: "Caisse reouverte"
         ,dayError: "Operation de caisse impossible"
+        ,dayNotStarted: "Caisse non ouverte"
+        ,dayOpen: "Caisse ouverte"
+        ,dayClosed: "Journee cloturee"
       },
       zh: {
         pageTitle: "CUBE - 收银台",
@@ -156,9 +162,14 @@
         methodOther: "其他"
         ,receiptLegal: "SAS，注册资本 6 000 欧元 | Paris RCS / SIREN 928 586 973 | SIRET 928 586 973 00010 | TVA FR83 928586973 | NAF / APE 5610C | 7 rue Blanche, 75009 Paris | 电话 01 88 61 44 96"
         ,openDay: "开班"
+        ,reopenDay: "重新开班"
         ,closeDay: "日结 / 打印 Z"
         ,dayOpened: "已开班"
+        ,dayReopened: "已重新开班"
         ,dayError: "收银操作失败"
+        ,dayNotStarted: "未开班"
+        ,dayOpen: "已开班"
+        ,dayClosed: "今日已日结"
       }
     };
 
@@ -519,8 +530,38 @@
       }
     }
 
+    let cashDayStatus = "not_started";
+
+    async function refreshCashDayState() {
+      try {
+        const res = await fetch(`/api/cash-register?date=${new Date().toISOString().slice(0, 10)}`, { credentials: "same-origin" });
+        if (res.status === 401) {
+          window.location.href = "admin.html?next=index.html";
+          return;
+        }
+        const data = await res.json();
+        if (!res.ok) return;
+        const status = data.closure?.status || "not_started";
+        cashDayStatus = status;
+        const openButton = document.getElementById("openDayButton");
+        const closeButton = document.getElementById("closeDayButton");
+        openButton.disabled = status === "open";
+        closeButton.disabled = status !== "open";
+        openButton.textContent = t(status === "closed" ? "reopenDay" : "openDay");
+        document.getElementById("cashDayStatus").textContent = t(
+          status === "open" ? "dayOpen" : status === "closed" ? "dayClosed" : "dayNotStarted"
+        );
+      } catch {
+        // Session validation below handles unavailable authenticated access.
+      }
+    }
+
     async function openCashDay() {
-      if (await updateCashDay("open")) alert(t("dayOpened"));
+      const wasClosed = cashDayStatus === "closed";
+      if (await updateCashDay("open")) {
+        await refreshCashDayState();
+        alert(t(wasClosed ? "dayReopened" : "dayOpened"));
+      }
     }
 
     async function closeCashDay() {
@@ -580,6 +621,7 @@
       if (lastReceiptData) {
         renderReceipt(lastReceiptData);
       }
+      refreshCashDayState();
     }
 
     function resetFormProtection() {
@@ -671,6 +713,7 @@
 
     setLang("fr");
     resetFormProtection();
+    refreshCashDayState();
     fetch("/api/admin-session", { credentials: "same-origin" })
       .then((res) => res.json())
       .then((data) => {
