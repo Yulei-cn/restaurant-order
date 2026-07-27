@@ -179,19 +179,51 @@ body {
   background: linear-gradient(135deg, #dff5df, #c8edca);
 }
 
-.menu-item--supplement {
+.menu-item--quick-add {
   background: #f0fdf4;
   border: 1px dashed #4caf50;
-}
-
-.menu-item--supplement .item-name::before {
-  content: "+ ";
-  color: #15803d;
 }
 
 .item-info {
   flex: 1;
   min-width: 0;
+}
+
+@media (min-width: 700px) {
+  .category--formules .menu-grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+
+  .category--formules .menu-item {
+    grid-column: span 4;
+  }
+
+  .category--formules .menu-item--quick-add {
+    grid-column: span 3;
+    min-height: 76px;
+    padding: 10px 12px;
+  }
+
+  .category--formules .menu-item--quick-add .item-name {
+    font-size: 0.95rem;
+  }
+
+  .category--formules .menu-item--quick-add .item-desc {
+    display: none;
+  }
+
+  .category--formules .menu-item--quick-add .qty-button {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    font-size: 19px;
+  }
+
+  .category--formules .menu-item--quick-add .qty-display {
+    min-width: 36px;
+    padding: 7px 8px;
+  }
 }
 
 .item-name {
@@ -488,7 +520,7 @@ body {
   }
 
   .category--formules .menu-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(12, minmax(0, 1fr));
   }
 
   .menu-item {
@@ -529,6 +561,14 @@ body {
   .cashier-day-actions,
   .cashier-toolbar .lang-switch {
     justify-content: center;
+  }
+
+  .category--formules .menu-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .category--formules .menu-item--quick-add {
+    min-height: 78px;
   }
 }
 

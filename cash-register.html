@@ -22,18 +22,18 @@
     </div>
   </main>
   <script>
-    const params = new URLSearchParams(window.location.search);
-    const day = /^\d{4}-\d{2}-\d{2}$/.test(params.get('date') || '')
-      ? params.get('date')
-      : new Date().toISOString().slice(0, 10);
-    document.getElementById('businessDate').textContent = `Date : ${new Date(`${day}T12:00:00`).toLocaleDateString('fr-FR')}`;
+    let day;
     const euro = (value) => `EUR ${Number(value || 0).toFixed(2)}`;
 
     async function loadReport() {
-      const res = await fetch(`/api/cash-register?date=${day}`, { credentials: 'same-origin' });
+      const res = await fetch('/api/cash-register', { credentials: 'same-origin' });
       if (res.status === 401) return window.location.href = 'admin.html?next=cash-register.html';
       const report = await res.json();
       if (!res.ok) return alert(report.error || 'Lecture du resume impossible');
+      day = report.day;
+      document.getElementById('businessDate').textContent = day
+        ? `Service commence : ${new Date(day.opened_at).toLocaleString('fr-FR')}`
+        : 'Aucun service enregistre';
       document.getElementById('totals').innerHTML = `
         Operations : ${report.events.length}<br>
         Especes : ${euro(report.totals.cash)}<br>

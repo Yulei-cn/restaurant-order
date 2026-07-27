@@ -213,7 +213,8 @@
           },
           {
             id: "formule_nouilles",
-            type: "supplement",
+            type: "quick-add",
+            addOn: true,
             fr: "Nouilles a la place du riz",
             zh: "米饭换炒面",
             server: "Supplement nouilles formule",
@@ -225,7 +226,8 @@
           },
           {
             id: "formule_boisson",
-            type: "supplement",
+            type: "quick-add",
+            addOn: true,
             fr: "Boisson",
             zh: "饮料",
             server: "Supplement boisson formule",
@@ -234,6 +236,22 @@
               fr: "Supplement partage pour les trois formules.",
               zh: "三种套餐通用加价。"
             }
+          },
+          {
+            id: "roujiamo_porc",
+            type: "quick-add",
+            fr: "Roujiamo porc",
+            zh: "猪肉夹馍",
+            server: "Roujiamo porc",
+            price: 5.8
+          },
+          {
+            id: "roujiamo_boeuf",
+            type: "quick-add",
+            fr: "Roujiamo boeuf",
+            zh: "牛肉夹馍",
+            server: "Roujiamo boeuf",
+            price: 6.8
           }
         ]
       },
@@ -267,13 +285,6 @@
           { id: "riz_nature", fr: "Riz nature", zh: "米饭", server: "Riz nature", price: 2.5 },
           { id: "riz_saute", fr: "Riz saute", zh: "炒饭", server: "Riz saute", price: 5.8 },
           { id: "nouilles", fr: "Nouilles sautees", zh: "炒面", server: "Nouilles sautees", price: 6.8 }
-        ]
-      },
-      {
-        title: { fr: "🥙 Snacks", zh: "🥙 小吃" },
-        items: [
-          { id: "roujiamo_porc", fr: "Roujiamo porc", zh: "猪肉夹馍", server: "Roujiamo porc", price: 5.8 },
-          { id: "roujiamo_boeuf", fr: "Roujiamo boeuf", zh: "牛肉夹馍", server: "Roujiamo boeuf", price: 6.8 }
         ]
       },
     ];
@@ -324,14 +335,25 @@
       menuData.forEach((category) => {
         const section = document.createElement("div");
         section.className = `category${category.kind ? ` category--${category.kind}` : ""}`;
+        const formulaQuickOrder = ["roujiamo_porc", "roujiamo_boeuf", "formule_nouilles", "formule_boisson"];
+        const displayItems = category.kind === "formules"
+          ? [...category.items].sort((left, right) => {
+            const leftPosition = formulaQuickOrder.indexOf(left.id);
+            const rightPosition = formulaQuickOrder.indexOf(right.id);
+            if (leftPosition === -1 && rightPosition === -1) return 0;
+            if (leftPosition === -1) return -1;
+            if (rightPosition === -1) return 1;
+            return leftPosition - rightPosition;
+          })
+          : category.items;
         section.innerHTML = `
           <h2>${category.title[currentLang]}</h2>
           <div class="menu-grid">
-            ${category.items.map((item) => `
+            ${displayItems.map((item) => `
               <div class="menu-item${item.type ? ` menu-item--${item.type}` : ""}">
                 <div class="item-info">
                   <div class="item-name">${item[currentLang]}</div>
-                  <div class="item-price">${item.type === "supplement" ? "+" : ""}${item.price.toFixed(2)} EUR</div>
+                  <div class="item-price">${item.addOn ? "+" : ""}${item.price.toFixed(2)} EUR</div>
                   ${item.desc ? `<div class="item-desc">${item.desc[currentLang]}</div>` : ""}
                 </div>
                 <div class="item-controls">
@@ -510,7 +532,6 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             action,
-            business_date: new Date().toISOString().slice(0, 10),
             opening_cash: 0,
             counted_cash: 0
           })
@@ -534,14 +555,14 @@
 
     async function refreshCashDayState() {
       try {
-        const res = await fetch(`/api/cash-register?date=${new Date().toISOString().slice(0, 10)}`, { credentials: "same-origin" });
+        const res = await fetch("/api/cash-register", { credentials: "same-origin" });
         if (res.status === 401) {
           window.location.href = "admin.html?next=index.html";
           return;
         }
         const data = await res.json();
         if (!res.ok) return;
-        const status = data.closure?.status || "not_started";
+        const status = data.day_state || "not_started";
         cashDayStatus = status;
         const openButton = document.getElementById("openDayButton");
         const closeButton = document.getElementById("closeDayButton");
@@ -566,7 +587,7 @@
 
     async function closeCashDay() {
       if (await updateCashDay("close")) {
-        window.location.href = `cash-register.html?date=${new Date().toISOString().slice(0, 10)}`;
+        window.location.href = "cash-register.html";
       }
     }
 
