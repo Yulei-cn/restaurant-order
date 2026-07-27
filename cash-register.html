@@ -3,62 +3,54 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CUBE - Journee de caisse</title>
+  <title>CUBE - Resume du jour</title>
   <link rel="stylesheet" href="index.css">
 </head>
 <body>
   <main class="container cash-register-page">
-    <div class="lang-switch"><a class="legal-link" href="admin.html">Admin</a></div>
+    <div class="lang-switch"><a class="legal-link" href="index.html">Retour a la caisse</a></div>
     <div class="content">
-      <section class="category z-report"><h2>Journee de caisse</h2><div class="menu-grid">
-        <div class="z-legal"><strong>CUBE</strong><br>7 rue Blanche, 75009 Paris<br>SIRET 928 586 973 00010 | TVA FR83 928586973</div>
-        <div id="businessDate"></div>
-        <button class="day-action day-action--open" id="openDay">Commencer le service</button>
-        <button class="day-action day-action--close" id="closeDay">Terminer le service et imprimer le Z</button>
-        <button class="day-refresh" id="refresh">Actualiser les totaux</button>
-        <div id="totals"></div>
-      </div></section>
-      <section class="category"><h2>Remboursement / annulation</h2><div class="menu-grid">
-        <label>ID commande<input id="refundOrder" type="text"></label>
-        <label>Operation<select id="refundType"><option value="refund">Remboursement</option><option value="void">Annulation</option></select></label>
-        <label>Mode de remboursement<select id="refundMethod"><option value="cash">Especes</option><option value="card">Carte bancaire</option><option value="meal_voucher">Titre-restaurant</option><option value="other">Autre</option></select></label>
-        <label>Montant (EUR)<input id="refundAmount" type="number" min="0.01" step="0.01"></label>
-        <label>Motif obligatoire<input id="refundReason" type="text"></label>
-        <button class="payment-btn" id="refund">Enregistrer le remboursement</button>
-      </div></section>
+      <section class="category z-report">
+        <h2>Resume du jour / Z</h2>
+        <div class="menu-grid">
+          <div class="z-legal"><strong>CUBE</strong><br>7 rue Blanche, 75009 Paris<br>SIRET 928 586 973 00010 | TVA FR83 928586973</div>
+          <div id="businessDate"></div>
+          <div id="totals"></div>
+          <button class="z-print-button" id="printZ" type="button">Imprimer le Z</button>
+        </div>
+      </section>
     </div>
   </main>
   <script>
-    const day = new Date().toISOString().slice(0, 10);
-    document.getElementById('businessDate').textContent = `Aujourd'hui : ${new Date().toLocaleDateString('fr-FR')}`;
-    let report;
+    const params = new URLSearchParams(window.location.search);
+    const day = /^\d{4}-\d{2}-\d{2}$/.test(params.get('date') || '')
+      ? params.get('date')
+      : new Date().toISOString().slice(0, 10);
+    document.getElementById('businessDate').textContent = `Date : ${new Date(`${day}T12:00:00`).toLocaleDateString('fr-FR')}`;
     const euro = (value) => `EUR ${Number(value || 0).toFixed(2)}`;
+
     async function loadReport() {
       const res = await fetch(`/api/cash-register?date=${day}`, { credentials: 'same-origin' });
       if (res.status === 401) return window.location.href = 'admin.html?next=cash-register.html';
-      report = await res.json();
-      document.getElementById('totals').innerHTML = `Aujourd'hui : ${report.events.length} operation(s)<br>Especes : ${euro(report.totals.cash)}<br>Carte : ${euro(report.totals.card)}<br>Titres-restaurant : ${euro(report.totals.meal_voucher)}<br>Autre : ${euro(report.totals.other)}<br>Remboursements / annulations : ${euro(report.totals.refunds)}<br>${report.closure ? 'Service termine' : 'Service en cours'}`;
+      const report = await res.json();
+      if (!res.ok) return alert(report.error || 'Lecture du resume impossible');
+      document.getElementById('totals').innerHTML = `
+        Operations : ${report.events.length}<br>
+        Especes : ${euro(report.totals.cash)}<br>
+        Carte : ${euro(report.totals.card)}<br>
+        Titres-restaurant : ${euro(report.totals.meal_voucher)}<br>
+        Autre : ${euro(report.totals.other)}
+      `;
     }
-    document.getElementById('refresh').onclick = loadReport;
-    document.getElementById('openDay').onclick = async () => {
-      const res = await fetch('/api/cash-register', { method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ action:'open', business_date: day, opening_cash: 0 }) });
-      const data = await res.json(); alert(res.ok ? 'Service commence' : data.error); if (res.ok) loadReport();
-    };
-    document.getElementById('closeDay').onclick = async () => {
-      const res = await fetch('/api/cash-register', { method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ action:'close', business_date: day, counted_cash: 0 }) });
-      const data = await res.json();
-      if (!res.ok) return alert(data.error);
-      await loadReport();
+
+    document.getElementById('printZ').onclick = () => {
       try {
         window.print();
       } catch {
-        // The day is already closed even if the browser cannot start printing.
+        // A print failure must not block access to the completed day summary.
       }
     };
-    document.getElementById('refund').onclick = async () => {
-      const res = await fetch('/api/cash-register', { method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ action:'payment', order_id:document.getElementById('refundOrder').value, event_type:document.getElementById('refundType').value, payment_method:document.getElementById('refundMethod').value, amount:document.getElementById('refundAmount').value, reason:document.getElementById('refundReason').value }) });
-      const data = await res.json(); alert(res.ok ? 'Remboursement enregistre' : data.error); if (res.ok) loadReport();
-    };
+
     loadReport();
   </script>
 </body>

@@ -48,6 +48,9 @@ Current implementation snapshot:
 - Admin-facing Chinese copy and asset references in `admin.html` and `mes-commandes.html` have been restored and must stay readable; do not regress them into mojibake/garbled text.
 - `index.html` submission success shows the pickup number (`orderNumber`), total, time, and pickup instructions.
 - `index.html` is optimized for cashier use on iPad: its three formula choices are listed first, and the shared noodle and drink supplements are each 1 EUR. Cashier orders do not request customer, phone, note, or delivery-address fields.
+- The active cashier day workflow is intentionally short: on `index.html`, the top-left toolbar contains `Ouvrir la caisse` / `开班` and `Cloturer et imprimer Z` / `日结 / 打印 Z`, while French/Chinese remain on the right. Opening records the day and leaves the cashier on the ordering page. Closing records the day, then redirects to `cash-register.html`, which is a read-only daily summary and Z-print page with a return-to-cashier link.
+- Do not put a cash float, cash count, discrepancy input, refund, or void UI in the normal cashier day flow. Refund/void operations remain ledger capabilities only and require an explicitly designed manager-only workflow before a staff UI is added.
+- The daily summary reports the number of operations and totals by payment method. Printing the Z report is non-blocking: a browser/printer failure must never undo the recorded closure or prevent a return to ordering.
 - `mes-commandes.html` polling now stops when the tab is hidden, pauses after inactivity, and uses incremental refresh based on `updated_at`; `api/list-orders.js` also limits the active-order response size.
 - `mes-commandes.html` presentation styles are now loaded from `mes-commandes.css`; keep polling, admin-session checks, audio alerts, and status-update flows unchanged when adjusting styling.
 - `api/payment-webhook.js` and `api/webhook-verify.js` are intentionally disabled until phase 3 and must not be treated as an active payment flow.
@@ -89,6 +92,7 @@ There is no automated suite yet. Validate changes manually against the current p
 - verify French and Chinese both render as single-language pages on `index.html` and `box-meals.html`
 - verify the legal/privacy information is reachable from the public pages and reflects current company identity information
 - verify mobile layout on `index.html`, `box-meals.html`, `FACTURE.html`, and `mes-commandes.html`
+- verify the complete cashier-day navigation on iPad: open day from the `index.html` toolbar, remain on order entry, close day from the same toolbar, see the Z summary, and return to order entry
 
 ## Commit & Pull Request Guidelines
 Recent history uses short update-style commit subjects. Prefer concise imperative messages such as `Fix admin session validation` or `Adjust mobile layout for FACTURE`.

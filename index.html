@@ -9,10 +9,15 @@
 </head>
   <body>
   <div class="container">
-    <div class="lang-switch">
-      <a class="cash-day-link" id="cashDayLink" href="cash-register.html"></a>
-      <button id="lang-fr" type="button" onclick="setLang('fr')">Français</button>
-      <button id="lang-zh" type="button" onclick="setLang('zh')">中文</button>
+    <div class="cashier-toolbar">
+      <div class="cashier-day-actions">
+        <button class="cashier-day-action cashier-day-action--open" id="openDayButton" type="button" onclick="openCashDay()"></button>
+        <button class="cashier-day-action cashier-day-action--close" id="closeDayButton" type="button" onclick="closeCashDay()"></button>
+      </div>
+      <div class="lang-switch">
+        <button id="lang-fr" type="button" onclick="setLang('fr')">Français</button>
+        <button id="lang-zh" type="button" onclick="setLang('zh')">中文</button>
+      </div>
     </div>
 
     <div class="content">
@@ -92,7 +97,10 @@
         methodVoucher: "Titre-restaurant",
         methodOther: "Autre"
         ,receiptLegal: "SAS au capital de 6 000,00 EUR | RCS Paris / SIREN 928 586 973 | SIRET 928 586 973 00010 | TVA FR83 928586973 | NAF / APE 5610C | 7 rue Blanche, 75009 Paris | Tel. 01 88 61 44 96"
-        ,cashDayLink: "Ouvrir / cloturer la caisse"
+        ,openDay: "Ouvrir la caisse"
+        ,closeDay: "Cloturer et imprimer Z"
+        ,dayOpened: "Caisse ouverte"
+        ,dayError: "Operation de caisse impossible"
       },
       zh: {
         pageTitle: "CUBE - 收银台",
@@ -147,7 +155,10 @@
         methodVoucher: "餐券",
         methodOther: "其他"
         ,receiptLegal: "SAS，注册资本 6 000 欧元 | Paris RCS / SIREN 928 586 973 | SIRET 928 586 973 00010 | TVA FR83 928586973 | NAF / APE 5610C | 7 rue Blanche, 75009 Paris | 电话 01 88 61 44 96"
-        ,cashDayLink: "开班 / 日结"
+        ,openDay: "开班"
+        ,closeDay: "日结 / 打印 Z"
+        ,dayOpened: "已开班"
+        ,dayError: "收银操作失败"
       }
     };
 
@@ -329,7 +340,8 @@
       document.documentElement.lang = currentLang;
       document.title = t("pageTitle");
       document.getElementById("totalLabel").textContent = t("totalPrefix");
-      document.getElementById("cashDayLink").textContent = t("cashDayLink");
+      document.getElementById("openDayButton").textContent = t("openDay");
+      document.getElementById("closeDayButton").textContent = t("closeDay");
       document.getElementById("lang-fr").classList.toggle("active", currentLang === "fr");
       document.getElementById("lang-zh").classList.toggle("active", currentLang === "zh");
     }
@@ -474,6 +486,46 @@
         window.print();
       } catch {
         // Printing is non-blocking: the order and payment are already recorded.
+      }
+    }
+
+    async function updateCashDay(action) {
+      const button = document.getElementById(action === "open" ? "openDayButton" : "closeDayButton");
+      button.disabled = true;
+      try {
+        const res = await fetch("/api/cash-register", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action,
+            business_date: new Date().toISOString().slice(0, 10),
+            opening_cash: 0,
+            counted_cash: 0
+          })
+        });
+        const data = await res.json();
+        if (res.status === 401) {
+          window.location.href = "admin.html?next=index.html";
+          return false;
+        }
+        if (!res.ok) throw new Error(data.error || "Operation impossible");
+        return true;
+      } catch (error) {
+        alert(`${t("dayError")} : ${error.message || "inconnue"}`);
+        return false;
+      } finally {
+        button.disabled = false;
+      }
+    }
+
+    async function openCashDay() {
+      if (await updateCashDay("open")) alert(t("dayOpened"));
+    }
+
+    async function closeCashDay() {
+      if (await updateCashDay("close")) {
+        window.location.href = `cash-register.html?date=${new Date().toISOString().slice(0, 10)}`;
       }
     }
 
