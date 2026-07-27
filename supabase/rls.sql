@@ -117,6 +117,11 @@ revoke all on function public.close_cash_register_day(jsonb) from anon;
 revoke all on function public.close_cash_register_day(jsonb) from authenticated;
 grant execute on function public.close_cash_register_day(jsonb) to service_role;
 
+revoke all on function public.open_cash_register_day(jsonb) from public;
+revoke all on function public.open_cash_register_day(jsonb) from anon;
+revoke all on function public.open_cash_register_day(jsonb) from authenticated;
+grant execute on function public.open_cash_register_day(jsonb) to service_role;
+
 revoke all on function public.create_invoice_with_items(jsonb, jsonb) from public;
 revoke all on function public.create_invoice_with_items(jsonb, jsonb) from anon;
 revoke all on function public.create_invoice_with_items(jsonb, jsonb) from authenticated;

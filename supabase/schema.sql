@@ -618,6 +618,26 @@ begin
 end;
 $$;
 
+create or replace function public.open_cash_register_day(open_payload jsonb)
+returns table (business_date date, opening_cash numeric)
+language plpgsql
+as $$
+declare
+  target_date date := coalesce((open_payload->>'business_date')::date, current_date);
+  target_opening numeric := (open_payload->>'opening_cash')::numeric;
+  target_actor text := open_payload->>'opened_by';
+begin
+  if target_opening is null or target_opening < 0 or target_actor is null or btrim(target_actor) = '' then raise exception 'Invalid opening'; end if;
+  insert into public.cash_register_days (business_date, opening_cash, opened_by)
+  values (target_date, target_opening, target_actor)
+  on conflict (business_date) do nothing;
+  if not found then raise exception 'Business day is already open or closed'; end if;
+  insert into public.cashier_audit_logs (event_type, entity_type, actor, details)
+  values ('daily_open', 'cash_register_day', target_actor, jsonb_build_object('business_date', target_date, 'opening_cash', target_opening));
+  business_date := target_date; opening_cash := target_opening; return next;
+end;
+$$;
+
 create or replace view public.order_summary as
 select
   o.id,

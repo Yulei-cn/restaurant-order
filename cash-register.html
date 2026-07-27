@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CUBE - Cloture de caisse</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <main class="container cash-register-page">
+    <div class="lang-switch"><a class="legal-link" href="admin.html">Admin</a></div>
+    <div class="content">
+      <section class="category"><h2>Cloture de caisse / Z</h2><div class="menu-grid">
+        <label>Date <input id="day" type="date"></label>
+        <button class="payment-btn" id="refresh">Actualiser</button>
+        <button class="payment-btn" onclick="window.print()">Imprimer Z</button>
+        <div id="totals"></div>
+      </div></section>
+      <section class="category"><h2>Ouverture de caisse</h2><div class="menu-grid">
+        <label>Fond de caisse (EUR)<input id="openingCash" type="number" min="0" step="0.01"></label>
+        <button class="payment-btn" id="openDay">Ouvrir la caisse</button>
+      </div></section>
+      <section class="category"><h2>Cloturer la caisse</h2><div class="menu-grid">
+        <label>Especes comptees (EUR)<input id="countedCash" type="number" min="0" step="0.01"></label>
+        <button class="payment-btn" id="closeDay">Valider la cloture</button>
+        <div id="closeResult"></div>
+      </div></section>
+      <section class="category"><h2>Remboursement / annulation</h2><div class="menu-grid">
+        <label>ID commande<input id="refundOrder" type="text"></label>
+        <label>Mode de remboursement<select id="refundMethod"><option value="cash">Especes</option><option value="card">Carte bancaire</option><option value="meal_voucher">Titre-restaurant</option><option value="other">Autre</option></select></label>
+        <label>Montant (EUR)<input id="refundAmount" type="number" min="0.01" step="0.01"></label>
+        <label>Motif obligatoire<input id="refundReason" type="text"></label>
+        <button class="payment-btn" id="refund">Enregistrer le remboursement</button>
+      </div></section>
+    </div>
+  </main>
+  <script>
+    const day = document.getElementById('day'); day.value = new Date().toISOString().slice(0, 10);
+    let report;
+    const euro = (value) => `EUR ${Number(value || 0).toFixed(2)}`;
+    async function loadReport() {
+      const res = await fetch(`/api/cash-day-report?date=${day.value}`, { credentials: 'same-origin' });
+      if (res.status === 401) return window.location.href = 'admin.html?next=cash-register.html';
+      report = await res.json();
+      document.getElementById('totals').innerHTML = `Especes : ${euro(report.totals.cash)}<br>Carte : ${euro(report.totals.card)}<br>Titres-restaurant : ${euro(report.totals.meal_voucher)}<br>Remboursements : ${euro(report.totals.refunds)}<br>${report.closure ? `Caisse cloturee : ecart ${euro(report.closure.variance_cash)}` : 'Caisse ouverte'}`;
+    }
+    document.getElementById('refresh').onclick = loadReport;
+    document.getElementById('openDay').onclick = async () => {
+      const res = await fetch('/api/open-cash-day', { method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ business_date: day.value, opening_cash: document.getElementById('openingCash').value }) });
+      const data = await res.json(); alert(res.ok ? 'Caisse ouverte' : data.error); if (res.ok) loadReport();
+    };
+    document.getElementById('closeDay').onclick = async () => {
+      const res = await fetch('/api/close-cash-day', { method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ business_date: day.value, counted_cash: document.getElementById('countedCash').value }) });
+      const data = await res.json(); document.getElementById('closeResult').textContent = res.ok ? `Cloture OK. Ecart : ${euro(data.closure.variance_cash)}` : data.error; if (res.ok) loadReport();
+    };
+    document.getElementById('refund').onclick = async () => {
+      const res = await fetch('/api/record-payment', { method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ order_id:document.getElementById('refundOrder').value, event_type:'refund', payment_method:document.getElementById('refundMethod').value, amount:document.getElementById('refundAmount').value, reason:document.getElementById('refundReason').value }) });
+      const data = await res.json(); alert(res.ok ? 'Remboursement enregistre' : data.error); if (res.ok) loadReport();
+    };
+    loadReport();
+  </script>
+</body>
+</html>
