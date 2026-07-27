@@ -10,6 +10,7 @@
   <body>
   <div class="container">
     <div class="lang-switch">
+      <a class="cash-day-link" id="cashDayLink" href="cash-register.html"></a>
       <button id="lang-fr" type="button" onclick="setLang('fr')">Français</button>
       <button id="lang-zh" type="button" onclick="setLang('zh')">中文</button>
     </div>
@@ -90,7 +91,8 @@
         methodCard: "Carte bancaire",
         methodVoucher: "Titre-restaurant",
         methodOther: "Autre"
-        ,receiptLegal: "SAS au capital de 6 000,00 EUR | RCS Paris / SIREN 928 586 973 | SIRET 928 586 973 00010 | TVA FR83 928586973 | 7 rue Blanche, 75009 Paris | Tel. 01 88 61 44 96"
+        ,receiptLegal: "SAS au capital de 6 000,00 EUR | RCS Paris / SIREN 928 586 973 | SIRET 928 586 973 00010 | TVA FR83 928586973 | NAF / APE 5610C | 7 rue Blanche, 75009 Paris | Tel. 01 88 61 44 96"
+        ,cashDayLink: "Ouvrir / cloturer la caisse"
       },
       zh: {
         pageTitle: "CUBE - 收银台",
@@ -144,7 +146,8 @@
         methodCard: "银行卡",
         methodVoucher: "餐券",
         methodOther: "其他"
-        ,receiptLegal: "SAS，注册资本 6 000 欧元 | Paris RCS / SIREN 928 586 973 | SIRET 928 586 973 00010 | TVA FR83 928586973 | 7 rue Blanche, 75009 Paris | 电话 01 88 61 44 96"
+        ,receiptLegal: "SAS，注册资本 6 000 欧元 | Paris RCS / SIREN 928 586 973 | SIRET 928 586 973 00010 | TVA FR83 928586973 | NAF / APE 5610C | 7 rue Blanche, 75009 Paris | 电话 01 88 61 44 96"
+        ,cashDayLink: "开班 / 日结"
       }
     };
 
@@ -326,6 +329,7 @@
       document.documentElement.lang = currentLang;
       document.title = t("pageTitle");
       document.getElementById("totalLabel").textContent = t("totalPrefix");
+      document.getElementById("cashDayLink").textContent = t("cashDayLink");
       document.getElementById("lang-fr").classList.toggle("active", currentLang === "fr");
       document.getElementById("lang-zh").classList.toggle("active", currentLang === "zh");
     }
@@ -466,7 +470,11 @@
     function printLastReceipt() {
       if (!lastReceiptData) return;
       renderReceipt(lastReceiptData);
-      window.print();
+      try {
+        window.print();
+      } catch {
+        // Printing is non-blocking: the order and payment are already recorded.
+      }
     }
 
     async function recordPayment(paymentMethod) {

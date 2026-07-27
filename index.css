@@ -78,6 +78,18 @@ body {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
+.cash-day-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 10px 16px;
+  border-radius: 25px;
+  background: #1d4ed8;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+}
+
 .lang-switch button.active {
   background: linear-gradient(135deg, #2e7d32, #1b5e20);
 }
