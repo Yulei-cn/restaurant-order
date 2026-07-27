@@ -23,38 +23,12 @@
 
         <div id="menuCategories"></div>
 
-        <div class="form-section">
-          <h2 id="pickupInfoTitle"></h2>
-
-          <div class="form-grid">
-            <div class="form-field">
-              <label for="customer_name" id="labelName"></label>
-              <input type="text" name="customer_name" id="customer_name" required>
-            </div>
-
-            <div class="form-field">
-              <label for="phone" id="labelPhone"></label>
-              <input type="tel" name="phone" id="phone">
-            </div>
-
-            <div class="form-field">
-              <label for="notes" id="labelNotes"></label>
-              <input type="text" name="notes" id="notes">
-            </div>
-
-            <div class="form-field">
-              <label for="address" id="labelAddress"></label>
-              <input type="text" name="address" id="address">
-            </div>
-
-            <div class="anti-bot-field" aria-hidden="true">
-              <label for="website">Website</label>
-              <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
-            </div>
-
-            <input type="hidden" id="form_started_at" name="form_started_at" value="">
-          </div>
+        <div class="anti-bot-field" aria-hidden="true">
+          <label for="website">Website</label>
+          <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
         </div>
+
+        <input type="hidden" id="form_started_at" name="form_started_at" value="">
       </form>
 
       <div id="result"></div>
@@ -89,6 +63,7 @@
         paymentLabel: "Paiement",
         paymentValue: "Paiement sur place",
         pickupNote: "Indiquez ce numero au comptoir pour retirer votre commande.",
+        counterCustomer: "Comptoir",
         reprint: "🖨️ Reimprimer le ticket",
         receiptTitle: "CUBE - TICKET",
         receiptOrder: "Commande",
@@ -122,6 +97,7 @@
         paymentLabel: "支付状态",
         paymentValue: "到店付款",
         pickupNote: "取餐时请向柜台报出此取餐号。",
+        counterCustomer: "柜台客人",
         reprint: "🖨️ 再次打印小票",
         receiptTitle: "CUBE - 小票",
         receiptOrder: "订单号",
@@ -309,11 +285,6 @@
       document.documentElement.lang = currentLang;
       document.title = t("pageTitle");
       document.getElementById("totalLabel").textContent = t("totalPrefix");
-      document.getElementById("pickupInfoTitle").textContent = t("pickupInfoTitle");
-      document.getElementById("labelName").textContent = t("nameLabel");
-      document.getElementById("labelAddress").textContent = t("addressLabel");
-      document.getElementById("labelPhone").textContent = t("phoneLabel");
-      document.getElementById("labelNotes").textContent = t("notesLabel");
       document.getElementById("lang-fr").classList.toggle("active", currentLang === "fr");
       document.getElementById("lang-zh").classList.toggle("active", currentLang === "zh");
     }
@@ -475,11 +446,7 @@
         return;
       }
 
-      const customerName = document.getElementById("customer_name").value.trim();
-      if (!customerName) {
-        showResult(t("missingName"), "error");
-        return;
-      }
+      const customerName = t("counterCustomer");
 
       const submitBtn = document.getElementById("submitBtn");
       submitBtn.disabled = true;
@@ -492,9 +459,6 @@
           body: JSON.stringify({
             customer_name: customerName,
             items,
-            address: document.getElementById("address").value.trim(),
-            phone: document.getElementById("phone").value.trim(),
-            notes: document.getElementById("notes").value.trim(),
             website: document.getElementById("website").value,
             form_started_at: document.getElementById("form_started_at").value,
             source: "internal",
