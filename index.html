@@ -67,6 +67,14 @@
         reprint: "🖨️ Reimprimer le ticket",
         receiptTitle: "CUBE - TICKET",
         receiptOrder: "Commande",
+        receiptSeller: "Vendeur : Admin(1) | POS# 001",
+        receiptItemHeader: "Qte  Designation                 P.U.TTC    S.Total",
+        receiptLineCount: "Nb ligne",
+        receiptGrossTotal: "Total TTC",
+        receiptDiscount: "Total Remise",
+        receiptNetTotal: "Net a payer TTC",
+        receiptChange: "Rendu",
+        receiptVatHeader: "% TVA            Prix H.T.       TVA      Prix TTC",
         receiptCustomer: "Client",
         receiptTime: "Heure",
         receiptTotal: "TOTAL",
@@ -113,6 +121,14 @@
         reprint: "🖨️ 再次打印小票",
         receiptTitle: "CUBE - 小票",
         receiptOrder: "订单号",
+        receiptSeller: "收银员：Admin(1) | POS# 001",
+        receiptItemHeader: "数量  名称                      单价含税     小计",
+        receiptLineCount: "商品行数",
+        receiptGrossTotal: "含税总额",
+        receiptDiscount: "折扣",
+        receiptNetTotal: "应付含税",
+        receiptChange: "找零",
+        receiptVatHeader: "TVA 税率          未税金额       TVA      含税金额",
         receiptCustomer: "客户",
         receiptTime: "时间",
         receiptTotal: "总计",
@@ -409,24 +425,39 @@
 
     function renderReceipt(receipt) {
       const receiptElement = document.getElementById("printReceipt");
+      const totalTtc = Number(receipt.serverTotal);
+      const totalHt = totalTtc / 1.1;
+      const vatAmount = totalTtc - totalHt;
+      const paymentLabel = receipt.paymentMethod
+        ? t({ cash: "methodCash", card: "methodCard", meal_voucher: "methodVoucher", other: "methodOther" }[receipt.paymentMethod])
+        : "-";
       const itemRows = receipt.items.map((item) => `
         <div class="receipt-item">
-          <span>${escapeHtml(displayItemName(item.name))} × ${item.qty}</span>
+          <span>${item.qty}  ${escapeHtml(displayItemName(item.name))}</span>
+          <span>EUR ${item.price.toFixed(2)}</span>
           <span>EUR ${(item.qty * item.price).toFixed(2)}</span>
         </div>
       `).join("");
 
       receiptElement.innerHTML = `
-        <h1>${t("receiptTitle")}</h1>
+        <div class="receipt-brand">CUBE</div>
         <p class="receipt-legal">CUBE<br>${t("receiptLegal")}</p>
+        <h1>${t("receiptTitle")}</h1>
+        <div class="receipt-meta"><span>${escapeHtml(receipt.data.orderNumber || "---")}</span><span>${escapeHtml(receipt.orderTime)}</span></div>
+        <p>${t("receiptSeller")}</p>
         <div class="receipt-rule"></div>
-        <p><strong>${t("receiptOrder")}:</strong> ${escapeHtml(receipt.data.orderNumber || "---")}</p>
-        <p><strong>${t("receiptCustomer")}:</strong> ${escapeHtml(receipt.customerName)}</p>
-        <p><strong>${t("receiptTime")}:</strong> ${escapeHtml(receipt.orderTime)}</p>
-        <div class="receipt-rule"></div>
+        <p class="receipt-table-head">${t("receiptItemHeader")}</p>
         ${itemRows}
         <div class="receipt-rule"></div>
-        <div class="receipt-total"><span>${t("receiptTotal")}</span><span>EUR ${Number(receipt.serverTotal).toFixed(2)}</span></div>
+        <div class="receipt-summary"><span>${t("receiptLineCount")} : ${receipt.items.length}</span></div>
+        <div class="receipt-summary"><span>${t("receiptGrossTotal")}</span><span>EUR ${totalTtc.toFixed(2)}</span></div>
+        <div class="receipt-summary"><span>${t("receiptDiscount")}</span><span>EUR 0.00</span></div>
+        <div class="receipt-total"><span>${t("receiptNetTotal")}</span><span>EUR ${totalTtc.toFixed(2)}</span></div>
+        <div class="receipt-summary"><span>${paymentLabel}</span><span>1 × EUR ${totalTtc.toFixed(2)}</span></div>
+        <div class="receipt-total"><span>${t("receiptChange")}</span><span>EUR 0.00</span></div>
+        <div class="receipt-rule"></div>
+        <p class="receipt-table-head">${t("receiptVatHeader")}</p>
+        <div class="receipt-summary"><span>10%</span><span>EUR ${totalHt.toFixed(2)}</span><span>EUR ${vatAmount.toFixed(2)}</span><span>EUR ${totalTtc.toFixed(2)}</span></div>
         <div class="receipt-rule"></div>
         <p class="receipt-thanks">${t("receiptThanks")}</p>
       `;
@@ -458,6 +489,7 @@
         const data = await res.json();
         if (!res.ok) throw new Error(data.error);
         currentCashierOrder.paymentStatus = data.paymentStatus;
+        lastReceiptData.paymentMethod = paymentMethod;
         showPickupResult(currentCashierOrder, lastReceiptData.serverTotal, lastReceiptData.customerName, lastReceiptData.orderTime);
         window.setTimeout(printLastReceipt, 150);
       } catch {

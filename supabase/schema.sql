@@ -577,6 +577,47 @@ begin
 end;
 $$;
 
+create or replace function public.close_cash_register_day(close_payload jsonb)
+returns table (business_date date, expected_cash numeric, counted_cash numeric, variance_cash numeric)
+language plpgsql
+as $$
+declare
+  target_date date := coalesce((close_payload->>'business_date')::date, current_date);
+  target_counted numeric := (close_payload->>'counted_cash')::numeric;
+  target_actor text := close_payload->>'closed_by';
+  calculated_cash numeric;
+begin
+  if target_counted is null or target_counted < 0 or target_actor is null or btrim(target_actor) = '' then
+    raise exception 'Invalid daily closure';
+  end if;
+
+  select coalesce(sum(case when event_type = 'payment' and payment_method = 'cash' then amount
+                           when event_type in ('refund', 'void') and payment_method = 'cash' then -amount else 0 end), 0)
+  into calculated_cash
+  from public.payment_events
+  where recorded_at::date = target_date;
+
+  insert into public.cash_register_days (business_date, opening_cash, opened_by)
+  values (target_date, 0, target_actor)
+  on conflict (business_date) do nothing;
+
+  update public.cash_register_days
+  set status = 'closed', expected_cash = opening_cash + calculated_cash,
+      counted_cash = target_counted, variance_cash = target_counted - (opening_cash + calculated_cash),
+      closed_by = target_actor, closed_at = timezone('utc', now()),
+      closing_hash = encode(digest(concat_ws('|', target_date::text, calculated_cash::text, target_counted::text, target_actor), 'sha256'), 'hex')
+  where business_date = target_date and status = 'open'
+  returning cash_register_days.expected_cash, cash_register_days.counted_cash, cash_register_days.variance_cash
+  into expected_cash, counted_cash, variance_cash;
+
+  if not found then raise exception 'Business day is already closed'; end if;
+  insert into public.cashier_audit_logs (event_type, entity_type, actor, details)
+  values ('daily_close', 'cash_register_day', target_actor, jsonb_build_object('business_date', target_date, 'expected_cash', expected_cash, 'counted_cash', counted_cash, 'variance_cash', variance_cash));
+  business_date := target_date;
+  return next;
+end;
+$$;
+
 create or replace view public.order_summary as
 select
   o.id,
