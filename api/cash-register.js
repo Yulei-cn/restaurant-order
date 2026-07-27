@@ -27,11 +27,12 @@ export default async function handler(req, res) {
   const rpc = action === 'open' ? 'open_cash_register_day' : action === 'close' ? 'close_cash_register_day' : action === 'payment' ? 'record_payment_event' : '';
   if (!rpc) return res.status(400).json({ error: 'Action invalide' });
   if (action === 'payment') {
+    const eventType = req.body.event_type || 'payment';
     const amount = roundMoney(Number(req.body.amount));
-    if (!req.body.order_id || !EVENT_TYPES.has(req.body.event_type) || !PAYMENT_METHODS.has(req.body.payment_method) || !Number.isFinite(amount) || amount <= 0) {
+    if (!req.body.order_id || !EVENT_TYPES.has(eventType) || !PAYMENT_METHODS.has(req.body.payment_method) || !Number.isFinite(amount) || amount <= 0) {
       return res.status(400).json({ error: 'Donnees de paiement invalides' });
     }
-    if ((req.body.event_type === 'refund' || req.body.event_type === 'void') && !String(req.body.reason || '').trim()) {
+    if ((eventType === 'refund' || eventType === 'void') && !String(req.body.reason || '').trim()) {
       return res.status(400).json({ error: 'Motif obligatoire pour un remboursement ou une annulation' });
     }
     if (String(req.body.terminal_reference || '').length > 100 || String(req.body.reason || '').length > 500) {
@@ -42,7 +43,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Montant de caisse invalide' });
   }
   const payload = action === 'payment'
-    ? { payment_payload: { ...req.body, amount: roundMoney(Number(req.body.amount)), recorded_by: 'admin' } }
+    ? { payment_payload: { ...req.body, event_type: req.body.event_type || 'payment', amount: roundMoney(Number(req.body.amount)), recorded_by: 'admin' } }
     : action === 'open'
       ? { open_payload: { business_date: req.body.business_date || '', opening_cash: roundMoney(Number(req.body.opening_cash)), opened_by: 'admin' } }
       : { close_payload: { business_date: req.body.business_date || '', counted_cash: roundMoney(Number(req.body.counted_cash)), closed_by: 'admin' } };
