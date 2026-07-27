@@ -41,22 +41,22 @@
     let report;
     const euro = (value) => `EUR ${Number(value || 0).toFixed(2)}`;
     async function loadReport() {
-      const res = await fetch(`/api/cash-day-report?date=${day.value}`, { credentials: 'same-origin' });
+      const res = await fetch(`/api/cash-register?date=${day.value}`, { credentials: 'same-origin' });
       if (res.status === 401) return window.location.href = 'admin.html?next=cash-register.html';
       report = await res.json();
       document.getElementById('totals').innerHTML = `Especes : ${euro(report.totals.cash)}<br>Carte : ${euro(report.totals.card)}<br>Titres-restaurant : ${euro(report.totals.meal_voucher)}<br>Remboursements : ${euro(report.totals.refunds)}<br>${report.closure ? `Caisse cloturee : ecart ${euro(report.closure.variance_cash)}` : 'Caisse ouverte'}`;
     }
     document.getElementById('refresh').onclick = loadReport;
     document.getElementById('openDay').onclick = async () => {
-      const res = await fetch('/api/open-cash-day', { method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ business_date: day.value, opening_cash: document.getElementById('openingCash').value }) });
+      const res = await fetch('/api/cash-register', { method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ action:'open', business_date: day.value, opening_cash: document.getElementById('openingCash').value }) });
       const data = await res.json(); alert(res.ok ? 'Caisse ouverte' : data.error); if (res.ok) loadReport();
     };
     document.getElementById('closeDay').onclick = async () => {
-      const res = await fetch('/api/close-cash-day', { method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ business_date: day.value, counted_cash: document.getElementById('countedCash').value }) });
-      const data = await res.json(); document.getElementById('closeResult').textContent = res.ok ? `Cloture OK. Ecart : ${euro(data.closure.variance_cash)}` : data.error; if (res.ok) loadReport();
+      const res = await fetch('/api/cash-register', { method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ action:'close', business_date: day.value, counted_cash: document.getElementById('countedCash').value }) });
+      const data = await res.json(); document.getElementById('closeResult').textContent = res.ok ? `Cloture OK. Ecart : ${euro(data.result.variance_cash)}` : data.error; if (res.ok) loadReport();
     };
     document.getElementById('refund').onclick = async () => {
-      const res = await fetch('/api/record-payment', { method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ order_id:document.getElementById('refundOrder').value, event_type:document.getElementById('refundType').value, payment_method:document.getElementById('refundMethod').value, amount:document.getElementById('refundAmount').value, reason:document.getElementById('refundReason').value }) });
+      const res = await fetch('/api/cash-register', { method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ action:'payment', order_id:document.getElementById('refundOrder').value, event_type:document.getElementById('refundType').value, payment_method:document.getElementById('refundMethod').value, amount:document.getElementById('refundAmount').value, reason:document.getElementById('refundReason').value }) });
       const data = await res.json(); alert(res.ok ? 'Remboursement enregistre' : data.error); if (res.ok) loadReport();
     };
     loadReport();
