@@ -7,13 +7,8 @@
   <link rel="icon" href="logo.png" type="image/png">
   <link rel="stylesheet" href="index.css">
 </head>
-<body>
+  <body>
   <div class="container">
-    <div class="header">
-      <h1 id="title">CUBE - Commande</h1>
-      <div class="info-box" id="infoBox"></div>
-    </div>
-
     <div class="lang-switch">
       <button id="lang-fr" type="button" onclick="setLang('fr')">Français</button>
       <button id="lang-zh" type="button" onclick="setLang('zh')">中文</button>
@@ -21,11 +16,12 @@
 
     <div class="content">
       <form id="orderForm">
-        <div id="menuCategories"></div>
-
-        <div class="cart-summary">
+        <div class="cart-summary cashier-summary">
           <div class="total-price"><span id="totalLabel"></span> <span id="total">0.00</span> EUR</div>
+          <button type="submit" class="submit-btn" id="submitBtn"></button>
         </div>
+
+        <div id="menuCategories"></div>
 
         <div class="form-section">
           <h2 id="pickupInfoTitle"></h2>
@@ -57,54 +53,26 @@
             </div>
 
             <input type="hidden" id="form_started_at" name="form_started_at" value="">
-
-            <button type="submit" class="submit-btn" id="submitBtn"></button>
           </div>
         </div>
       </form>
 
       <div id="result"></div>
-
-      <div class="map-section">
-        <h2 id="mapTitle"></h2>
-        <div class="map-container">
-          <iframe
-            src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d8826.566768564202!2d2.327968040327757!3d48.87434070843596!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e66f9eb79f4ec3%3A0x8afbe2aac1fe8dd8!2sCUBE!5e0!3m2!1szh-CN!2sfr!4v1749454247270!5m2!1szh-CN!2sfr"
-            width="100%"
-            height="300"
-            style="border:0;"
-            allowfullscreen=""
-            loading="lazy">
-          </iframe>
-        </div>
-      </div>
-
-      <div class="legal-section">
-        <div class="legal-card">
-          <h3 id="legalTitle"></h3>
-          <p id="legalBody"></p>
-          <a class="legal-link" id="legalLink" href="politique-confidentialite.html" target="_blank" rel="noopener"></a>
-        </div>
-      </div>
+      <section id="printReceipt" class="print-receipt" aria-hidden="true"></section>
     </div>
   </div>
 
   <script>
     const i18n = {
       fr: {
-        pageTitle: "🍱 CUBE - Commande",
-        infoBox: "📍 7 Rue Blanche, 75009 Paris | 🕒 11:30-20:30",
+        pageTitle: "CUBE - Caisse",
         totalPrefix: "💵 Total :",
         pickupInfoTitle: "Informations de retrait",
         nameLabel: "Nom du client (obligatoire)",
         addressLabel: "Adresse de livraison (optionnel)",
         phoneLabel: "Telephone (optionnel)",
         notesLabel: "Remarques (optionnel)",
-        mapTitle: "📍 Nous trouver",
-        legalTitle: "Informations legales",
-        legalBody: "CUBE, SAS au capital de 6 000,00 EUR, RCS Paris 928 586 973, siege social : 7 rue Blanche, 75009 Paris. Consultez les mentions legales et la politique de confidentialite pour les details sur l'editeur, les donnees traitees et vos droits.",
-        legalLink: "Mentions legales et confidentialite",
-        submitReady: "✅ Commander",
+        submitReady: "🖨️ Confirmer et imprimer",
         submitDisabled: "Selectionnez des articles",
         submitLoading: "Envoi en cours...",
         decAria: "Diminuer",
@@ -120,22 +88,24 @@
         totalLabel: "Total",
         paymentLabel: "Paiement",
         paymentValue: "Paiement sur place",
-        pickupNote: "Presentez cette page ou indiquez ce numero au comptoir pour retirer votre commande."
+        pickupNote: "Indiquez ce numero au comptoir pour retirer votre commande.",
+        reprint: "🖨️ Reimprimer le ticket",
+        receiptTitle: "CUBE - TICKET",
+        receiptOrder: "Commande",
+        receiptCustomer: "Client",
+        receiptTime: "Heure",
+        receiptTotal: "TOTAL",
+        receiptThanks: "Merci et bon appetit !"
       },
       zh: {
-        pageTitle: "🍱 CUBE 盒饭点餐",
-        infoBox: "📍 巴黎9区 Rue Blanche 7号 | 🕒 营业时间 11:30-20:30",
+        pageTitle: "CUBE - 收银台",
         totalPrefix: "💵 总计：",
         pickupInfoTitle: "订单信息",
         nameLabel: "姓名（必填）",
         addressLabel: "送餐地址（可选）",
         phoneLabel: "电话（可选）",
         notesLabel: "备注（可选）",
-        mapTitle: "📍 我们的位置",
-        legalTitle: "法律与隐私信息",
-        legalBody: "CUBE 为法国简化股份公司（SAS），注册资本 6 000,00 欧元，Paris RCS 编号 928 586 973，注册地址 7 rue Blanche, 75009 Paris。请查看法律声明与隐私政策页面，了解网站主体、数据处理和您的权利。",
-        legalLink: "查看法律声明与隐私政策",
-        submitReady: "✅ 提交订单",
+        submitReady: "🖨️ 确认订单并打印",
         submitDisabled: "选择商品后提交",
         submitLoading: "提交中...",
         decAria: "减少",
@@ -151,7 +121,14 @@
         totalLabel: "总金额",
         paymentLabel: "支付状态",
         paymentValue: "到店付款",
-        pickupNote: "到店取餐时请向柜台出示此页面或报出取餐号。"
+        pickupNote: "取餐时请向柜台报出此取餐号。",
+        reprint: "🖨️ 再次打印小票",
+        receiptTitle: "CUBE - 小票",
+        receiptOrder: "订单号",
+        receiptCustomer: "客户",
+        receiptTime: "时间",
+        receiptTotal: "总计",
+        receiptThanks: "谢谢惠顾！"
       }
     };
 
@@ -267,6 +244,7 @@
     let currentLang = "fr";
     let cart = {};
     let lastPickupData = null;
+    let lastReceiptData = null;
     let formStartedAt = Date.now();
 
     function t(key) {
@@ -329,19 +307,13 @@
 
     function updateStaticTexts() {
       document.documentElement.lang = currentLang;
-      document.title = currentLang === "zh" ? "CUBE 盒饭点餐" : "CUBE - Commande";
-      document.getElementById("title").textContent = t("pageTitle");
-      document.getElementById("infoBox").textContent = t("infoBox");
+      document.title = t("pageTitle");
       document.getElementById("totalLabel").textContent = t("totalPrefix");
       document.getElementById("pickupInfoTitle").textContent = t("pickupInfoTitle");
       document.getElementById("labelName").textContent = t("nameLabel");
       document.getElementById("labelAddress").textContent = t("addressLabel");
       document.getElementById("labelPhone").textContent = t("phoneLabel");
       document.getElementById("labelNotes").textContent = t("notesLabel");
-      document.getElementById("mapTitle").textContent = t("mapTitle");
-      document.getElementById("legalTitle").textContent = t("legalTitle");
-      document.getElementById("legalBody").textContent = t("legalBody");
-      document.getElementById("legalLink").textContent = t("legalLink");
       document.getElementById("lang-fr").classList.toggle("active", currentLang === "fr");
       document.getElementById("lang-zh").classList.toggle("active", currentLang === "zh");
     }
@@ -356,7 +328,7 @@
       updateCartSummary();
     }
 
-    function getPickupContent(data, clientTotal, customerName) {
+    function getPickupContent(data, clientTotal, customerName, orderTime) {
       return {
         title: t("pickupTitle"),
         pickupLabel: t("pickupLabel"),
@@ -367,14 +339,14 @@
         paymentValue: t("paymentValue"),
         note: t("pickupNote"),
         customerName: customerName || "-",
-        orderTime: new Date().toLocaleString(currentLang === "zh" ? "zh-CN" : "fr-FR"),
+        orderTime: orderTime || new Date().toLocaleString(currentLang === "zh" ? "zh-CN" : "fr-FR"),
         serverTotal: Number(data.serverTotal || clientTotal || 0).toFixed(2)
       };
     }
 
-    function showPickupResult(data, clientTotal, customerName) {
+    function showPickupResult(data, clientTotal, customerName, orderTime) {
       const resultDiv = document.getElementById("result");
-      const content = getPickupContent(data, clientTotal, customerName);
+      const content = getPickupContent(data, clientTotal, customerName, orderTime);
 
       resultDiv.className = "pickup-card";
       resultDiv.innerHTML = `
@@ -402,10 +374,56 @@
           </div>
         </div>
         <div class="pickup-note">${content.note}</div>
+        <button type="button" class="reprint-btn" onclick="printLastReceipt()">${t("reprint")}</button>
       `;
 
-      lastPickupData = { data, clientTotal, customerName };
+      lastPickupData = { data, clientTotal, customerName, orderTime: content.orderTime };
       resultDiv.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>'"]/g, (character) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "'": "&#39;",
+        "\"": "&quot;"
+      }[character]));
+    }
+
+    function displayItemName(serverName) {
+      const item = Object.values(itemIndex).find((entry) => entry.server === serverName);
+      return item ? item[currentLang] : serverName;
+    }
+
+    function renderReceipt(receipt) {
+      const receiptElement = document.getElementById("printReceipt");
+      const itemRows = receipt.items.map((item) => `
+        <div class="receipt-item">
+          <span>${escapeHtml(displayItemName(item.name))} × ${item.qty}</span>
+          <span>EUR ${(item.qty * item.price).toFixed(2)}</span>
+        </div>
+      `).join("");
+
+      receiptElement.innerHTML = `
+        <h1>${t("receiptTitle")}</h1>
+        <div class="receipt-rule"></div>
+        <p><strong>${t("receiptOrder")}:</strong> ${escapeHtml(receipt.data.orderNumber || "---")}</p>
+        <p><strong>${t("receiptCustomer")}:</strong> ${escapeHtml(receipt.customerName)}</p>
+        <p><strong>${t("receiptTime")}:</strong> ${escapeHtml(receipt.orderTime)}</p>
+        <div class="receipt-rule"></div>
+        ${itemRows}
+        <div class="receipt-rule"></div>
+        <div class="receipt-total"><span>${t("receiptTotal")}</span><span>EUR ${Number(receipt.serverTotal).toFixed(2)}</span></div>
+        <div class="receipt-rule"></div>
+        <p class="receipt-thanks">${t("receiptThanks")}</p>
+      `;
+    }
+
+    function printLastReceipt() {
+      if (!lastReceiptData) return;
+      renderReceipt(lastReceiptData);
+      window.print();
     }
 
     function showResult(message, type) {
@@ -424,7 +442,10 @@
       updateCartSummary();
 
       if (lastPickupData) {
-        showPickupResult(lastPickupData.data, lastPickupData.clientTotal, lastPickupData.customerName);
+        showPickupResult(lastPickupData.data, lastPickupData.clientTotal, lastPickupData.customerName, lastPickupData.orderTime);
+      }
+      if (lastReceiptData) {
+        renderReceipt(lastReceiptData);
       }
     }
 
@@ -491,13 +512,23 @@
             return;
           }
 
+          const orderTime = new Date().toLocaleString(currentLang === "zh" ? "zh-CN" : "fr-FR");
+          lastReceiptData = {
+            data,
+            customerName,
+            orderTime,
+            items,
+            serverTotal: data.serverTotal || clientTotal
+          };
+
           cart = {};
           document.getElementById("orderForm").reset();
           renderCategories();
           updateTotal();
           updateCartSummary();
           resetFormProtection();
-          showPickupResult(data, clientTotal, customerName);
+          showPickupResult(data, clientTotal, customerName, orderTime);
+          window.setTimeout(printLastReceipt, 150);
         } else {
           showResult(`❌ ${data.error}`, "error");
         }

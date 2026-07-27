@@ -59,7 +59,7 @@ body {
 
 .lang-switch {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   gap: 15px;
   margin: 24px 20px;
 }
@@ -205,6 +205,31 @@ body {
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
 }
 
+.cashier-summary {
+  position: sticky;
+  top: 0;
+  bottom: auto;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin: 0 0 22px;
+  border-radius: 14px;
+}
+
+.cashier-summary .total-price {
+  margin-bottom: 0;
+  white-space: nowrap;
+}
+
+.cashier-summary .submit-btn {
+  flex: 1 1 auto;
+  max-width: 360px;
+  border: 2px solid rgba(255, 255, 255, 0.72);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+}
+
 .total-price {
   font-size: clamp(1.5rem, 5vw, 2rem);
   font-weight: 700;
@@ -282,6 +307,24 @@ body {
   cursor: not-allowed;
 }
 
+.reprint-btn {
+  display: block;
+  width: 100%;
+  margin-top: 14px;
+  min-height: 48px;
+  border: 0;
+  border-radius: 10px;
+  background: #166534;
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.print-receipt {
+  display: none;
+}
+
 @media (min-width: 769px) {
   body {
     background: #eef4ef;
@@ -307,7 +350,6 @@ body {
   }
 
   .lang-switch {
-    justify-content: flex-end;
     margin: 14px 24px;
   }
 
@@ -543,6 +585,19 @@ body {
     margin: 20px -14px -14px -14px;
   }
 
+  .cashier-summary {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin: 0 0 16px;
+  }
+
+  .cashier-summary .total-price,
+  .cashier-summary .submit-btn {
+    max-width: none;
+    width: 100%;
+  }
+
   .form-section {
     padding: 20px 14px;
     margin: 0 -14px;
@@ -553,6 +608,71 @@ body {
     padding: 14px 20px;
     min-height: 50px;
     font-size: 16px;
+  }
+}
+
+@page {
+  size: 80mm auto;
+  margin: 0;
+}
+
+@media print {
+  body {
+    background: #fff;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  #printReceipt,
+  #printReceipt * {
+    visibility: visible;
+  }
+
+  #printReceipt {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 80mm;
+    padding: 4mm;
+    color: #000;
+    font-family: Arial, sans-serif;
+    font-size: 11pt;
+    line-height: 1.35;
+  }
+
+  #printReceipt h1 {
+    margin: 0 0 3mm;
+    font-size: 15pt;
+    text-align: center;
+  }
+
+  #printReceipt p {
+    margin: 1.5mm 0;
+  }
+
+  .receipt-rule {
+    border-top: 1px dashed #000;
+    margin: 3mm 0;
+  }
+
+  .receipt-item,
+  .receipt-total {
+    display: flex;
+    justify-content: space-between;
+    gap: 3mm;
+  }
+
+  .receipt-total {
+    font-size: 13pt;
+    font-weight: 700;
+  }
+
+  .receipt-thanks {
+    text-align: center;
+    font-weight: 700;
   }
 }
 
