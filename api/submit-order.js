@@ -1,4 +1,5 @@
 import { getServiceHeaders, getSupabaseUrl, requireSupabaseConfig, roundMoney } from './_supabase.js';
+import { requireAdminConfig, requireAdminSession } from './_adminAuth.js';
 
 const rateLimitMap = new Map();
 const TAX_RATE = 0.1;
@@ -134,6 +135,17 @@ export default async function handler(req, res) {
     fulfillment_type = 'pickup',
     payment_status
   } = req.body || {};
+
+  if (source === 'internal') {
+    try {
+      requireAdminConfig();
+    } catch {
+      return res.status(500).json({ error: 'Configuration admin manquante' });
+    }
+    if (!requireAdminSession(req, res)) {
+      return;
+    }
+  }
 
   if (!isAllowedOrigin(req)) {
     logSuspiciousActivity(clientIP, 'Blocked by origin check', {

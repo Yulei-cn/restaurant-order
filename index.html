@@ -71,6 +71,17 @@
         receiptTime: "Heure",
         receiptTotal: "TOTAL",
         receiptThanks: "Merci et bon appetit !"
+        ,paymentPanelTitle: "Encaissement",
+        paymentMethod: "Mode de paiement",
+        paymentAmount: "Montant a encaisser",
+        terminalReference: "Reference TPE (optionnel)",
+        recordPayment: "Valider le paiement",
+        paymentSaved: "Paiement enregistre",
+        paymentError: "Erreur lors de l'enregistrement du paiement",
+        methodCash: "Especes",
+        methodCard: "Carte bancaire",
+        methodVoucher: "Titre-restaurant",
+        methodOther: "Autre"
       },
       zh: {
         pageTitle: "CUBE - 收银台",
@@ -105,6 +116,17 @@
         receiptTime: "时间",
         receiptTotal: "总计",
         receiptThanks: "谢谢惠顾！"
+        ,paymentPanelTitle: "收款",
+        paymentMethod: "付款方式",
+        paymentAmount: "本次收款金额",
+        terminalReference: "TPE 交易参考号（可选）",
+        recordPayment: "确认收款",
+        paymentSaved: "付款已记录",
+        paymentError: "付款记录失败",
+        methodCash: "现金",
+        methodCard: "银行卡",
+        methodVoucher: "餐券",
+        methodOther: "其他"
       }
     };
 
@@ -221,6 +243,7 @@
     let cart = {};
     let lastPickupData = null;
     let lastReceiptData = null;
+    let currentCashierOrder = null;
     let formStartedAt = Date.now();
 
     function t(key) {
@@ -345,10 +368,31 @@
           </div>
         </div>
         <div class="pickup-note">${content.note}</div>
+        ${data.paymentStatus === "paid" ? "" : `
+          <div class="payment-panel">
+            <h4>${t("paymentPanelTitle")}</h4>
+            <label>${t("paymentMethod")}
+              <select id="paymentMethod">
+                <option value="cash">${t("methodCash")}</option>
+                <option value="card">${t("methodCard")}</option>
+                <option value="meal_voucher">${t("methodVoucher")}</option>
+                <option value="other">${t("methodOther")}</option>
+              </select>
+            </label>
+            <label>${t("paymentAmount")}
+              <input id="paymentAmount" type="number" min="0.01" step="0.01" value="${content.serverTotal}">
+            </label>
+            <label>${t("terminalReference")}
+              <input id="terminalReference" type="text" maxlength="100">
+            </label>
+            <button type="button" class="payment-btn" onclick="recordPayment()">${t("recordPayment")}</button>
+          </div>
+        `}
         <button type="button" class="reprint-btn" onclick="printLastReceipt()">${t("reprint")}</button>
       `;
 
       lastPickupData = { data, clientTotal, customerName, orderTime: content.orderTime };
+      currentCashierOrder = data;
       resultDiv.scrollIntoView({ behavior: "smooth", block: "center" });
     }
 
@@ -395,6 +439,35 @@
       if (!lastReceiptData) return;
       renderReceipt(lastReceiptData);
       window.print();
+    }
+
+    async function recordPayment() {
+      if (!currentCashierOrder?.orderId) return;
+      const button = document.querySelector(".payment-btn");
+      const amount = Number(document.getElementById("paymentAmount").value);
+      if (!Number.isFinite(amount) || amount <= 0) return;
+      button.disabled = true;
+      try {
+        const res = await fetch("/api/record-payment", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            order_id: currentCashierOrder.orderId,
+            payment_method: document.getElementById("paymentMethod").value,
+            amount,
+            terminal_reference: document.getElementById("terminalReference").value.trim()
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        currentCashierOrder.paymentStatus = data.paymentStatus;
+        showPickupResult(currentCashierOrder, lastReceiptData.serverTotal, lastReceiptData.customerName, lastReceiptData.orderTime);
+        window.setTimeout(printLastReceipt, 150);
+      } catch {
+        button.disabled = false;
+        alert(t("paymentError"));
+      }
     }
 
     function showResult(message, type) {
@@ -470,6 +543,11 @@
 
         const data = await res.json();
 
+        if (res.status === 401) {
+          window.location.href = "admin.html?next=index.html";
+          return;
+        }
+
         if (res.ok) {
           if (data.serverTotal && Math.abs(data.serverTotal - clientTotal) > 0.01) {
             showResult(t("priceError"), "error");
@@ -492,7 +570,6 @@
           updateCartSummary();
           resetFormProtection();
           showPickupResult(data, clientTotal, customerName, orderTime);
-          window.setTimeout(printLastReceipt, 150);
         } else {
           showResult(`❌ ${data.error}`, "error");
         }
@@ -505,6 +582,12 @@
 
     setLang("fr");
     resetFormProtection();
+    fetch("/api/admin-session", { credentials: "same-origin" })
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data.authenticated) window.location.href = "admin.html?next=index.html";
+      })
+      .catch(() => { window.location.href = "admin.html?next=index.html"; });
     document.addEventListener("touchstart", function () {}, { passive: true });
   </script>
 </body>

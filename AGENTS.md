@@ -52,6 +52,7 @@ Current implementation snapshot:
 - `api/payment-webhook.js` and `api/webhook-verify.js` are intentionally disabled until phase 3 and must not be treated as an active payment flow.
 - `politique-confidentialite.html` is currently the public legal/privacy page, and public pages now expose company/legal identity information based on the current Kbis details.
 - Current Kbis-confirmed identity: CUBE, SAS with share capital of 6 000 EUR, RCS/SIREN Paris 928 586 973, SIRET 928 586 973 00010, intra-community VAT number FR83 928586973, registered office at 7 rue Blanche, 75009 Paris; its stated activity is traditional restaurant service, on-site and takeaway sales, and home delivery.
+- Cash-register work is in scope for phase 2. Payment-card authorization remains on the physical TPE; the application must only record the payment method and a non-sensitive TPE reference. Payment events, cashier audit logs, and daily closure records must be append-only.
 
 ## Deployment & Development Workflow
 This project is intentionally operated in the cloud. It does not aim to expose a full local server workflow or a complete self-explanatory deployment recipe. Treat Vercel and Supabase as the operational environment.
