@@ -278,10 +278,10 @@
         </article>
 
         <article class="tool-card">
-          <span class="badge badge-soon">后续阶段</span>
+          <span class="badge badge-live">当前使用</span>
           <h3>内部点单入口</h3>
-          <p>预留给店员录单页面。等后台框架稳定后再接入，不在当前改动范围内。</p>
-          <span class="card-link secondary">待接入</span>
+          <p>店员在 iPad 上录入堂食、外带和现场收银订单。</p>
+          <a class="card-link primary" href="index.html">进入收银点单</a>
         </article>
       </div>
     </section>
@@ -299,6 +299,7 @@
     const allowedTargets = new Set([
       'mes-commandes.html',
       'FACTURE.html',
+      'index.html',
       'admin.html'
     ]);
     const nextTarget = allowedTargets.has(rawNextTarget) ? rawNextTarget : '';

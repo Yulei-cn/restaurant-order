@@ -27,6 +27,7 @@ The current delivery target is phase 2. Do not let phase-3 payment work disrupt 
 Current implementation snapshot:
 
 - `admin.html` is the backend gateway for `mes-commandes.html` and `FACTURE.html`.
+- `admin.html` is also the authenticated gateway for the internal iPad cashier order entry (`index.html`).
 - `FACTURE.html` must use database-backed invoice clients and invoice saves; session-only client storage and hard-coded invoice/ticket placeholders are not acceptable for the active phase-2 admin flow.
 - `FACTURE.html` now loads clients from the database, saves clients through `api/invoice-clients.js`, and saves invoices through `api/save-invoice.js`.
 - `api/list-orders.js` and `api/mark-printed.js` are now protected by server-side admin session checks.
