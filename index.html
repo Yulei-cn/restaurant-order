@@ -82,6 +82,7 @@
         methodCard: "Carte bancaire",
         methodVoucher: "Titre-restaurant",
         methodOther: "Autre"
+        ,receiptLegal: "SAS au capital de 6 000,00 EUR | RCS Paris / SIREN 928 586 973 | SIRET 928 586 973 00010 | TVA FR83 928586973 | 7 rue Blanche, 75009 Paris | Tel. 01 88 61 44 96"
       },
       zh: {
         pageTitle: "CUBE - 收银台",
@@ -127,6 +128,7 @@
         methodCard: "银行卡",
         methodVoucher: "餐券",
         methodOther: "其他"
+        ,receiptLegal: "SAS，注册资本 6 000 欧元 | Paris RCS / SIREN 928 586 973 | SIRET 928 586 973 00010 | TVA FR83 928586973 | 7 rue Blanche, 75009 Paris | 电话 01 88 61 44 96"
       }
     };
 
@@ -371,21 +373,15 @@
         ${data.paymentStatus === "paid" ? "" : `
           <div class="payment-panel">
             <h4>${t("paymentPanelTitle")}</h4>
-            <label>${t("paymentMethod")}
-              <select id="paymentMethod">
-                <option value="cash">${t("methodCash")}</option>
-                <option value="card">${t("methodCard")}</option>
-                <option value="meal_voucher">${t("methodVoucher")}</option>
-                <option value="other">${t("methodOther")}</option>
-              </select>
-            </label>
-            <label>${t("paymentAmount")}
-              <input id="paymentAmount" type="number" min="0.01" step="0.01" value="${content.serverTotal}">
-            </label>
-            <label>${t("terminalReference")}
+            <div class="payment-quick-actions">
+              <button type="button" class="payment-choice cash" onclick="recordPayment('cash')">💶 ${t("methodCash")}</button>
+              <button type="button" class="payment-choice card" onclick="recordPayment('card')">💳 ${t("methodCard")}</button>
+              <button type="button" class="payment-choice voucher" onclick="recordPayment('meal_voucher')">🍽️ ${t("methodVoucher")}</button>
+              <button type="button" class="payment-choice other" onclick="recordPayment('other')">${t("methodOther")}</button>
+            </div>
+            <label class="terminal-reference">${t("terminalReference")}
               <input id="terminalReference" type="text" maxlength="100">
             </label>
-            <button type="button" class="payment-btn" onclick="recordPayment()">${t("recordPayment")}</button>
           </div>
         `}
         <button type="button" class="reprint-btn" onclick="printLastReceipt()">${t("reprint")}</button>
@@ -422,6 +418,7 @@
 
       receiptElement.innerHTML = `
         <h1>${t("receiptTitle")}</h1>
+        <p class="receipt-legal">CUBE<br>${t("receiptLegal")}</p>
         <div class="receipt-rule"></div>
         <p><strong>${t("receiptOrder")}:</strong> ${escapeHtml(receipt.data.orderNumber || "---")}</p>
         <p><strong>${t("receiptCustomer")}:</strong> ${escapeHtml(receipt.customerName)}</p>
@@ -441,12 +438,11 @@
       window.print();
     }
 
-    async function recordPayment() {
+    async function recordPayment(paymentMethod) {
       if (!currentCashierOrder?.orderId) return;
-      const button = document.querySelector(".payment-btn");
-      const amount = Number(document.getElementById("paymentAmount").value);
-      if (!Number.isFinite(amount) || amount <= 0) return;
-      button.disabled = true;
+      const buttons = document.querySelectorAll(".payment-choice");
+      const amount = Number(lastReceiptData.serverTotal);
+      buttons.forEach((button) => { button.disabled = true; });
       try {
         const res = await fetch("/api/record-payment", {
           method: "POST",
@@ -454,7 +450,7 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             order_id: currentCashierOrder.orderId,
-            payment_method: document.getElementById("paymentMethod").value,
+            payment_method: paymentMethod,
             amount,
             terminal_reference: document.getElementById("terminalReference").value.trim()
           })
@@ -465,7 +461,7 @@
         showPickupResult(currentCashierOrder, lastReceiptData.serverTotal, lastReceiptData.customerName, lastReceiptData.orderTime);
         window.setTimeout(printLastReceipt, 150);
       } catch {
-        button.disabled = false;
+        buttons.forEach((button) => { button.disabled = false; });
         alert(t("paymentError"));
       }
     }
