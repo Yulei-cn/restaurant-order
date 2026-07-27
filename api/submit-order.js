@@ -166,7 +166,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Requete invalide' });
   }
 
-  if (Date.now() - startedAt < MIN_FORM_FILL_MS) {
+  if (source !== 'internal' && Date.now() - startedAt < MIN_FORM_FILL_MS) {
     logSuspiciousActivity(clientIP, 'Submitted too quickly', { elapsedMs: Date.now() - startedAt });
     return res.status(400).json({ error: 'Soumission trop rapide' });
   }
