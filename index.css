@@ -407,6 +407,28 @@ body {
   cursor: pointer;
 }
 
+.cashier-after-payment-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.cashier-after-payment-actions .reprint-btn {
+  margin-top: 0;
+}
+
+.next-order-btn {
+  min-height: 48px;
+  border: 0;
+  border-radius: 10px;
+  background: #1d4ed8;
+  color: #fff;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
 .payment-panel {
   display: grid;
   grid-template-columns: 1fr;

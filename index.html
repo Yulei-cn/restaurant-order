@@ -71,7 +71,8 @@
         paymentValue: "Paiement sur place",
         pickupNote: "Indiquez ce numero au comptoir pour retirer votre commande.",
         counterCustomer: "Comptoir",
-        reprint: "🖨️ Reimprimer le ticket",
+        reprint: "🖨️ Imprimer le ticket (optionnel)",
+        nextOrder: "Nouvelle commande",
         receiptTitle: "CUBE - TICKET",
         receiptOrder: "Commande",
         receiptSeller: "Vendeur : Admin(1) | POS# 001",
@@ -134,7 +135,8 @@
         paymentValue: "到店付款",
         pickupNote: "取餐时请向柜台报出此取餐号。",
         counterCustomer: "柜台客人",
-        reprint: "🖨️ 再次打印小票",
+        reprint: "🖨️ 打印小票（可选）",
+        nextOrder: "下一位顾客",
         receiptTitle: "CUBE - 小票",
         receiptOrder: "订单号",
         receiptSeller: "收银员：Admin(1) | POS# 001",
@@ -449,7 +451,10 @@
             </label>
           </div>
         `}
-        <button type="button" class="reprint-btn" onclick="printLastReceipt()">${t("reprint")}</button>
+        ${data.paymentStatus === "paid" ? `<div class="cashier-after-payment-actions">
+          <button type="button" class="reprint-btn" onclick="printLastReceipt()">${t("reprint")}</button>
+          <button type="button" class="next-order-btn" onclick="startNextOrder()">${t("nextOrder")}</button>
+        </div>` : ""}
       `;
 
       lastPickupData = { data, clientTotal, customerName, orderTime: content.orderTime };
@@ -520,6 +525,16 @@
       } catch {
         // Printing is non-blocking: the order and payment are already recorded.
       }
+    }
+
+    function startNextOrder() {
+      lastPickupData = null;
+      lastReceiptData = null;
+      currentCashierOrder = null;
+      const resultDiv = document.getElementById("result");
+      resultDiv.className = "";
+      resultDiv.innerHTML = "";
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     async function updateCashDay(action) {
@@ -614,7 +629,6 @@
         currentCashierOrder.paymentStatus = data.result.payment_status;
         lastReceiptData.paymentMethod = paymentMethod;
         showPickupResult(currentCashierOrder, lastReceiptData.serverTotal, lastReceiptData.customerName, lastReceiptData.orderTime);
-        window.setTimeout(printLastReceipt, 150);
       } catch (error) {
         buttons.forEach((button) => { button.disabled = false; });
         alert(`${t("paymentError")} : ${error.message || "inconnue"}`);
