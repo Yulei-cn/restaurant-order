@@ -41,6 +41,7 @@ Current implementation snapshot:
 - Database-generated invoice numbers must come from the Supabase invoice trigger/function path, not from hard-coded front-end defaults.
 - `FACTURE.html` now replaces its draft placeholder with the database-generated invoice number returned after save.
 - Before save, `FACTURE.html` must show a date-derived temporary reference based on the current invoice date (for example `0331` for March 31) instead of a generic draft label.
+- Invoice saving and A4 printing are separate: saving never opens a print dialog. The saved invoice enables the optional print button. `FACTURE.css` owns an A4 portrait print layout with 12mm margins, a 186mm centered invoice area, and no controls/login screen; do not apply the 80mm receipt print rules used by the cashier page.
 - `index.html` and `box-meals.html` now use true single-language rendering: French view is fully French, Chinese view is fully Chinese.
 - Public delivery messaging must not mention Uber Eats; the current intended external channels are PandaGo and the self-operated delivery website only.
 - `index.html` presentation styles are now loaded from `index.css`; keep ordering logic and pickup-result behavior in the HTML script unchanged when adjusting styling.

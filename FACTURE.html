@@ -108,7 +108,7 @@
             <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd;">
                 <button class="btn btn-primary" onclick="updateInvoice()">Mettre a jour l'aperçu</button>
                 <button class="btn btn-success" onclick="saveInvoice()">Sauvegarder facture</button>
-                <button class="btn btn-secondary" onclick="window.print()">Imprimer / PDF</button>
+                <button class="btn btn-secondary" id="printInvoiceButton" type="button" onclick="printInvoice()" disabled>Imprimer la facture (optionnel)</button>
                 <div id="saveStatus" style="margin-top: 10px; font-size: 12px; color: #475467;"></div>
             </div>
         </div>
@@ -638,7 +638,16 @@
         hasSavedInvoiceNumber = true;
         document.getElementById('ticketNumber').value = saved.invoiceNumber;
         document.getElementById('displayTicket').textContent = saved.invoiceNumber;
+        document.getElementById('printInvoiceButton').disabled = false;
         setSaveStatus(`Facture sauvegardee: ${saved.invoiceNumber}`);
+    }
+
+    function printInvoice() {
+        if (!hasSavedInvoiceNumber) {
+            alert('Sauvegardez d\'abord la facture avant de l\'imprimer.');
+            return;
+        }
+        window.print();
     }
 
     async function initApp() {
