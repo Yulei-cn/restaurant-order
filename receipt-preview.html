@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aperçu ticket CUBE</title>
+  <style>
+    @page { size: 80mm 210mm; margin: 0; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f3f3f3; color: #000; font-family: Arial, "Microsoft YaHei", sans-serif; }
+    .receipt { width: 80mm; min-height: 210mm; margin: 12px auto; padding: 4mm 7mm 4mm 4mm; background: #fff; font-size: 11pt; line-height: 1.35; break-after: page; page-break-after: always; }
+    .receipt:last-of-type { break-after: auto; page-break-after: auto; }
+    h1 { margin: 0 0 3mm; font-size: 15pt; text-align: center; }
+    p { margin: 1.5mm 0; }
+    .brand { font-size: 17pt; font-weight: 800; text-align: center; }
+    .legal { font-size: 7.5pt; text-align: center; }
+    .rule { margin: 3mm 0; border-top: 1px dashed #000; }
+    .meta, .item, .summary, .total { display: flex; justify-content: space-between; gap: 3mm; }
+    .item span:first-child { flex: 1; }
+    .table-head { font-size: 8pt; font-weight: 700; white-space: pre-wrap; }
+    .total { font-size: 13pt; font-weight: 700; }
+    .thanks { text-align: center; font-weight: 700; }
+    .tax-head, .tax-row, .certificate-head, .certificate-row { display: grid; gap: 2mm; }
+    .tax-head, .tax-row { grid-template-columns: 1.2fr 1.5fr 1fr 1.25fr; }
+    .tax-head { font-size: 9pt; font-weight: 700; }
+    .certificate-head, .certificate-row { grid-template-columns: 1.15fr .7fr 1.7fr .85fr; font-size: 7.6pt; }
+    .certificate-head { font-weight: 700; }
+    .operation { display: flex; gap: 2mm; margin-top: 2mm; font-size: 8.5pt; }
+    .note { width: 80mm; margin: 0 auto 12px; color: #555; font-size: 13px; text-align: center; }
+    @media print {
+      body { background: #fff; }
+      .receipt { margin: 0; }
+      .note { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="receipt">
+    <div class="brand">CUBE</div>
+    <p class="legal">CUBE<br>7 RUE Blanche<br>75009 PARIS FRANCE<br>Tél. 01.88.61.44.96<br><strong>N° SIRET : 92858697300010</strong><br><strong>N° TVA : FR83928586973</strong><br><strong>Code NAF / APE : 5610C</strong></p>
+    <h1>Ticket</h1>
+    <div class="meta"><span class="receipt-number">T004274</span><span class="receipt-date">13-07-2026&nbsp; 18:08:37</span></div>
+    <p>Vendeur : &nbsp; Admin(1) <span style="float:right">POS#&nbsp;&nbsp; 001</span></p>
+    <div class="rule"></div>
+    <p class="table-head">Qté&nbsp;&nbsp; Désignation&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P.U.TTC&nbsp;&nbsp;&nbsp;&nbsp; S.Total</p>
+    <div class="item"><span>1&nbsp;&nbsp;&nbsp; Formule 10 Euros</span><span>10,00</span><span>10,00(1)</span></div>
+    <div class="rule"></div>
+    <div class="summary"><span>Nb ligne :</span><span>1</span></div>
+    <div class="summary"><span>Total TTC</span><span>10,00 €</span></div>
+    <div class="summary"><span>Total Remise</span><span>0,00 €</span></div>
+    <div class="total"><span>Net à payer TTC:</span><span>10,00 €</span></div>
+    <div class="summary"><span>Carte Bleue&nbsp;&nbsp; 1 X 10,00 €</span><span>10,00 €</span></div>
+    <div class="total"><span>Rendu :</span><span>0,00 €</span></div>
+    <div class="rule"></div>
+    <div class="tax-head"><span>%TVA</span><span>Prix H.T</span><span>TVA</span><span>Prix TTC</span></div>
+    <div class="tax-row"><span>(1)10%</span><span>9,09 €</span><span>0,91 €</span><span>10,00 €</span></div>
+    <div class="tax-row"><span>(2)20%</span><span>0,00 €</span><span>0,00 €</span><span>0,00 €</span></div>
+    <div class="tax-row"><span>total</span><span>9,09 €</span><span>0,91 €</span><span>10,00 €</span></div>
+    <div class="rule"></div>
+    <div class="certificate-head"><span>Logiciel</span><span>Category</span><span>Certificat</span><span>Signature</span></div>
+    <div class="certificate-row"><span>10.02.09.09.25</span><span>B</span><span>(NF525)0410-6</span><span class="receipt-signature">NM-M</span></div>
+    <div class="operation"><span>Type d'opération :</span><strong>Credit</strong><span>Nb. impression :</span><strong>1</strong></div>
+    <p class="thanks">Merci de votre visite, A bientôt !</p>
+  </main>
+  <p class="note">Aperçu local statique : commandes d'exemple, sans effet sur les transactions.</p>
+  <script>
+    const firstReceipt = document.querySelector('.receipt');
+    const secondReceipt = firstReceipt.cloneNode(true);
+    secondReceipt.querySelector('.receipt-number').textContent = 'T004468';
+    secondReceipt.querySelector('.receipt-date').textContent = '20-07-2026 18:34:16';
+    secondReceipt.querySelector('.receipt-signature').textContent = '6-LQ';
+    firstReceipt.after(secondReceipt);
+  </script>
+</body>
+</html>

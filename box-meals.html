@@ -489,7 +489,10 @@
       document.documentElement.lang = lang;
       document.title = lang === "zh" ? "CUBE 盒饭宣传页" : "Restaurant CUBE - Boites Repas & Menu";
       document.getElementById("heroTitle").textContent = data.title;
-      document.getElementById("vipNotice").innerHTML = `${data.vip}<div><img src="vip.jpg" alt="VIP"></div>`;
+      document.getElementById("vipNotice").innerHTML = `
+        <img src="名片1.png" alt="${lang === "zh" ? "CUBE 名片 1" : "Carte de visite CUBE 1"}">
+        <img src="名片2.png" alt="${lang === "zh" ? "CUBE 名片 2" : "Carte de visite CUBE 2"}">
+      `;
       document.getElementById("downloadBtn").textContent = data.download;
       document.getElementById("lang-fr").classList.toggle("active", lang === "fr");
       document.getElementById("lang-zh").classList.toggle("active", lang === "zh");
