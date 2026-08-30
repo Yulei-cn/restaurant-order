@@ -102,14 +102,22 @@ table tr:hover td { background: #fbfbf7; }
 .footer-meta { margin-top: 10px; font-size: .78rem; }
 .footer-links { margin-top: 14px; }
 .footer-links a { color: var(--red); font-weight: 750; }
+@media (max-width: 1024px) {
+  .container { width: 100%; margin: 0; border-width: 0; }
+  .header { min-height: 360px; }
+  .content { padding-inline: clamp(24px, 5vw, 48px); }
+  .offers-container { margin-inline: clamp(24px, 5vw, 48px); }
+  .offer-card { grid-template-columns: minmax(210px, 34%) 1fr; }
+  .footer-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
 @media (max-width: 760px) {
-  .container { width: 100%; margin: 0; border: 0; }
-  .header { min-height: 345px; padding: 100px 24px 56px; background-position: 58% center; }
+  body { background: var(--paper); }
+  .header { min-height: 332px; padding: 100px 24px 56px; background-position: 58% center; }
   .header::before { inset: 12px; }
   .header::after { right: 20px; bottom: 18px; }
   .lang-switch { top: 22px; right: 20px; }
-  .vip-notice { gap: 10px; padding: 18px 20px; }
-  .vip-notice img { max-height: 140px; }
+  .vip-notice { grid-template-columns: 1fr; gap: 14px; padding: 18px 20px; }
+  .vip-notice img { height: auto; max-height: none; }
   .offers-container { margin: 26px 0 0; }
   .offer-card { min-height: 238px; grid-template-columns: 38% 1fr; }
   .offer-content { padding: 22px 16px; }
@@ -123,13 +131,32 @@ table tr:hover td { background: #fbfbf7; }
   .drinks-list { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .catering-highlight { padding: 22px !important; }
 }
-@media (max-width: 390px) {
-  .header h1 { font-size: 1.9rem; }
-  .offer-card { grid-template-columns: 34% 1fr; }
-  .offer-content { padding: 18px 12px; }
-  .offer-content h3 { font-size: 1.15rem; }
-  .offer-content p { font-size: .8rem; }
+@media (max-width: 480px) {
+  .header { min-height: 310px; padding: 94px 18px 46px; }
+  .header h1 { font-size: clamp(1.75rem, 9vw, 2.2rem); }
+  .logo { width: 72px; height: 72px; margin-bottom: 14px; }
+  .lang-switch { top: 14px; right: 14px; }
+  .lang-switch button { min-height: 34px; padding-inline: 10px; font-size: .78rem; }
+  .vip-notice { padding: 14px; }
+  .offers-container { margin-top: 20px; }
+  .offer-card { grid-template-columns: 1fr; min-height: 0; }
+  .offer-image { height: 180px; }
+  .offer-content { padding: 20px 18px 34px; }
+  .offer-content h3 { font-size: 1.35rem; }
+  .offer-content p { font-size: .9rem; }
+  .slider-dots { right: 18px; bottom: 14px; }
+  .dot { width: 28px; height: 4px; }
+  .content { padding-inline: 14px; }
+  .section { margin-top: 32px; }
+  .section h2 { font-size: 1.35rem; }
+  .section-content > p { font-size: .98rem; }
+  .formula-card { min-height: 165px; padding: 20px; }
+  .formula-price { font-size: 1.75rem; }
+  .contact-item { min-height: 0; padding: 16px; }
+  .drinks-list { grid-template-columns: 1fr; }
   table th, table td { padding: 12px; }
+  table td:last-child { width: 110px; }
+  .footer-card { padding: 18px; }
 }
 @media print {
   body { background: #fff; }
