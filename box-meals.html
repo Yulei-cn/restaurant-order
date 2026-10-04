@@ -4,43 +4,36 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Restaurant CUBE - Boites Repas & Menu</title>
-  <link rel="stylesheet" href="stylebox.css">
-  <style>
-    .lang-switch button.active {
-      background: linear-gradient(135deg, #2e7d32, #1b5e20);
-    }
-  </style>
+  <link rel="stylesheet" href="box-meals.css">
 </head>
 <body>
   <div class="container">
-    <div class="header">
+    <nav class="topbar" aria-label="CUBE">
       <img src="logo.png" alt="Logo CUBE" class="logo">
-      <h1 id="heroTitle"></h1>
-    </div>
-
-    <div id="vipNotice" class="vip-notice"></div>
-
-    <div class="lang-switch">
+      <span class="brand">CUBE <small>PARIS · 9</small></span>
+      <div class="lang-switch">
       <button id="lang-fr" type="button" onclick="setLang('fr')">Français</button>
       <button id="lang-zh" type="button" onclick="setLang('zh')">中文</button>
-    </div>
-
-    <div class="offers-container">
-      <div class="offers-slider" id="offersSlider"></div>
-      <div class="slider-dots">
-        <span class="dot active" onclick="showSlide(0)"></span>
-        <span class="dot" onclick="showSlide(1)"></span>
       </div>
-    </div>
-
-    <div class="content">
+    </nav>
+    <header class="header">
+      <div class="hero-copy">
+        <p class="eyebrow" id="heroEyebrow"></p>
+        <h1 id="heroTitle"></h1>
+        <p id="heroDescription" class="hero-description"></p>
+        <a href="#menuSections" class="button" id="exploreMenu"></a>
+        <span class="hero-address">7 rue Blanche · Paris 9</span>
+      </div>
+      <div class="hero-photo"><img src="Photo/Cube_Hero01.jpg" alt="" fetchpriority="high"><span id="heroStamp"></span></div>
+    </header>
+    <div id="vipNotice" class="vip-notice"></div>
+    <main class="content">
+      <div id="menuSections"></div>
+      <div class="offers-container"><div id="offersSlider"></div></div>
       <div id="storySections"></div>
-
       <div class="download-section">
         <a href="meun.pdf" download class="download-btn" id="downloadBtn"></a>
       </div>
-
-      <div id="menuSections"></div>
 
       <footer class="section site-footer">
         <h2 id="footerTitle"></h2>
@@ -48,8 +41,9 @@
           <div class="footer-grid" id="footerGrid"></div>
         </div>
       </footer>
-    </div>
+    </main>
   </div>
+  <nav class="mobile-actions" id="contactActions"></nav>
 
   <script>
     const pageData = {
@@ -304,8 +298,6 @@
     };
 
     let currentLang = "fr";
-    let currentSlide = 0;
-    let slideInterval;
 
     function applyChannelCopyRules() {
       Object.values(pageData).forEach((langData) => {
@@ -333,7 +325,7 @@
       slider.innerHTML = offers.map((offer) => `
         <div class="offer-card">
           <div class="offer-image">
-            <img src="${offer.image}" alt="${offer.alt}">
+            <img src="${offer.image}" alt="${offer.alt}" loading="lazy">
           </div>
           <div class="offer-content">
             <div class="offer-badge">${offer.badge}</div>
@@ -342,7 +334,7 @@
           </div>
         </div>
       `).join("");
-      showSlide(currentSlide);
+
     }
 
     function renderStorySections() {
@@ -378,11 +370,14 @@
           <h2>${menu.formulasTitle}</h2>
           <div class="section-content">
             <div class="formulas">
-              ${menu.formulas.map((formula) => `
+              ${menu.formulas.map((formula, index) => `
                 <div class="formula-card">
-                  <div class="formula-title">${formula.title}</div>
-                  <div class="formula-price">${formula.price}</div>
-                  <div>${formula.desc}</div>
+                  <img class="formula-photo" src="Photo/Cube_Formule0${index + 1}.jpg" alt="" loading="lazy">
+                  <div class="formula-details">
+                    <div class="formula-title">${formula.title}</div>
+                    <div class="formula-price">${formula.price}</div>
+                    <div>${formula.desc}</div>
+                  </div>
                 </div>
               `).join("")}
             </div>
@@ -398,12 +393,13 @@
         : null;
 
       const groupOrderSection = groupOrderCard ? `
-        <div class="section">
+        <div class="section catering-section">
           <h2>${groupOrderCard.title}</h2>
           <div class="section-content">
             <div class="info-box catering-highlight">
               <div class="catering-badge">${currentLang === "zh" ? "企业 / 团体订餐" : "Commande entreprise / groupe"}</div>
               <strong>${groupOrderCard.body.replace(/\n/g, "<br>")}</strong>
+              <div class="catering-actions"><a class="button" href="tel:+33188614496">${currentLang === "zh" ? "电话咨询 ↗" : "Appelez-nous ↗"}</a><a href="mailto:cube.paris9@gmail.com">${currentLang === "zh" ? "发送邮件 ↗" : "Envoyer un email ↗"}</a></div>
             </div>
           </div>
         </div>
@@ -429,7 +425,7 @@
         <div class="section">
           <h2>${menu.drinksTitle}</h2>
           <div class="section-content">
-            <p style="text-align:center;font-size:1.2rem;font-weight:bold;color:#4CAF50;margin-bottom:20px;">
+            <p class="drinks-intro">
               ${menu.drinksIntro}
             </p>
             <ul class="drinks-list">
@@ -459,40 +455,28 @@
       `).join("");
     }
 
-    function showSlide(index) {
-      currentSlide = index;
-      const slider = document.getElementById("offersSlider");
-      const dots = document.querySelectorAll(".dot");
-      slider.style.transform = `translateX(-${currentSlide * 50}%)`;
-      dots.forEach((dot, i) => dot.classList.toggle("active", i === currentSlide));
-    }
-
-    function nextSlide() {
-      currentSlide = (currentSlide + 1) % 2;
-      showSlide(currentSlide);
-    }
-
-    function startAutoSlide() {
-      stopAutoSlide();
-      slideInterval = setInterval(nextSlide, 4000);
-    }
-
-    function stopAutoSlide() {
-      if (slideInterval) {
-        clearInterval(slideInterval);
-      }
-    }
-
     function setLang(lang) {
       currentLang = lang;
       const data = pageData[lang];
       document.documentElement.lang = lang;
       document.title = lang === "zh" ? "CUBE 盒饭宣传页" : "Restaurant CUBE - Boites Repas & Menu";
-      document.getElementById("heroTitle").textContent = data.title;
-      document.getElementById("vipNotice").innerHTML = `
-        <img src="名片1.png" alt="${lang === "zh" ? "CUBE 名片 1" : "Carte de visite CUBE 1"}">
-        <img src="名片2.png" alt="${lang === "zh" ? "CUBE 名片 2" : "Carte de visite CUBE 2"}">
-      `;
+      const copy = lang === "zh" ? {
+        eyebrow: "巴黎九区 · 中式风味", title: "好好吃饭，\n就是好日常。",
+        description: "一份热腾腾的中式盒饭，为忙碌的一天添点滋味。自由搭配，堂食或打包带走。",
+        explore: "看看菜单 ↓", stamp: "你的午餐，\n自由搭配", call: "电话联系", directions: "到店导航"
+      } : {
+        eyebrow: "CUISINE CHINOISE · PARIS 9", title: "La pause déjeuner,\npleine de saveurs.",
+        description: "Une boîte repas généreuse, à composer à votre goût. Les saveurs de la Chine, sur place ou à emporter.",
+        explore: "Découvrir le menu ↓", stamp: "Votre pause,\nà votre goût", call: "Nous appeler", directions: "Itinéraire"
+      };
+      document.getElementById("heroTitle").textContent = copy.title;
+      document.getElementById("heroEyebrow").textContent = copy.eyebrow;
+      document.getElementById("heroDescription").textContent = copy.description;
+      document.getElementById("exploreMenu").textContent = copy.explore;
+      document.getElementById("heroStamp").textContent = copy.stamp;
+      document.getElementById("vipNotice").textContent = data.vip;
+      document.getElementById("contactActions").innerHTML = `<a href="tel:+33188614496">${copy.call} ↗</a><a href="https://www.google.com/maps/dir/?api=1&destination=7+rue+Blanche+75009+Paris" target="_blank" rel="noopener">${copy.directions} ↗</a>`;
+      document.getElementById("contactActions").setAttribute("aria-label", lang === "zh" ? "联系与导航" : "Contact et itinéraire");
       document.getElementById("downloadBtn").textContent = data.download;
       document.getElementById("lang-fr").classList.toggle("active", lang === "fr");
       document.getElementById("lang-zh").classList.toggle("active", lang === "zh");
@@ -502,42 +486,18 @@
       renderMenu();
       renderFooter();
 
-      localStorage.setItem("preferredLanguage", lang);
+      document.querySelectorAll(".lang-switch button").forEach(button => button.setAttribute("aria-pressed", button.id === `lang-${lang}`));
+      try { localStorage.setItem("preferredLanguage", lang); } catch {}
     }
 
     window.addEventListener("load", () => {
       applyChannelCopyRules();
-      const savedLang = localStorage.getItem("preferredLanguage") || "fr";
-      setLang(savedLang);
-      startAutoSlide();
-
-      const offersContainer = document.querySelector(".offers-container");
-      if (offersContainer) {
-        offersContainer.addEventListener("mouseenter", stopAutoSlide);
-        offersContainer.addEventListener("mouseleave", startAutoSlide);
-
-        let startX = 0;
-        let dragging = false;
-
-        offersContainer.addEventListener("touchstart", (event) => {
-          startX = event.touches[0].clientX;
-          dragging = true;
-          stopAutoSlide();
-        });
-
-        offersContainer.addEventListener("touchend", (event) => {
-          if (!dragging) return;
-          const diff = startX - event.changedTouches[0].clientX;
-          if (Math.abs(diff) > 50) {
-            showSlide(diff > 0 ? 1 : 0);
-          }
-          dragging = false;
-          setTimeout(startAutoSlide, 2000);
-        });
-      }
+      let savedLang = "fr";
+      try { savedLang = localStorage.getItem("preferredLanguage") || "fr"; } catch {}
+      setLang(savedLang === "zh" ? "zh" : "fr");
     });
 
-    document.addEventListener("touchstart", function () {}, { passive: true });
+
   </script>
 </body>
 </html>

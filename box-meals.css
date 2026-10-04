@@ -1,0 +1,114 @@
+/* Public marketing page. Mobile layout is independent of the cashier. */
+:root { --ink: #183e32; --muted: #626b61; --paper: #faf8f1; --line: #e1e5d9; }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; line-height: 1.65; }
+a { color: inherit; text-underline-offset: 4px; }
+button { font: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid #b8501f; outline-offset: 5px; }
+img { display: block; max-width: 100%; }
+.container { max-width: 1200px; margin: auto; padding: 0 40px; }
+.topbar { display: flex; align-items: center; gap: 12px; min-height: 96px; }
+.logo { width: 48px; height: 48px; object-fit: contain; border-radius: 50%; }
+.brand { font-size: 24px; font-weight: 900; letter-spacing: -.04em; }
+.brand small { display: block; font-size: 9px; letter-spacing: .2em; }
+.lang-switch { margin-left: auto; display: flex; border: 1px solid var(--line); border-radius: 30px; padding: 4px; }
+.lang-switch button { border: 0; border-radius: 24px; padding: 8px 16px; min-height: 44px; background: transparent; color: var(--ink); font-size: 13px; }
+.lang-switch button.active { background: var(--ink); color: white; }
+.header { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 40px; padding: 30px 0 48px; }
+.eyebrow { font-size: 11px; font-weight: 800; letter-spacing: .16em; margin: 0 0 20px; }
+h1 { font-size: clamp(36px, 4.8vw, 62px); line-height: 1.08; letter-spacing: -.055em; font-weight: 850; margin: 0; white-space: pre-line; text-wrap: balance; }
+.hero-description { color: var(--muted); max-width: 420px; margin: 24px 0; }
+.button, .download-btn { display: inline-flex; justify-content: center; align-items: center; padding: 13px 22px; min-height: 48px; background: var(--ink); color: white; border-radius: 30px; text-decoration: none; font-weight: 700; font-size: 14px; }
+.button:hover, .download-btn:hover { background: #2d5b48; }
+.hero-address { display: block; margin-top: 18px; color: var(--muted); font-size: 12px; }
+.hero-photo { position: relative; }
+.hero-photo img { width: 100%; aspect-ratio: 1.08; object-fit: cover; border-radius: 120px 28px 28px 28px; }
+.hero-photo span { position: absolute; bottom: 20px; left: -20px; background: #e9a153; border-radius: 50%; width: 118px; height: 118px; display: grid; place-content: center; text-align: center; font-weight: 800; font-size: 14px; line-height: 1.4; white-space: pre-line; transform: rotate(-10deg); }
+.vip-notice { padding: 16px 22px; text-align: center; background: #edf0df; border-radius: 16px; font-size: 14px; }
+.section { margin-top: 56px; }
+h2 { font-size: clamp(25px, 3vw, 34px); line-height: 1.25; letter-spacing: -.04em; margin: 0 0 24px; }
+.section-content > p { color: var(--muted); }
+.formulas { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+.formula-card { overflow: hidden; background: white; border: 1px solid var(--line); border-radius: 24px; }
+.formula-photo { width: 100%; aspect-ratio: 1.9; object-fit: cover; }
+.formula-details { padding: 24px; display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; }
+.formula-title { font-size: 19px; font-weight: 800; }
+.formula-price { font-size: 22px; font-weight: 850; letter-spacing: -.04em; }
+.formula-details > div:last-child { grid-column: 1 / -1; font-size: 14px; color: var(--muted); }
+.catering-section { background: var(--ink); color: white; border-radius: 24px; padding: 32px; }
+.catering-section h2 { margin-bottom: 16px; }
+.catering-highlight { display: grid; gap: 16px; }
+.catering-badge { color: #f6c589; font-size: 12px; font-weight: 800; letter-spacing: .08em; }
+.catering-highlight strong { font-weight: 400; font-size: 15px; overflow-wrap: anywhere; }
+.catering-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 24px; }
+.catering-actions .button { background: #f5bb78; color: var(--ink); }
+.catering-actions > a { min-height: 48px; display: inline-flex; align-items: center; font-size: 14px; }
+.menu-table { background: white; border-radius: 20px; overflow: hidden; border: 1px solid var(--line); }
+table { width: 100%; border-collapse: collapse; font-size: 15px; }
+th { text-align: left; background: #edf0e6; font-size: 12px; color: var(--muted); }
+th, td { padding: 15px 22px; }
+td { border-top: 1px solid #eff0e9; }
+td:last-child, th:last-child { text-align: right; white-space: nowrap; }
+td:last-child { font-weight: 750; }
+.drinks-intro { font-weight: 700; }
+.drinks-list { display: flex; flex-wrap: wrap; gap: 10px; padding: 0; list-style: none; }
+.drinks-list li { background: #edf0e6; border-radius: 30px; padding: 10px 18px; font-size: 14px; }
+.offers-container { margin-top: 56px; }
+#offersSlider { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.offer-card { display: flex; align-items: center; gap: 18px; padding: 20px; border-radius: 20px; background: #f1ecdf; }
+.offer-image { flex: 0 0 90px; }
+.offer-image img { width: 90px; height: 110px; object-fit: cover; border-radius: 14px; }
+.offer-badge { font-size: 11px; color: #65552e; }
+.offer-content h3 { font-size: 18px; line-height: 1.3; margin: 6px 0; }
+.offer-content p { font-size: 13px; color: var(--muted); margin: 0; }
+#storySections { display: grid; grid-template-columns: 1fr 1fr; gap: 0 32px; }
+#storySections h2 { font-size: 23px; }
+#storySections .section { border-top: 1px solid var(--line); padding-top: 24px; }
+#storySections .section:last-child { grid-column: 1 / -1; }
+.info-box:not(.catering-highlight) { font-size: 14px; color: var(--muted); }
+.contact-info { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.contact-item { padding: 20px; background: #edf0e6; border-radius: 18px; font-size: 14px; }
+.contact-icon { margin-bottom: 8px; }
+.download-section { margin-top: 28px; }
+.site-footer { border-top: 1px solid var(--line); padding: 32px 0 120px; }
+.site-footer h2 { font-size: 20px; }
+.footer-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.footer-title { font-weight: 750; margin-bottom: 12px; font-size: 14px; }
+.footer-text, .footer-meta, .footer-links { font-size: 12px; color: var(--muted); overflow-wrap: anywhere; }
+.footer-meta, .footer-links { margin-top: 12px; }
+.mobile-actions { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; padding: 6px; background: #fff; border: 1px solid var(--line); border-radius: 40px; box-shadow: 0 8px 32px #183e3226; z-index: 5; }
+.mobile-actions a { padding: 12px 24px; min-height: 48px; border-radius: 30px; font-size: 14px; font-weight: 750; white-space: nowrap; text-decoration: none; text-align: center; }
+.mobile-actions a:first-child { background: var(--ink); color: white; }
+@media (max-width: 700px) {
+  .container { padding: 0 20px; }
+  .topbar { min-height: 82px; gap: 8px; }
+  .logo { width: 38px; height: 38px; }
+  .brand { font-size: 21px; }
+  .lang-switch button { padding: 7px 12px; }
+  .header { grid-template-columns: 1fr; gap: 24px; padding: 22px 0 28px; }
+  h1 { font-size: clamp(34px, 9.5vw, 54px); max-width: 520px; }
+  .eyebrow { font-size: 10px; margin-bottom: 14px; }
+  .hero-description { margin: 18px 0; font-size: 15px; }
+  .hero-address { display: inline-block; margin: 12px 0 0 10px; font-size: 11px; }
+  .hero-photo img { aspect-ratio: 1.65; border-radius: 64px 20px 20px 20px; }
+  .hero-photo span { width: 88px; height: 88px; left: auto; right: 12px; bottom: -12px; font-size: 11px; }
+  .vip-notice { font-size: 12px; padding: 14px 16px; }
+  .section { margin-top: 36px; }
+  h2 { font-size: 25px; margin-bottom: 18px; }
+  .formulas { grid-template-columns: 1fr; gap: 16px; }
+  .formula-photo { aspect-ratio: 2.05; }
+  .formula-details { padding: 18px 20px; }
+  .catering-section { padding: 24px; }
+  th, td { padding: 14px 16px; }
+  table { font-size: 14px; }
+  #offersSlider, #storySections, .footer-grid, .contact-info { grid-template-columns: 1fr; }
+  .offers-container { margin-top: 36px; }
+  .offer-card { padding: 16px; }
+  .contact-item { display: flex; align-items: start; gap: 12px; }
+  .site-footer { padding-bottom: 130px; }
+  .mobile-actions { width: calc(100% - 24px); max-width: 420px; bottom: max(10px, env(safe-area-inset-bottom)); }
+  .mobile-actions a { flex: 1; padding: 12px 8px; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+@media print { .mobile-actions, .lang-switch, .download-section { display: none; } .container { padding: 0; } .site-footer { padding-bottom: 0; } }

@@ -7,6 +7,7 @@ This repository supports a cloud-only restaurant workflow: frontend on Vercel, d
 - `index.html` is the internal cashier/staff ordering page in the current phase-2 operating model; do not use it as the public marketing surface for company/group meal messaging.
 - `box-meals.html`: mobile-first public marketing page exposed on Google Maps; static/promotional only.
 - `box-meals.html` is the public-facing marketing page and is the correct place for company/group catering messaging and contact instructions.
+- `box-meals.html` uses a mobile-first photo hero, formula cards, static promotional cards, and a fixed call/directions bar with bottom safe-area spacing. Keep formulas before the catering block and individual menu; keep all new labels in the selected language and do not link visitors into the internal cashier.
 - On `box-meals.html`, company/group catering information should appear directly below the formula offers and above the standard individual dishes, not be buried only in the footer.
 - The company/group catering block on `box-meals.html` should be visually emphasized so public visitors can identify that business-order contact path quickly.
 - `FACTURE.html`: invoice and receipt page.
